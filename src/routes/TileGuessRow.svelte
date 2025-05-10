@@ -1,17 +1,7 @@
 <script lang="ts">
-import TileRow from "./TileRow.svelte";
-import {Tile, TileType} from "./Tile.ts";
-import {backspaceGuess, consumeGuess, extendGuess, inputState} from "./inputState.svelte.ts";
-import {nextTileId} from "./uiState.svelte.ts";
+import {backspaceGuess, consumeGuess, extendGuess, uiState} from "./uiState.svelte.ts";
+import TileView from "./TileView.svelte";
 
-const tileIds = $state(new Array(5).fill(0).map(() => nextTileId()));
-
-const tiles = $derived(
-    inputState.guess
-        .padEnd(5, " ")
-        .split("")
-        .map((char, i) => new Tile(tileIds[i], TileType.Empty, char === " " ? "" : char))
-);
 
 const keydown = (event: KeyboardEvent) => {
     if (event.ctrlKey || event.altKey) return;
@@ -40,4 +30,20 @@ const keydown = (event: KeyboardEvent) => {
 
 <svelte:window onkeydown={keydown} />
 
-<TileRow {tiles} />
+<tile-row>
+    {#each uiState.guessTiles as tile, i}
+        <TileView
+            {tile}
+            isInputRow
+            isFlipping={uiState.isFlipping}
+            revealAnimationDelay={i * 100}
+        />
+    {/each}
+</tile-row>
+
+<style lang="scss">
+tile-row {
+    display: flex;
+    gap: 0.5rem;
+}
+</style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { backspaceGuess, consumeGuess, extendGuess } from "./inputState.svelte";
+import { backspaceGuess, consumeGuess, extendGuess } from "./uiState.svelte";
 import Key from "./Key.svelte";
 
 const keyRows = [

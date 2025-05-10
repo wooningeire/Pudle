@@ -1,7 +1,8 @@
 import { SvelteSet } from "svelte/reactivity";
 import { emplace, update } from "./emplace.ts";
-import { Tile, TileType } from "./Tile.ts";
+import { TileType, Tile } from "./Tile.ts";
 import { createWordGetter } from "./words.ts";
+import { ISLAND_SIZE_THRESHOLD, N_ROWS } from "./constants.ts";
 
 
 type InitialLoad = {
@@ -15,16 +16,22 @@ export const gameState = $state({
     currentGuess: "",
     guessedWordsThisRound: new SvelteSet<string>(),
     
-    board: new Array(9).fill(0).map(
-        () => new Array(5).fill(0).map(() => new Tile())
-    ),
+    board: new Array(5).fill(0).map(() => <Tile[]>[]),
 
     currentColors: {
         match: TileType.Green,
         misplaced: TileType.Yellow,
         absent: TileType.Gray,
     },
+
+    nextTileId: 0n,
+    guessTileIds: <bigint[]>[],
 });
+
+export const nextTileId = () => gameState.nextTileId++;
+
+gameState.guessTileIds = new Array(5).fill(0).map(() => nextTileId());
+
 
 export const initialLoadPromise = (async () => {
     gameState.initialLoad = {
@@ -45,6 +52,12 @@ const nextWord = () => {
     gameState.guessedWordsThisRound.clear();
 };
 
+export const nextWordIfGuessMatched = (guess: string) => {
+    if (guess === gameState.currentWord) {
+        nextWord();
+    }
+};
+
 export const isValidGuess = (guess: string) => {
     return (
         guess.length === 5
@@ -53,7 +66,9 @@ export const isValidGuess = (guess: string) => {
     );
 };
 
-const resultsOfGuess = (guess: string) => {
+export const resultsOfGuess = (guess: string) => {
+    gameState.guessedWordsThisRound.add(guess);
+
     const chars = guess.split("");
     const results = chars.map(() => MatchResult.Absent);
 
@@ -80,48 +95,123 @@ const resultsOfGuess = (guess: string) => {
         results[i] = MatchResult.Misplaced;
     }
 
-    return results;
+    return results.map((result, i) => {
+        switch (result) {
+            case MatchResult.Match:
+                return new Tile(gameState.guessTileIds[i], gameState.currentColors.match, guess[i]);
+            case MatchResult.Misplaced:
+                return new Tile(gameState.guessTileIds[i], gameState.currentColors.misplaced, guess[i]);
+            case MatchResult.Absent:
+                return new Tile(gameState.guessTileIds[i], gameState.currentColors.absent, guess[i]);
+        }
+    });
 };
 
 
 
-const placeTile = (column: number, tile: Tile) => {
-    if (tile.type === TileType.Empty) return true;
-
-    const lowestEmptyTileRow = gameState.board.findLastIndex(row => row[column].type === TileType.Empty);
-
-    if (lowestEmptyTileRow === -1) {
-        return false;
+export const placeNewTiles = (tiles: Tile[]) => {
+    for (const [i, tile] of tiles.entries()) {
+        gameState.board[i].push(tile);
     }
+};
 
-    gameState.board[lowestEmptyTileRow][column] = tile;
+
+export type Point = {
+    x: number,
+    y: number,
+};
+
+const hash = (point: Point) => {
+    const dataView = new DataView(new ArrayBuffer(16));
+    dataView.setFloat64(0, point.x);
+    dataView.setFloat64(8, point.y);
+    return (dataView.getBigUint64(0) << 8n) + (dataView.getBigUint64(8));
+};
+
+
+const pointIsInBoard = (x: number, y: number) => {
+    if (x < 0 || x >= 5) return false;
+    if (y < 0 || y >= gameState.board[x].length) return false;
+
     return true;
 };
 
 
-export const submitGuess = (guess: string) => {
-    if (guess === gameState.currentWord) {
-        nextWord();
-        return;
-    }
+export const locateIslands = () => {
+    const islands: Point[][] = [];
 
+    const visited = gameState.board.map(col => col.map(() => false));
 
-    gameState.guessedWordsThisRound.add(guess);
+    const dfsExplore = (x: number, y: number, targetColor: TileType, currentIsland: Point[]) => {
+        if (!pointIsInBoard(x, y)) return;
+        if (visited[x][y]) return;
 
-    const newTiles = resultsOfGuess(guess).map((result, i) => {
-        switch (result) {
-            case MatchResult.Match:
-                return new Tile(gameState.currentColors.match, guess[i]);
-            case MatchResult.Misplaced:
-                return new Tile(gameState.currentColors.misplaced, guess[i]);
-            case MatchResult.Absent:
-                return new Tile(gameState.currentColors.absent, guess[i]);
+        visited[x][y] = true;
+        const tile = gameState.board[x][y];
+        if (tile.type !== targetColor) return;
+
+        currentIsland.push({x, y});
+        
+        dfsExplore(x - 1, y, targetColor, currentIsland);
+        dfsExplore(x + 1, y, targetColor, currentIsland);
+        dfsExplore(x, y - 1, targetColor, currentIsland);
+        dfsExplore(x, y + 1, targetColor, currentIsland);
+    };
+
+    for (let x = 0; x < 5; x++) {
+        for (let y = 0; y < gameState.board[x].length; y++) {
+            const lookingForColor = gameState.board[x][y].type;
+            if (lookingForColor === TileType.Gray) continue;
+
+            const currentIsland: Point[] = [];
+            dfsExplore(x, y, lookingForColor, currentIsland);
+
+            if (currentIsland.length >= ISLAND_SIZE_THRESHOLD) {
+                islands.push(currentIsland);
+            }
         }
-    });
+    }
+    console.log(islands);
 
-    let pass = true;
-    for (const [i, tile] of newTiles.entries()) {
-        pass &&= placeTile(i, tile);
+    return islands;
+};
+
+export const getAdjacentGrays = (islands: Point[][]) => {
+    const eliminatedGrays: Point[] = [];
+
+    const visited = gameState.board.map(col => col.map(() => false));
+
+    const checkGray = (x: number, y: number) => {
+        if (!pointIsInBoard(x, y)) return;
+        if (visited[x][y]) return;
+
+        visited[x][y] = true;
+        const tile = gameState.board[x][y];
+        if (tile.type !== TileType.Gray) return;
+
+        eliminatedGrays.push({x, y});
+    };
+
+    for (const island of islands) {
+        for (const point of island) {
+            const {x, y} = point;
+            checkGray(x - 1, y);
+            checkGray(x + 1, y);
+            checkGray(x, y - 1);
+            checkGray(x, y + 1);
+        }
     }
 
+    return eliminatedGrays;
 };
+
+export const eliminateTiles = (islands: Point[][], grays: Point[]) => {
+    const eliminatedPoints = new Set([
+        ...islands.flat(),
+        ...grays,
+    ].map(point => hash(point)));
+
+    gameState.board = gameState.board.map(
+        (col, x) => col.filter((_, y) => !eliminatedPoints.has(hash({x, y})))
+    );
+}

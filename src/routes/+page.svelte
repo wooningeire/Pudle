@@ -9,9 +9,9 @@ import Letterboard from "./Letterboard.svelte";
     {#await initialLoadPromise}
         Loading
     {:then}
-        <Letterboard />
-
         <Keyboard />
+
+        <Letterboard />
     {:catch}
         Error, please reload
     {/await}
