@@ -1,4 +1,4 @@
-import { isValidGuess, nextWordIfGuessMatched, placeNewTiles, resultsOfGuess, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles } from "./gameState.svelte.ts";
+import { isValidGuess, nextWordIfGuessMatched, placeNewTiles, resultsOfGuess, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles, setNextGuessTiles } from "./gameState.svelte.ts";
 import { Tile, TileType } from "./Tile.ts";
 
 export const uiState = $state({
@@ -35,7 +35,11 @@ export const consumeGuess = () => {
         uiState.guess = "";
         uiState.isFlipping = false;
         resetGuessTiles();
-
+        setTimeout(() => {
+            setNextGuessTiles();
+            resetGuessTiles();
+        });
+    
 
         const islands = locateIslands();
 

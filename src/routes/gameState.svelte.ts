@@ -30,7 +30,10 @@ export const gameState = $state({
 
 export const nextTileId = () => gameState.nextTileId++;
 
-gameState.guessTileIds = new Array(5).fill(0).map(() => nextTileId());
+export const setNextGuessTiles = () => {
+    gameState.guessTileIds = new Array(5).fill(0).map(() => nextTileId());
+};
+setNextGuessTiles();
 
 
 export const initialLoadPromise = (async () => {
@@ -146,9 +149,11 @@ export const locateIslands = () => {
         if (!pointIsInBoard(x, y)) return;
         if (visited[x][y]) return;
 
-        visited[x][y] = true;
         const tile = gameState.board[x][y];
         if (tile.type !== targetColor) return;
+
+        visited[x][y] = true;
+        if (targetColor === TileType.Gray) return;
 
         currentIsland.push({x, y});
         
@@ -161,7 +166,6 @@ export const locateIslands = () => {
     for (let x = 0; x < 5; x++) {
         for (let y = 0; y < gameState.board[x].length; y++) {
             const lookingForColor = gameState.board[x][y].type;
-            if (lookingForColor === TileType.Gray) continue;
 
             const currentIsland: Point[] = [];
             dfsExplore(x, y, lookingForColor, currentIsland);
@@ -171,7 +175,6 @@ export const locateIslands = () => {
             }
         }
     }
-    console.log(islands);
 
     return islands;
 };

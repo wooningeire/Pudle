@@ -3,20 +3,40 @@ import TileGuessRow from "./TileGuessRow.svelte";
 import { N_ROWS } from "./constants";
 import TileView from "./TileView.svelte";
 import { gameState } from "./gameState.svelte";
+    import TileBg from "./TileBg.svelte";
+    import { flip } from "svelte/animate";
+    import { cubicInOut } from "svelte/easing";
 </script>
 
-<letter-board>
+<letter-board
+    style:--n-rows={N_ROWS}
+>
     <TileGuessRow />
 
-    <tile-grid>
-        {#each new Array(N_ROWS).fill(0) as _, x}
-            {#each gameState.board as column}
-                <TileView
-                    tile={column[N_ROWS - x - 1] ?? null}
-                />
+    <tile-grids>
+        <tile-grid>
+            {#each gameState.board as _}
+                {#each new Array(N_ROWS).fill(0) as _, x}
+                    <TileBg />
+                {/each}
             {/each}
-        {/each}
-    </tile-grid>
+        </tile-grid>
+
+        <tile-grid>
+            {#each gameState.board as column, x}
+                {#each column as tile, y (tile.id)}
+                    <tile-view-container
+                        animate:flip={{duration: 500, easing: cubicInOut}}
+                        style:grid-area="{N_ROWS - y}/{x + 1}"
+                    >
+                        {#if y < N_ROWS}
+                            <TileView {tile} />
+                        {/if}
+                    </tile-view-container>
+                {/each}
+            {/each}
+        </tile-grid>
+    </tile-grids>
 </letter-board>
 
 <style lang="scss">
@@ -26,9 +46,24 @@ letter-board {
     gap: 0.5rem;
 }
 
+tile-grids {
+    display: grid;
+    align-items: stretch;
+
+    > * {
+        grid-area: 1/1;
+    }
+}
+
 tile-grid {
     display: grid;
-    grid-template-columns: repeat(5, auto);
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(var(--n-rows), 1fr);
     gap: 0.5rem;
+}
+
+tile-view-container {
+    display: grid;
+    place-items: stretch;
 }
 </style>
