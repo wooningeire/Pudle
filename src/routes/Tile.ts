@@ -1,4 +1,4 @@
-export enum TileType {
+export enum TileColor {
     Empty,
     Yellow,
     Gray,
@@ -8,7 +8,8 @@ export enum TileType {
 export class Tile {
     constructor(
         readonly id: bigint,
-        readonly type: TileType = TileType.Empty,
+        readonly color: TileColor = TileColor.Empty,
         readonly letter: string = "",
+        readonly currentWordColor: TileColor | null = null,
     ) {}
 }

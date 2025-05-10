@@ -2,26 +2,34 @@
 import { fade } from "svelte/transition";
 import {Tile} from "./Tile.ts";
     import TileContent from "./TileContent.svelte";
+    import { N_ROWS } from "./constants.ts";
 
 const {
     tile = null,
     isInputRow = false,
     flipping = false,
     revealAnimationDelay = 0,
+    hidden = false,
+    x = null,
+    y = null,
 }: {
     tile?: Tile | null,
     isInputRow?: boolean,
     flipping?: boolean,
     revealAnimationDelay?: number,
+    hidden?: boolean,
+    x?: number | null,
+    y?: number | null,
 } = $props();
 </script>
 
 
-<tile-bg-container>
+<tile-bg-container style:grid-area={x !== null && y !== null ? `${N_ROWS - y}/${x + 1}` : ""}>
     <tile-bg
         class:filled={isInputRow && (tile?.letter.length ?? 0) > 0}
         class:flipping
-        style:--reveal-animation-delay={`${revealAnimationDelay}ms`}
+        class:hidden
+        style:--reveal-animation-delay="{revealAnimationDelay}ms"
     >
         {#if tile !== null && isInputRow}
             <span transition:fade={{duration: 50}}>{tile.letter}</span>
@@ -59,7 +67,8 @@ tile-bg {
 
     transition:
         outline 0.125s ease-in-out,
-        outline-offset 0.075s ease-in-out;
+        outline-offset 0.075s ease-in-out,
+        opacity 0.175s ease-in-out;
     outline: 2px solid #aaa;
     outline-offset: -0.5rem;
 
@@ -72,6 +81,11 @@ tile-bg {
                 transform: scale(1.125);
             }
         }
+    }
+
+    &.hidden {
+        opacity: 0;
+        transition-delay: 0.25s;
     }
 
     &.flipping {

@@ -1,5 +1,7 @@
 <script lang="ts">
+    import CurrentWordInfo from "./CurrentWordInfo.svelte";
 import { initialLoadPromise } from "./gameState.svelte";
+    import GameStatus from "./GameStatus.svelte";
 import "./index.scss";
 import Keyboard from "./Keyboard.svelte";
 import Letterboard from "./Letterboard.svelte";
@@ -9,9 +11,15 @@ import Letterboard from "./Letterboard.svelte";
     {#await initialLoadPromise}
         Loading
     {:then}
-        <Keyboard />
+        <center-content>
+            <Keyboard />
 
-        <Letterboard />
+            <Letterboard />
+
+            <GameStatus />
+
+            <CurrentWordInfo />
+        </center-content>
     {:catch}
         Error, please reload
     {/await}
@@ -19,15 +27,21 @@ import Letterboard from "./Letterboard.svelte";
 
 <style lang="scss">
 main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    gap: 2rem;
+    display: grid;
+    place-items: center;
     
     width: 100vw;
     height: 100vh;
-    user-select: none;
+}
+
+center-content {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-rows: auto auto;
+
+    gap: 2rem;
 }
 </style>

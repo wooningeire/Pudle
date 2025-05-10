@@ -11,13 +11,17 @@ import { gameState } from "./gameState.svelte";
 <letter-board
     style:--n-rows={N_ROWS}
 >
-    <TileGuessRow />
-
     <tile-grids>
         <tile-grid>
-            {#each gameState.board as _}
-                {#each new Array(N_ROWS).fill(0) as _, x}
-                    <TileBg />
+            <TileGuessRow />
+
+            {#each gameState.board as column, x}
+                {#each new Array(N_ROWS - 1).fill(0) as _, y}
+                    <TileBg
+                        hidden={column.length > y}
+                        {x}
+                        {y}
+                    />
                 {/each}
             {/each}
         </tile-grid>
@@ -41,9 +45,11 @@ import { gameState } from "./gameState.svelte";
 
 <style lang="scss">
 letter-board {
+    grid-area: 2/2;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    user-select: none;
 }
 
 tile-grids {

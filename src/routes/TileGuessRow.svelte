@@ -1,9 +1,6 @@
 <script lang="ts">
-import {backspaceGuess, consumeGuess, extendGuess, uiState} from "./uiState.svelte.ts";
-    import TileBg from "./TileBg.svelte";
-    import { gameState } from "./gameState.svelte.ts";
-    import { N_ROWS } from "./constants.ts";
-    import TileContent from "./TileContent.svelte";
+import {backspaceGuess, consumeGuess, extendGuess, uiState } from "./uiState.svelte.ts";
+import TileBg from "./TileBg.svelte";
 
 
 const keydown = (event: KeyboardEvent) => {
@@ -28,41 +25,19 @@ const keydown = (event: KeyboardEvent) => {
 
     extendGuess(key);
 };
-
-enum TileSource {
-    Guessing,
-    LastGuess,
-}
-
-const tiles = $derived(
-    new Array(5).fill(0).map((_, i) => gameState.board[i].length > N_ROWS
-        ? {tile: gameState.board[i][N_ROWS], source: TileSource.LastGuess}
-        : {tile: uiState.guessTiles[i], source: TileSource.Guessing}
-    )
-);
 </script>
 
 
 <svelte:window onkeydown={keydown} />
 
-<tile-row>
-    {#each tiles as {tile, source}, i}
-        <tile-entry>
-            <TileBg
-                tile={source === TileSource.Guessing ? tile : null}
-                isInputRow
-                flipping={uiState.isFlipping}
-                revealAnimationDelay={i * 100}
-            />
-    
-            {#if source === TileSource.LastGuess}
-                <TileContent
-                    {tile}
-                />
-            {/if}
-        </tile-entry>
-    {/each}
-</tile-row>
+{#each uiState.guessTiles as tile, i}
+    <TileBg
+        {tile}
+        isInputRow
+        flipping={uiState.flipping}
+        revealAnimationDelay={i * 100}
+    />
+{/each}
 
 <style lang="scss">
 tile-row {

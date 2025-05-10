@@ -2,6 +2,16 @@
     box-sizing: border-box;
 }
 
+:root {
+    --tile-green: #66a166;
+    --tile-yellow: #bbb660;
+    --tile-gray: #7c7c81;
+
+    --tile-green-dark: #457462;
+    --tile-yellow-dark: #75704c;
+    --tile-gray-dark: #4a4a55;
+}
+
 body {
     margin: 0;
     font-family: Belanosima, sans-serif;

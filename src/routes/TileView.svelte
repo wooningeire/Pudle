@@ -1,5 +1,5 @@
 <script lang="ts">
-import {Tile, TileType} from "./Tile.ts";
+import {Tile, TileColor} from "./Tile.ts";
 import TileContent from "./TileContent.svelte";
     import { fade, type TransitionConfig } from "svelte/transition";
     import { cubicOut } from "svelte/easing";
@@ -39,4 +39,3 @@ tile-view {
     }
 }
 </style>
-

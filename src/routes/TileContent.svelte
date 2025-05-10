@@ -1,5 +1,6 @@
 <script lang="ts">
-import {Tile, TileType} from "./Tile.ts";
+import {Tile, TileColor} from "./Tile.ts";
+    import { getTileTypeCssColor } from "./tileColors.ts";
 import { receive, send } from "./transition.ts";
     import { cubicIn, cubicInOut, cubicOut, quadIn } from "svelte/easing";
 
@@ -12,6 +13,11 @@ const {
     flipping?: boolean,
     revealAnimationDelay?: number,
 } = $props();
+
+const hasTab = $derived(tile.currentWordColor !== null && tile.currentWordColor !== tile.color);
+
+const bgColor = $derived(getTileTypeCssColor(tile.color));
+const tabColor = $derived(tile.currentWordColor !== null ? getTileTypeCssColor(tile.currentWordColor!) : bgColor);
 </script>
 
 
@@ -19,12 +25,12 @@ const {
     in:receive|global={{key: tile.id, easing: cubicInOut, duration: 500}}
     out:send|global={{key: tile.id, easing: cubicInOut, duration: 500}}
     class:flipping
-    class:green={tile.type === TileType.Green}
-    class:yellow={tile.type === TileType.Yellow}
-    class:gray={tile.type === TileType.Gray}
+    style:--bg-color={bgColor}
+    class:has-tab={hasTab}
     style:--reveal-animation-delay="{revealAnimationDelay}ms"
+    style:--tab-color={tabColor}
 >
-    {tile.letter}
+    <div>{tile.letter}</div>
 </tile-content>
 
 
@@ -36,16 +42,18 @@ tile-content {
     place-items: center;
     color: #fff;
 
-    &.green {
-        background: #66a166;
-    }
 
-    &.yellow {
-        background: #bbb660;
-    }
+    background: linear-gradient(135deg, var(--bg-color) 80%, #0000 80%, #0000 85%, var(--tab-color) 85%);
+    background-repeat: no-repeat;
+    background-size: 4.5rem 4.5rem;
 
-    &.gray {
-        background: #7c7c81;
+    transition: background-position 0.25s cubic-bezier(.04,.64,.2,1.43);
+
+    &:not(.has-tab) {
+        background-position: 0;
+    }
+    &.has-tab {
+        background-position: -1.25rem -1.25rem;
     }
 
     &.flipping {
@@ -71,6 +79,8 @@ tile-content {
             }
         }
     }
+
+
 }
 </style>
 

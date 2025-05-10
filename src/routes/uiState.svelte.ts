@@ -1,65 +1,84 @@
-import { isValidGuess, nextWordIfGuessMatched, placeNewTiles, resultsOfGuess, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles, setNextGuessTiles } from "./gameState.svelte.ts";
-import { Tile, TileType } from "./Tile.ts";
+import { isValidGuess, nextWordIfGuessMatched, placeNewTiles, recordGuess, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles, setNextGuessTiles, isGameOver, createTilesFromGuess, updateKnownInfoFromTiles, recalculateExistingTiles } from "./gameState.svelte.ts";
+import { Tile, TileColor } from "./Tile.ts";
 
 export const uiState = $state({
     guess: "",
     inputLocked: false,
-    isFlipping: false,
+    flipping: false,
     guessTiles: <Tile[]>[],
     currentIslands: <Point[][]>[],
     currentGrays: <Point[]>[],
+    gameOver: false,
 });
 
 const resetGuessTiles = () => {
     uiState.guessTiles = uiState.guess
         .padEnd(5, " ")
         .split("")
-        .map((char, i) => new Tile(gameState.guessTileIds[i], TileType.Empty, char === " " ? "" : char));
+        .map((char, i) => new Tile(gameState.guessTileIds[i], TileColor.Empty, char === " " ? "" : char));
 };
 
 resetGuessTiles();
 
-export const consumeGuess = () => {
+const wait = (ms: number=0) => new Promise(resolve => {
+    setTimeout(resolve, ms);
+});
+
+export const consumeGuess = async () => {
     if (uiState.inputLocked) return;
     if (!isValidGuess(uiState.guess)) return;
 
+    recordGuess(uiState.guess);
+    const results = createTilesFromGuess(uiState.guess);
+
     uiState.inputLocked = true;
-    uiState.isFlipping = true;
-    const results = resultsOfGuess(uiState.guess);
-    uiState.guessTiles = results.map((tile, i) => new Tile(gameState.guessTileIds[i], tile.type, tile.letter));
+    uiState.flipping = true;
+    uiState.guessTiles = <Tile[]>results;
 
-    setTimeout(() => {
-        nextWordIfGuessMatched(uiState.guess);
-        placeNewTiles(results);
+    await wait(850);
 
-        uiState.guess = "";
-        uiState.isFlipping = false;
-        resetGuessTiles();
-        setTimeout(() => {
-            setNextGuessTiles();
-            resetGuessTiles();
-        });
-    
+    placeNewTiles(results);
+    updateKnownInfoFromTiles(results);
 
+    const matched = nextWordIfGuessMatched(uiState.guess);
+
+    uiState.guess = "";
+    uiState.flipping = false;
+    resetGuessTiles();
+
+    await wait(0);
+
+    setNextGuessTiles();
+    resetGuessTiles();
+
+
+    while (true) {
         const islands = locateIslands();
+        if (islands.length === 0) break;
 
-        if (islands.length === 0) {
-            uiState.inputLocked = false;
-            return;
-        }
-
-        
         const grays = getAdjacentGrays(islands);
-
         
         uiState.currentIslands = islands;
         uiState.currentGrays = grays;
 
-        setTimeout(() => {
-            eliminateTiles(islands, grays);
-            uiState.inputLocked = false;
-        }, 850);
-    }, 850);
+        await wait(500);
+
+        eliminateTiles(islands, grays);
+    }
+
+    if (matched) {
+        await wait(750);
+
+        recalculateExistingTiles();
+    }
+    
+    if (isGameOver()) {
+        uiState.gameOver = true;
+        return;
+    }
+    
+    gameState.stats.nGuessesMade++;
+    uiState.inputLocked = false;
 };
 export const backspaceGuess = () => {
     if (uiState.inputLocked) return;

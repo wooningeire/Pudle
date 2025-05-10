@@ -24,6 +24,7 @@ const keyRows = [
                 <Key
                     label={char}
                     onClick={() => extendGuess(char)}
+                    colorable
                 />
             {/each}
 
@@ -41,11 +42,13 @@ const keyRows = [
 
 <style lang="scss">
 key-board {
+    grid-area: 1/2;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     align-items: center;
     font-size: 1.5rem;
+    user-select: none;
 }
 
 key-row {
