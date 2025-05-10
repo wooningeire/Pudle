@@ -1,5 +1,5 @@
 <script lang="ts">
-import {backspaceGuess, consumeGuess, extendGuess, uiState } from "./uiState.svelte.ts";
+import {backspaceGuess, consumeGuess, extendGuess, uiState } from "$lib/state/uiState.svelte.ts";
 import TileBg from "./TileBg.svelte";
 
 

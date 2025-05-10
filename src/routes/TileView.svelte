@@ -1,5 +1,5 @@
 <script lang="ts">
-import {Tile, TileColor} from "./Tile.ts";
+import {Tile, TileColor} from "$lib/types/Tile.ts";
 import TileContent from "./TileContent.svelte";
     import { fade, type TransitionConfig } from "svelte/transition";
     import { cubicOut } from "svelte/easing";

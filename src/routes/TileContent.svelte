@@ -1,6 +1,6 @@
 <script lang="ts">
-import {Tile, TileColor} from "./Tile.ts";
-    import { getTileTypeCssColor } from "./tileColors.ts";
+import {Tile, TileColor} from "$lib/types/Tile.ts";
+    import { getTileTypeCssColor } from "$lib/types/tileColors.ts";
 import { receive, send } from "./transition.ts";
     import { cubicIn, cubicInOut, cubicOut, quadIn } from "svelte/easing";
 

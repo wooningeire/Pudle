@@ -1,8 +1,8 @@
 import { SvelteMap, SvelteSet } from "svelte/reactivity";
-import { emplace, update } from "./emplace.ts";
-import { TileColor, Tile } from "./Tile.ts";
-import { createWordGetter } from "./words.ts";
-import { ISLAND_SIZE_THRESHOLD, N_ROWS } from "./constants.ts";
+import { emplace, update } from "$lib/emplace.ts";
+import { TileColor, Tile } from "$lib/types/Tile.ts";
+import { createWordGetter } from "$lib/words.ts";
+import { ISLAND_SIZE_THRESHOLD, N_ROWS } from "$lib/constants.ts";
 
 
 type InitialLoad = {

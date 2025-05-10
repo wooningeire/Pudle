@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { gameState } from "./gameState.svelte";
-    import { getTileTypeCssColor, getTileTypeCssColorDark } from "./tileColors";
-    import { uiState } from "./uiState.svelte";
+    import { gameState } from "$lib/state/gameState.svelte.ts";
+    import { getTileTypeCssColor, getTileTypeCssColorDark } from "$lib/types/tileColors.ts";
+    import { uiState } from "$lib/state/uiState.svelte.ts";
 
 const {
     onClick,

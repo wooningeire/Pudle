@@ -1,8 +1,8 @@
 <script lang="ts">
 import { fade } from "svelte/transition";
-import {Tile} from "./Tile.ts";
+import {Tile} from "$lib/types/Tile.ts";
     import TileContent from "./TileContent.svelte";
-    import { N_ROWS } from "./constants.ts";
+    import { N_ROWS } from "$lib/constants.ts";
 
 const {
     tile = null,

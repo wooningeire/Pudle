@@ -1,6 +1,6 @@
 <script lang="ts">
     import CurrentWordInfo from "./CurrentWordInfo.svelte";
-import { initialLoadPromise } from "./gameState.svelte";
+import { initialLoadPromise } from "$lib/state/gameState.svelte.ts";
     import GameStatus from "./GameStatus.svelte";
 import "./index.scss";
 import Keyboard from "./Keyboard.svelte";

@@ -1,8 +1,8 @@
 <script lang="ts">
 import TileGuessRow from "./TileGuessRow.svelte";
-import { N_ROWS } from "./constants";
+import { N_ROWS } from "$lib/constants.ts";
 import TileView from "./TileView.svelte";
-import { gameState } from "./gameState.svelte";
+import { gameState } from "$lib/state/gameState.svelte.ts";
     import TileBg from "./TileBg.svelte";
     import { flip } from "svelte/animate";
     import { cubicInOut } from "svelte/easing";

@@ -1,5 +1,5 @@
 import { isValidGuess, nextWordIfGuessMatched, placeNewTiles, recordGuess, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles, setNextGuessTiles, isGameOver, createTilesFromGuess, updateKnownInfoFromTiles, recalculateExistingTiles } from "./gameState.svelte.ts";
-import { Tile, TileColor } from "./Tile.ts";
+import { Tile, TileColor } from "$lib/types/Tile.ts";
 
 export const uiState = $state({
     guess: "",

@@ -1,5 +1,5 @@
 <script>
-    import { gameState } from "./gameState.svelte";
+    import { gameState } from "$lib/state/gameState.svelte.ts";
 
 </script>
 

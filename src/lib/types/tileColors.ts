@@ -1,4 +1,4 @@
-import { Tile, TileColor } from "./Tile.ts";
+import { Tile, TileColor } from "$lib/types/Tile.ts";
 
 
 const colorsMap = new Map<TileColor, string>([
