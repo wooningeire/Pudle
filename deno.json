@@ -1,0 +1,29 @@
+{
+	"tasks": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+	},
+  "imports": {
+    "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.4",
+    "@sveltejs/adapter-static": "npm:@sveltejs/adapter-static@^3.0.8",
+    "@sveltejs/kit": "npm:@sveltejs/kit@^2.20.8",
+    "@sveltejs/vite-plugin-svelte": "npm:@sveltejs/vite-plugin-svelte@^5.0.3",
+    "sass": "npm:sass@^1.87.0",
+    "svelte": "npm:svelte@^5.28.2",
+    "svelte-check": "npm:svelte-check@^4.1.7",
+    "typescript": "npm:typescript@^5.8.3",
+    "vite": "npm:vite@^6.3.5"
+  },
+  "nodeModulesDir": "auto",
+  "compilerOptions": {
+    "checkJs": true,
+    "strict": true
+  },
+  "unstable": [
+    "sloppy-imports"
+  ]
+}
