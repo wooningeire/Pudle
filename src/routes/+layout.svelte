@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { Snippet } from "svelte";
-import "./index.scss";
+import "#/index.scss";
 
 const {
     children,

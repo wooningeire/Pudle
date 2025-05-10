@@ -1,6 +1,6 @@
 <script lang="ts">
 import {backspaceGuess, consumeGuess, extendGuess, uiState } from "$lib/state/uiState.svelte.ts";
-import TileBg from "./TileBg.svelte";
+import TileBg from "#/TileBg.svelte";
 
 
 const keydown = (event: KeyboardEvent) => {

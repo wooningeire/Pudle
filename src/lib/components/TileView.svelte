@@ -1,6 +1,6 @@
 <script lang="ts">
 import {Tile, TileColor} from "$lib/types/Tile.ts";
-import TileContent from "./TileContent.svelte";
+import TileContent from "#/TileContent.svelte";
     import { fade, type TransitionConfig } from "svelte/transition";
     import { cubicOut } from "svelte/easing";
 
@@ -28,7 +28,7 @@ const explode = (node: HTMLElement, params: TransitionConfig, options: {directio
 </tile-view>
 
 <style lang="scss">
-@import "./mixins.scss";
+@import "#/mixins.scss";
 tile-view {
     @include tile;
     display: grid;

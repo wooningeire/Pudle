@@ -1,6 +1,6 @@
 <script lang="ts">
 import { backspaceGuess, consumeGuess, extendGuess } from "$lib/state/uiState.svelte.ts";
-import Key from "./Key.svelte";
+import Key from "#/Key.svelte";
 
 const keyRows = [
     "QWERTYUIOP",

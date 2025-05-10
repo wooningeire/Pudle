@@ -1,7 +1,7 @@
 <script lang="ts">
 import {Tile, TileColor} from "$lib/types/Tile.ts";
     import { getTileTypeCssColor } from "$lib/types/tileColors.ts";
-import { receive, send } from "./transition.ts";
+import { receive, send } from "#/transition.ts";
     import { cubicIn, cubicInOut, cubicOut, quadIn } from "svelte/easing";
 
 const {
@@ -35,7 +35,7 @@ const tabColor = $derived(tile.currentWordColor !== null ? getTileTypeCssColor(t
 
 
 <style lang="scss">
-@import "./mixins.scss";
+@import "#/mixins.scss";
 
 tile-content {
     display: grid;
