@@ -1,9 +1,9 @@
-import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles, setNextGuessTiles, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess, removeTags } from "./gameState.svelte.ts";
+import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles, setNextGuessTiles, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess, removeTags, resetGameState } from "./gameState.svelte.ts";
 import { Tile, TileColor } from "$lib/types/Tile.ts";
-import { guessMatches, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo } from "./roundState.svelte.ts";
+import { guessMatches, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, resetRoundState } from "./roundState.svelte.ts";
 import { TileTag } from "$lib/types/TileTag.ts";
 
-export const uiState = $state({
+const uiStateInitial = {
     guess: "",
     inputLocked: false,
     flipping: false,
@@ -11,7 +11,9 @@ export const uiState = $state({
     currentIslands: <Point[][]>[],
     currentGrays: <Point[]>[],
     gameOver: false,
-});
+};
+
+export const uiState = $state(structuredClone(uiStateInitial));
 
 const resetGuessTiles = () => {
     uiState.guessTiles = uiState.guess
@@ -59,10 +61,10 @@ const destroyCellsIfApplicable = async () => {
 
         const grays = getAdjacentGrays(islands);
         
+        await wait(750);
+        
         uiState.currentIslands = islands;
         uiState.currentGrays = grays;
-
-        await wait(1000);
 
         eliminateTiles(islands, grays);
     }
@@ -91,7 +93,7 @@ export const consumeGuess = async () => {
     uiState.flipping = false;
     resetGuessTiles();
 
-    await wait(isFirstGuess() ? 1500 : 250);
+    await wait(isFirstGuess() ? 1500 : 500); // falling animation
 
     setNextGuessTiles();
     resetGuessTiles();
@@ -99,22 +101,28 @@ export const consumeGuess = async () => {
     await destroyCellsIfApplicable();
 
     if (guessMatches(guess)) {
+        await wait(500);
+
         await nextWord();
         gameState.stats.nthWord++;
     }
+
+    await wait(250);
 
     const tags = checkIfTilesNeedTagging();
 
     if (tags.length > 0) {
         removeTags(tags);
 
-        await wait(250);
+        await wait(500);
         
         applyTags(tags);
     }
 
 
     if (isGameOver()) {
+        await wait(500);
+
         uiState.gameOver = true;
         return;
     }
@@ -136,4 +144,10 @@ export const extendGuess = (char: string) => {
 
     uiState.guess += char;
     resetGuessTiles();
+};
+
+export const reset = () => {
+    Object.assign(uiState, structuredClone(uiStateInitial));
+    resetGameState();
+    resetRoundState();
 };

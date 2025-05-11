@@ -5,6 +5,7 @@
 :root {
     --off-black: #42444b;
         
+    --light-green: #8dc28d;
     --tile-green: #66a166;
     --tile-yellow: #bbb660;
     --tile-gray: #7c7c81;
@@ -12,6 +13,9 @@
     --tile-green-dark: #457462;
     --tile-yellow-dark: #75704c;
     --tile-gray-dark: #4a4a55;
+
+    --button-bg: #f0f1ee;
+    --button-bg-dark: #bdc7bf;
 
     --tile-flip-duration-first-guess: 0.5s;
 }

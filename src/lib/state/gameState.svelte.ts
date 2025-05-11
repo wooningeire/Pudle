@@ -4,7 +4,7 @@ import { ISLAND_SIZE_THRESHOLD, N_ROWS } from "$lib/constants.ts";
 import { MatchResult } from "$lib/types/MatchResult.ts";
 import type { TileTag } from "../types/TileTag";
 
-export const gameState = $state({
+const gameStateInitial = {
     board: new Array(5).fill(0).map(() => <Tile[]>[]),
 
     currentColors: {
@@ -27,7 +27,9 @@ export const gameState = $state({
     lastTimeout: 0,
 
     hasRestarted: false,
-});
+};
+
+export const gameState = $state(structuredClone(gameStateInitial));
 
 export const nextTileId = () => gameState.nextTileId++;
 
@@ -159,10 +161,13 @@ export const getAdjacentGrays = (islands: Point[][]) => {
     for (const island of islands) {
         for (const point of island) {
             const {x, y} = point;
+            checkGray(x - 1, y - 1);
             checkGray(x - 1, y);
-            checkGray(x + 1, y);
+            checkGray(x - 1, y + 1);
             checkGray(x, y - 1);
             checkGray(x, y + 1);
+            checkGray(x + 1, y - 1);
+            checkGray(x + 1, y + 1);
         }
     }
 
@@ -207,3 +212,9 @@ export const pauseTimer = () => {
 };
 
 export const isFirstGuess = () => !gameState.hasRestarted && gameState.stats.nthGuess === 1;
+
+
+export const resetGameState = () => {
+    Object.assign(gameState, structuredClone(gameStateInitial));
+    gameState.hasRestarted = true;
+};

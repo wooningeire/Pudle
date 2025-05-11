@@ -1,10 +1,8 @@
 <script lang="ts">
-    import RightPanel from "#/RightPanel.svelte";
-    import LeftPanel from "#/LeftPanel.svelte";
-import Keyboard from "#/Keyboard.svelte";
-import Letterboard from "#/Letterboard.svelte";
     import { onMount } from "svelte";
     import { setupInitialLoad } from "$lib/state/initialLoadState.svelte";
+    import GamePage from "@/lib/components/GamePage.svelte";
+    import LoadingScreen from "@/lib/components/LoadingScreen.svelte";
 
 
 let initialLoadPromise = $state<Promise<void>>(new Promise(resolve => {
@@ -18,17 +16,9 @@ let initialLoadPromise = $state<Promise<void>>(new Promise(resolve => {
 
 <main>
     {#await initialLoadPromise}
-        Loading
+        <LoadingScreen />
     {:then}
-        <center-content>
-            <Keyboard />
-
-            <Letterboard />
-
-            <LeftPanel />
-
-            <RightPanel />
-        </center-content>
+        <GamePage />
     {:catch}
         Error, please reload
     {/await}
@@ -41,17 +31,5 @@ main {
     
     width: 100vw;
     height: 100vh;
-}
-
-center-content {
-    display: grid;
-    align-items: center;
-    justify-items: center;
-
-    grid-template-columns: 1fr auto 1fr;
-    grid-template-rows: auto auto;
-
-    gap: 2rem;
-    perspective: 50rem;
 }
 </style>

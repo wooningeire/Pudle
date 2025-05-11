@@ -22,7 +22,7 @@ const {
         crossorigin
     />
     <link
-        href="https://fonts.googleapis.com/css2?family=Belanosima:wght@400;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Shanti&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Belanosima:wght@400;700&display=swap"
         rel="stylesheet"
     />
 </svelte:head>
@@ -30,8 +30,12 @@ const {
 <style lang="scss">
 @import "#/constants.scss";
 :global(:root) {
-    @media screen and (max-width: $xxsmall-view) {
+    @media screen and (max-height: $small-height), (max-width: $xxsmall-width) {
         font-size: 0.85em;
+
+        @media screen and (max-height: $xsmall-height) {
+            font-size: 0.65em;
+        }
     }
 }
 </style>

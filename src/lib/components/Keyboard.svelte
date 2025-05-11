@@ -45,7 +45,7 @@ const keyRows = [
 
 <style lang="scss">
 key-board {
-    grid-area: 1/2;
+    grid-area: 2/2;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;

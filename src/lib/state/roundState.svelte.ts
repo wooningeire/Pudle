@@ -17,13 +17,14 @@ export type KnownLetterInfo = {
     positionInfo: PositionType[],
 };
 
-
-export const roundState = $state({
+const roundStateInitial = {
     word: "",
     guessedWords: new SvelteMap<string, MatchResult[]>(),
     knownLetterInfo: <Record<string, KnownLetterInfo>>{},
     ready: false,
-});
+};
+
+export const roundState = $state(structuredClone(roundStateInitial));
 
 
 const forEachLetter = (fn: (char: string) => void) => {
@@ -112,12 +113,24 @@ const updateInfoFromResult = (i: number, char: string, result: MatchResult) => {
     }
 };
 
+const updateInfoFromElimination = () => {
+    for (const info of Object.values(roundState.knownLetterInfo)) {
+        if (info.positionInfo.filter(positionType => positionType === PositionType.MustNotBeInPosition).length !== 4) continue;
+
+        const lastIndex = info.positionInfo.findIndex(positionType => positionType === PositionType.NoInfo);
+        if (lastIndex === -1) continue;
+
+        info.positionInfo[lastIndex] = PositionType.MustBeInPosition;
+    }
+};
+
 export const updateKnownLetterInfo = (guess: string, matchResults: MatchResult[]) => {
     for (const [i, result] of matchResults.entries()) {
         if (guess[i] === " " || result === MatchResult.Empty) continue;
 
         updateInfoFromResult(i, guess[i], result);
     }
+    updateInfoFromElimination();
 };
 
 export const isValidGuess = async (guess: string) => {
@@ -166,4 +179,8 @@ export const matchResults = (guess: string) => {
     }
 
     return results;
+};
+
+export const resetRoundState = () => {
+    Object.assign(roundState, structuredClone(roundStateInitial));
 };

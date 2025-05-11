@@ -55,11 +55,11 @@ const disabled = $derived(uiState.inputLocked || forceDisabled);
 
 <style lang="scss">
 key-view {
-    --box-shadow-color: #bfbdc7;
+    --box-shadow-color: var(--button-bg-dark);
 
     display: grid;
     place-items: center;
-    background: #ececec;
+    background: var(--button-bg);
     box-shadow: 0 0.25rem var(--box-shadow-color);
     width: 2rem;
     height: 3rem;
@@ -71,7 +71,18 @@ key-view {
         color 0.175s ease-in-out,
         opacity 0.5s cubic-bezier(.14,.67,.2,1.43),
         transform 0.5s cubic-bezier(.14,.67,.2,1.43),
-        filter 0.25s ease-in-out;
+        filter 0.125s ease-in-out;
+
+    &:hover,
+    &:focus {
+        transform: translateY(-0.125rem);
+        filter: brightness(1.125);
+    }
+
+    &:active {
+        transform: translateY(-0.125rem);
+        filter: brightness(0.85);
+    }
 
     &.small {
         font-size: 1rem;

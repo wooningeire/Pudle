@@ -1,86 +1,48 @@
 <script>
-    import { gameState, isFirstGuess } from "$lib/state/gameState.svelte.ts";
-
+import { gameState, isFirstGuess } from "$lib/state/gameState.svelte.ts";
+    import { fly } from "svelte/transition";
+import { uiState } from "../state/uiState.svelte";
+import Button from "./Button.svelte";
+import GameOverOptions from "./GameOverOptions.svelte";
+import GameStats from "./GameStats.svelte";
+    import { quartOut } from "svelte/easing";
 </script>
 
 
-<game-status class:hidden={isFirstGuess()}>
-    {#key gameState.stats.nthWord}
-        <game-stat class="nth-word">
-            <stat-label>word</stat-label>
-            <stat-number>{gameState.stats.nthWord}</stat-number>
-        </game-stat>
-    {/key}
+{#if !isFirstGuess()}
+    <left-panel in:fly={{duration: 2000, easing: quartOut}}>
+        <GameStats />
 
-    {#key gameState.stats.nthGuess}
-        <game-stat class="nth-guess">
-            <stat-label>guess</stat-label>
-            <stat-number>{gameState.stats.nthGuess}</stat-number>
-        </game-stat>
-    {/key}
-</game-status>
+        {#if uiState.gameOver}
+            <GameOverOptions />
+        {/if}
+    </left-panel>
+{/if}
 
 
 <style lang="scss">
 @import "#/constants.scss";
-game-status {
-    grid-area: 1/1 / 3/2;
-    align-self: start;
-    justify-self: end;
+
+left-panel {
+    grid-area: 2/1 / 4/2;
+    place-self: stretch;
     display: flex;
     flex-direction: column;
-    gap: 3rem;
+    align-items: end;
+    justify-content: space-between;
 
-    text-align: right;
-    line-height: 0.8;
-
-
-    transition: opacity 2s ease-in-out;
-    &.hidden {
-        opacity: 0;
-    }
-
-    transform: rotateY(25deg) scale(var(--scale-fac));
+    transform: rotateY(35deg) scale(var(--scale-fac));
     transform-origin: right;
 
     --scale-fac: 1;
-    @media screen and (max-width: $small-view) {
+    @media screen and (max-width: $small-width) {
         --scale-fac: 0.75;
     }
-    @media screen and (max-width: $xsmall-view) {
+    @media screen and (max-width: $xsmall-width) {
         display: none;
     }
-}
 
-game-stat {
-    display: flex;
-    flex-direction: column;
-}
-
-stat-label {
-    font-size: 2rem;
-}
-stat-number {
-    font-size: 4rem;
-}
-
-.nth-word {
-    animation: pulse-green 1s linear;
-
-    @keyframes pulse-green {
-        0% {
-            color: var(--tile-green);
-        }
-    }
-}
-
-.nth-guess {
-    animation: pulse-yellow 1s linear;
-
-    @keyframes pulse-yellow {
-        0% {
-            color: var(--tile-yellow);
-        }
-    }
+    text-align: right;
+    line-height: 0.8;
 }
 </style>

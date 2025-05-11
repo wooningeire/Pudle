@@ -58,7 +58,7 @@ tile-content {
     transition: background-position 0.25s cubic-bezier(.04,.64,.2,1.43);
 
     &:not(.has-tab) {
-        background-position: 0;
+        background-position: -0.5rem -0.5rem;
     }
     &.has-tab {
         background-position: -1.75rem -1.75rem;
