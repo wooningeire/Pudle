@@ -1,6 +1,8 @@
 <script lang="ts">
 import {backspaceGuess, consumeGuess, extendGuess, uiState } from "$lib/state/uiState.svelte.ts";
 import TileBg from "#/TileBg.svelte";
+    import { gameState } from "../state/gameState.svelte";
+    import { N_ROWS } from "../constants";
 
 
 const keydown = (event: KeyboardEvent) => {
@@ -35,7 +37,8 @@ const keydown = (event: KeyboardEvent) => {
         {tile}
         isInputRow
         flipping={uiState.flipping}
-        revealAnimationDelay={i * 100}
+        revealAnimationDelay={i * (gameState.stats.nthGuess === 1 ? 200 : 100)}
+        hidden={gameState.board[i].length >= N_ROWS}
     />
 {/each}
 

@@ -3,6 +3,7 @@ import {Tile, TileColor} from "$lib/types/Tile.ts";
     import { getTileTypeCssColor } from "$lib/types/tileColors.ts";
 import { receive, send } from "#/transition.ts";
     import { cubicIn, cubicInOut, cubicOut, quadIn } from "svelte/easing";
+    import { gameState } from "../state/gameState.svelte";
 
 const {
     tile,
@@ -18,17 +19,20 @@ const hasTab = $derived(tile.currentWordColor !== null && tile.currentWordColor 
 
 const bgColor = $derived(getTileTypeCssColor(tile.color));
 const tabColor = $derived(tile.currentWordColor !== null ? getTileTypeCssColor(tile.currentWordColor!) : bgColor);
+
+const fallDuration = $derived(gameState.stats.nthGuess === 1 ? 1000 : 500)
 </script>
 
 
 <tile-content
-    in:receive|global={{key: tile.id, easing: cubicInOut, duration: 500}}
-    out:send|global={{key: tile.id, easing: cubicInOut, duration: 500}}
+    in:receive|global={{key: tile.id, easing: cubicInOut, duration: fallDuration}}
+    out:send|global={{key: tile.id, easing: cubicInOut, duration: fallDuration}}
     class:flipping
     style:--bg-color={bgColor}
     class:has-tab={hasTab}
     style:--reveal-animation-delay="{revealAnimationDelay}ms"
     style:--tab-color={tabColor}
+    class:is-first-guess={gameState.stats.nthGuess === 1}
 >
     <div>{tile.letter}</div>
 </tile-content>
@@ -61,6 +65,10 @@ tile-content {
         transform: rotateX(90deg);
         animation: flip-content 0.5s ease-out forwards;
         animation-delay: var(--reveal-animation-delay);
+
+        &.is-first-guess {
+            animation-duration: var(--tile-flip-duration-first-guess);
+        }
 
         @keyframes flip-content {
             0% {

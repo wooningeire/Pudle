@@ -3,6 +3,7 @@ import { fade } from "svelte/transition";
 import {Tile} from "$lib/types/Tile.ts";
     import TileContent from "#/TileContent.svelte";
     import { N_ROWS } from "$lib/constants.ts";
+    import { gameState } from "../state/gameState.svelte";
 
 const {
     tile = null,
@@ -30,6 +31,7 @@ const {
         class:flipping
         class:hidden
         style:--reveal-animation-delay="{revealAnimationDelay}ms"
+        class:is-first-guess={gameState.stats.nthGuess === 1}
     >
         {#if tile !== null && isInputRow}
             <span transition:fade={{duration: 50}}>{tile.letter}</span>
@@ -85,7 +87,11 @@ tile-bg {
 
     &.hidden {
         opacity: 0;
-        transition-delay: 0.25s;
+        transition-delay: 0.35s;
+
+        &.is-first-guess {
+            transition-delay: 0.7s;
+        }
     }
 
     &.flipping {
@@ -93,6 +99,10 @@ tile-bg {
         transform: rotateX(0deg);
         animation: flip-bg 0.5s ease-in forwards;
         animation-delay: var(--reveal-animation-delay);
+
+        &.is-first-guess {
+            animation-duration: var(--tile-flip-duration-first-guess);
+        }
         
         @keyframes flip-bg {
             0% {

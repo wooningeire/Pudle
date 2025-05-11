@@ -7,12 +7,12 @@
 <game-status>
     <game-stat>
         <stat-label>word</stat-label>
-        <stat-number>{gameState.stats.nWordsFound + 1}</stat-number>
+        <stat-number>{gameState.stats.nthWord}</stat-number>
     </game-stat>
 
     <game-stat>
         <stat-label>guess</stat-label>
-        <stat-number>{gameState.stats.nGuessesMade + 1}</stat-number>
+        <stat-number>{gameState.stats.nthGuess}</stat-number>
     </game-stat>
 </game-status>
 

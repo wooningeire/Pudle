@@ -1,4 +1,4 @@
-import { isValidGuess, nextWordIfGuessMatched, placeNewTiles, recordGuess, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles, setNextGuessTiles, isGameOver, createTilesFromGuess, updateKnownInfoFromTiles, recalculateExistingTiles } from "./gameState.svelte.ts";
+import { isValidGuess, nextWordIfGuessMatched, placeNewTiles, recordGuess, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles, setNextGuessTiles, isGameOver, createTilesFromGuess, updateKnownInfoFromTiles, checkIfTilesNeedTagging, applyTags } from "./gameState.svelte.ts";
 import { Tile, TileColor } from "$lib/types/Tile.ts";
 
 export const uiState = $state({
@@ -35,18 +35,23 @@ export const consumeGuess = async () => {
     uiState.flipping = true;
     uiState.guessTiles = <Tile[]>results;
 
-    await wait(850);
+    await wait(gameState.stats.nthGuess === 1 ? 2000 : 850);
 
     placeNewTiles(results);
     updateKnownInfoFromTiles(results);
 
-    const matched = nextWordIfGuessMatched(uiState.guess);
+    nextWordIfGuessMatched(uiState.guess);
 
     uiState.guess = "";
     uiState.flipping = false;
     resetGuessTiles();
 
-    await wait(0);
+    if (gameState.stats.nthGuess === 1) {
+        await wait(1000);
+    } else {
+        await wait(0);
+    }
+
 
     setNextGuessTiles();
     resetGuessTiles();
@@ -66,18 +71,22 @@ export const consumeGuess = async () => {
         eliminateTiles(islands, grays);
     }
 
-    if (matched) {
-        await wait(750);
 
-        recalculateExistingTiles();
+    const tagAssignments = checkIfTilesNeedTagging();
+
+    if (tagAssignments.length > 0) {
+        await wait(750);
+        
+        applyTags(tagAssignments);
     }
-    
+
+
     if (isGameOver()) {
         uiState.gameOver = true;
         return;
     }
-    
-    gameState.stats.nGuessesMade++;
+
+    gameState.stats.nthGuess++;
     uiState.inputLocked = false;
 };
 export const backspaceGuess = () => {

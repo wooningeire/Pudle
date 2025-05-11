@@ -20,8 +20,8 @@ const info = $derived(hasInfo ? gameState.knownLetterInfo.get(label)! : null);
 const bgColor = $derived(hasInfo ? getTileTypeCssColor(info!.type) : "");
 const bgColorDark = $derived(hasInfo ? getTileTypeCssColorDark(info!.type) : "");
 
-const must = $derived(colorable && !uiState.gameOver && (info?.mustBeInPositions.has(uiState.guess.length) ?? false));
-const mustNot = $derived(colorable && !uiState.gameOver && (uiState.guess.length === 5 || (info?.mustNotBeInPositions.has(uiState.guess.length) ?? false)));
+const must = $derived(!uiState.gameOver && colorable && (info?.mustBeInPositions.has(uiState.guess.length) ?? false));
+const mustNot = $derived(uiState.gameOver || (colorable && (uiState.guess.length === 5 || (info?.mustNotBeInPositions.has(uiState.guess.length) ?? false))));
 </script>
 
 <key-view

@@ -35,9 +35,14 @@ export const gameState = $state({
     guessTileIds: <bigint[]>[],
 
     stats: {
-        nWordsFound: 0,
-        nGuessesMade: 0,
+        nthWord: 1,
+        nthGuess: 1,
     },
+
+    lastTimerStart: 0,
+    lastTimerOffset: 0,
+    timerPaused: true,
+    lastTimeout: 0,
 });
 
 export const nextTileId = () => gameState.nextTileId++;
@@ -47,14 +52,14 @@ export const setNextGuessTiles = () => {
 };
 setNextGuessTiles();
 
-
-export const initialLoadPromise = (async () => {
-    gameState.initialLoad = {
+export const setupInitialLoad = async () => {
+    const initialLoad = {
         words: await createWordGetter(),
     };
 
-    gameState.currentWord = gameState.initialLoad.words.getRandomTargetWord();
-})();
+    gameState.initialLoad = initialLoad;
+    gameState.currentWord = initialLoad.words.getRandomTargetWord();
+};
 
 enum MatchResult {
     Empty,
@@ -63,7 +68,23 @@ enum MatchResult {
     Absent,
 }
 
-export const recalculateExistingTiles = () => {
+class TileTagAssignment {
+    constructor(
+        readonly x: number,
+        readonly y: number,
+        readonly existingTile: Tile,
+        readonly tagColor: TileColor,
+    ) {}
+    
+
+    apply() {
+        gameState.board[this.x][this.y] = new Tile(this.existingTile.id, this.existingTile.color, this.existingTile.letter, this.tagColor);
+    }
+}
+
+export const checkIfTilesNeedTagging = () => {
+    const newAssignments: TileTagAssignment[] = [];
+
     const maxColumnHeight = Math.max(...gameState.board.map(column => column.length));
     for (let y = 0; y < maxColumnHeight; y++) {
         const existingTiles = gameState.board.map(column => column[y] ?? null);
@@ -75,8 +96,17 @@ export const recalculateExistingTiles = () => {
             if (tile === null) continue;
 
             const existingTile = gameState.board[x][y];
-            gameState.board[x][y] = new Tile(existingTile.id, existingTile.color, existingTile.letter, tile.color);
+            newAssignments.push(new TileTagAssignment(x, y, existingTile, tile.color));
         }
+    }
+
+    return newAssignments;
+};
+
+
+export const applyTags = (assignments: TileTagAssignment[]) => {
+    for (const assignment of assignments) {
+        assignment.apply();
     }
 };
 
@@ -84,7 +114,7 @@ const nextWord = () => {
     gameState.guessedWordsThisRound.clear();
     gameState.knownLetterInfo.clear();
     gameState.currentWord = gameState.initialLoad!.words.getRandomTargetWord();
-    gameState.stats.nWordsFound++;
+    gameState.stats.nthWord++;
 };
 
 export const nextWordIfGuessMatched = (guess: string) => {
@@ -317,4 +347,26 @@ export const eliminateTiles = (islands: Point[][], grays: Point[]) => {
 
 export const isGameOver = () => {
     return gameState.board.some(column => column.length >= N_ROWS);
+};
+
+
+const placeBlocks = () => {
+
+};
+
+
+export const startTimer = () => {
+    gameState.lastTimerStart = Date.now();
+    gameState.timerPaused = false;
+    gameState.lastTimeout = setTimeout(() => {
+        placeBlocks();
+        gameState.lastTimerOffset = 0;
+        startTimer();
+    }, 15000 - gameState.lastTimerOffset);
+};
+
+export const pauseTimer = () => {
+    gameState.lastTimerOffset = Date.now() - gameState.lastTimerStart;
+    gameState.timerPaused = true;
+    clearTimeout(gameState.lastTimeout);
 };
