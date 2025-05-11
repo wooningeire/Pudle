@@ -3,9 +3,10 @@
     import { MatchResult } from "../types/MatchResult";
     import { getMatchResultCssColor } from "../types/tileColors";
     import { flipLeft, flipRight, halfFlipLeft, halfFlipRight } from "./transition";
+    import { EMPTY_TILE_CHAR } from "../constants";
 
 const {
-    letter = " ",
+    letter = EMPTY_TILE_CHAR,
     matchResult,
     x = 0,
     y = 0,

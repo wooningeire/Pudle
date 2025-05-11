@@ -7,12 +7,15 @@ import GameOverOptions from "./GameOverOptions.svelte";
 import GameStats from "./GameStats.svelte";
     import { elasticOut, quartOut } from "svelte/easing";
     import { flipLeft, halfFlipLeft } from "./transition";
+    import AutoDropTimer from "./AutoDropTimer.svelte";
 </script>
 
 
 {#if !isFirstGuess()}
     <left-panel in:halfFlipLeft={{duration: 3000, easing: elasticOut, baseRot: "35deg"}}>
         <GameStats />
+
+        <AutoDropTimer />
 
         {#if uiState.gameOver}
             <GameOverOptions />
@@ -30,7 +33,7 @@ left-panel {
     display: flex;
     flex-direction: column;
     align-items: end;
-    justify-content: space-between;
+    gap: 3rem;
 
     transform: rotateY(35deg) scale(var(--scale-fac));
     transform-origin: right;

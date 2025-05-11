@@ -27,7 +27,7 @@ game-page {
     justify-items: center;
 
     grid-template-columns: 15rem auto 15rem;
-    grid-template-rows: auto auto 20rem;
+    grid-template-rows: auto auto auto 5rem;
 
     gap: 2rem;
     perspective: 50rem;

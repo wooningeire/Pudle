@@ -4,7 +4,9 @@ import { Tile, TileColor } from "$lib/types/Tile";
 import { initialLoadState } from "./initialLoadState.svelte";
 import { TileTag } from "$lib/types/TileTag";
 import { emplace, update } from "$lib/emplace";
-import { WORD_LENGTH } from "../constants";
+import { EMPTY_TILE_CHAR, WORD_LENGTH } from "../constants";
+
+const ALPHABET = new Set("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
 
 export enum PositionType {
@@ -80,7 +82,17 @@ const updateInfoFromResult = (index: number, char: string, result: MatchResult) 
             return;
         }
 
-        // Absent must be handled after processing the rest of these
+        case MatchResult.Absent: {
+            const newPositionInfo = [...info.positionInfo];
+            newPositionInfo[index] = PositionType.MustNotBeInPosition;
+        
+            roundState.knownLetterInfo[char] = {
+                type: info.type === MatchResult.Empty
+                    ? MatchResult.Absent
+                    : info.type,
+                positionInfo: newPositionInfo,
+            };
+        }
     }
 };
 
@@ -106,28 +118,17 @@ const updateInfoFromMismatchResults = (index: number, guess: string, result: Mat
         }
 
         case MatchResult.Absent: {
-            let newPositionInfo: PositionType[];
-            if (nActualAppearances === nKnownPositions) {
-                // We know where those instances should be already
-                newPositionInfo = info.positionInfo.map(
-                    positionType => positionType === PositionType.MustBeInPosition
-                        ? PositionType.MustBeInPosition
-                        : PositionType.MustNotBeInPosition
-                );
-            } else {
-                // We just know it's not at this index
-                newPositionInfo = [...info.positionInfo];
-                newPositionInfo[index] = PositionType.MustNotBeInPosition;
-            }
+            if (nActualAppearances !== nKnownPositions) return false;
 
+            // We know where those instances should be already
+            const newPositionInfo = info.positionInfo.map(
+                positionType => positionType === PositionType.MustBeInPosition
+                    ? PositionType.MustBeInPosition
+                    : PositionType.MustNotBeInPosition
+            );
             if (newPositionInfo.every((positionType, i) => positionType === info.positionInfo[i])) return false;
         
-            roundState.knownLetterInfo[char] = {
-                type: info.type === MatchResult.Empty
-                    ? MatchResult.Absent
-                    : info.type,
-                positionInfo: newPositionInfo,
-            };
+            roundState.knownLetterInfo[char].positionInfo = newPositionInfo;
         }
     }
     return true;
@@ -148,7 +149,7 @@ const updateInfoFromKnownChar = (index: number, char: string) => {
 export const updateKnownLetterInfo = (guess: string, matchResults: MatchResult[]) => {
     let mismatchIndices: number[] = [];
     for (const [i, result] of matchResults.entries()) {
-        if (guess[i] === " " || result === MatchResult.Empty) continue;
+        if (!ALPHABET.has(guess[i]) || result === MatchResult.Empty) continue;
 
         updateInfoFromResult(i, guess[i], result);
 
@@ -185,7 +186,7 @@ export const matchResults = (guess: string) => {
 
     const letterCounts = new Map<string, number>();
     for (const char of roundState.word) {
-        if (char === " ") continue;
+        if (!ALPHABET.has(char)) continue;
 
         emplace(letterCounts, char, {
             insert: () => 1,
@@ -194,10 +195,11 @@ export const matchResults = (guess: string) => {
     }
 
     for (const [i, char] of chars.entries()) {
-        if (char === " ") {
+        if (char === EMPTY_TILE_CHAR) {
             results[i] = MatchResult.Empty;
             continue;
         }
+        if (!ALPHABET.has(char)) continue;
         if (char !== roundState.word[i]) continue;
 
         update(letterCounts, char, existing => existing - 1);
@@ -205,6 +207,7 @@ export const matchResults = (guess: string) => {
     }
 
     for (const [i, char] of chars.entries()) {
+        if (!ALPHABET.has(char)) continue;
         if ([MatchResult.Match, MatchResult.Empty].includes(results[i])) continue;
         if ((letterCounts.get(char) ?? 0) === 0) continue;
 

@@ -1,9 +1,10 @@
 import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles, setNextGuessTileIds, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess, removeTags, resetGameState } from "./gameState.svelte.ts";
 import { Tile, TileColor } from "$lib/types/Tile.ts";
-import { guessMatches, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, resetRoundState } from "./roundState.svelte.ts";
+import { guessMatches, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, resetRoundState, roundState } from "./roundState.svelte.ts";
 import { TileTag } from "$lib/types/TileTag.ts";
 import type { MatchResult } from "../types/MatchResult.ts";
-import { WORD_LENGTH } from "../constants.ts";
+import { GUESS_TIME_BY_GUESS_NO_DECAY_FAC, GUESS_TIME_BY_WORD_NO_DECAY_FAC, MAX_TIME_LIMIT_S_BY_WORD_NO, MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO, MIN_TIME_LIMIT_S_BY_WORD_NO, WORD_LENGTH, MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO, EMPTY_TILE_CHAR } from "../constants.ts";
+import { pauseTimer, resetTimerState, restartTimer, setTimeLimit, timerState } from "./timerState.svelte.ts";
 
 export const uiState = $state({
     guess: "",
@@ -17,9 +18,9 @@ export const uiState = $state({
 
 const resetGuessTiles = (guess=uiState.guess) => {
     uiState.guessTiles = guess
-        .padEnd(WORD_LENGTH, " ")
+        .padEnd(WORD_LENGTH, EMPTY_TILE_CHAR)
         .split("")
-        .map((char, i) => new Tile(gameState.guessTileIds[i], TileColor.Empty, char === " " ? "" : char));
+        .map((char, i) => new Tile(gameState.guessTileIds[i], TileColor.Empty, char === EMPTY_TILE_CHAR ? "" : char));
 };
 
 type ExistingRowEvaluation = {
@@ -33,7 +34,7 @@ const reevaluateExistingRows = function* () {
     const maxColumnHeight = Math.max(...gameState.board.map(column => column.length));
     for (let y = 0; y < maxColumnHeight; y++) {
         const existingTiles = gameState.board.map(column => column[y] ?? null);
-        const mockGuess = existingTiles.map(tile => tile?.letter ?? " ").join("");
+        const mockGuess = existingTiles.map(tile => tile?.letter ?? EMPTY_TILE_CHAR).join("");
 
         const results = matchResults(mockGuess);
 
@@ -88,9 +89,25 @@ const destroyCellsIfApplicable = async () => {
     }
 };
 
-export const consumeGuess = async () => {
+const nextGuessTimeLimit = () => {
+    // https://www.desmos.com/calculator/jledjyjotv
+    const maxTimeLimitByWordNo = MIN_TIME_LIMIT_S_BY_WORD_NO + 2 * (MAX_TIME_LIMIT_S_BY_WORD_NO - MIN_TIME_LIMIT_S_BY_WORD_NO) / (1 + Math.exp((gameState.stats.nthWord - 1) * GUESS_TIME_BY_WORD_NO_DECAY_FAC));
+    const minTimeLimitByWordNo = MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO + 2 * (MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO - MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO) / (1 + Math.exp((gameState.stats.nthWord - 1) * GUESS_TIME_BY_WORD_NO_DECAY_FAC));
+    const timeLimitByGuessNo = minTimeLimitByWordNo + 2 * (maxTimeLimitByWordNo - minTimeLimitByWordNo) / (1 + Math.exp((roundState.guessedWords.size - 1) * GUESS_TIME_BY_GUESS_NO_DECAY_FAC));
+
+    return timeLimitByGuessNo * 1000;
+};
+
+const autoDrop = () => {
+    uiState.guess = "×".repeat(WORD_LENGTH);
+    consumeGuess(true);
+};
+
+export const consumeGuess = async (isGarbage=false) => {
     if (uiState.inputLocked) return;
-    if (!await isValidGuess(uiState.guess)) return;
+    if (!isGarbage && !await isValidGuess(uiState.guess)) return;
+
+    pauseTimer();
 
     const results = matchResults(uiState.guess);
     const tiles = tilesFromMatchResults(uiState.guess, results);
@@ -101,11 +118,13 @@ export const consumeGuess = async () => {
 
     await wait(isFirstGuess() ? 2250 : 875); // wait for the flipping animation
 
-    if (!isFirstGuess()) {
+    if (!isGarbage && !isFirstGuess()) {
         updateKnownLetterInfo(uiState.guess, results); // delay this until later for the first guess
     }
     placeNewTiles(tiles);
-    recordGuessResults(uiState.guess, results);
+    if (!isGarbage) {
+        recordGuessResults(uiState.guess, results);
+    }
 
     uiState.flipping = false;
     resetGuessTiles(""); // make sure the letters don't render in their original spots
@@ -155,7 +174,11 @@ export const consumeGuess = async () => {
         updateInfoFromReevaluation(evaluationsOfExistingRows);
     }
 
-    gameState.stats.nthGuess++;
+    restartTimer(autoDrop, nextGuessTimeLimit());
+
+    if (!isGarbage) {
+        gameState.stats.nthGuess++;
+    }
     uiState.guess = "";
     uiState.inputLocked = false;
 };
@@ -178,6 +201,9 @@ export const extendGuess = (char: string) => {
 export const reset = async () => {
     await resetRoundState();
     resetGameState();
+    resetTimerState();
+
+    setTimeLimit(MAX_TIME_LIMIT_S_BY_WORD_NO * 1000);
     
     uiState.guess = "";
     uiState.inputLocked = false;

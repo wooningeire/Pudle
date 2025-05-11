@@ -21,11 +21,6 @@ export const gameState = $state({
         nthGuess: 1,
     },
 
-    lastTimerStart: 0,
-    lastTimerOffset: 0,
-    timerPaused: true,
-    lastTimeout: 0,
-
     hasRestarted: false,
 });
 
@@ -187,28 +182,6 @@ export const isGameOver = () => {
     return gameState.board.some(column => column.length >= N_ROWS);
 };
 
-
-const placeBlocks = () => {
-
-};
-
-
-export const startTimer = () => {
-    gameState.lastTimerStart = Date.now();
-    gameState.timerPaused = false;
-    gameState.lastTimeout = setTimeout(() => {
-        placeBlocks();
-        gameState.lastTimerOffset = 0;
-        startTimer();
-    }, 15000 - gameState.lastTimerOffset);
-};
-
-export const pauseTimer = () => {
-    gameState.lastTimerOffset = Date.now() - gameState.lastTimerStart;
-    gameState.timerPaused = true;
-    clearTimeout(gameState.lastTimeout);
-};
-
 export const isFirstGuess = () => !gameState.hasRestarted && gameState.stats.nthGuess === 1;
 
 
@@ -228,11 +201,6 @@ export const resetGameState = () => {
         nthWord: 1,
         nthGuess: 1,
     };
-
-    gameState.lastTimerStart = 0;
-    gameState.lastTimerOffset = 0;
-    gameState.timerPaused = true;
-    gameState.lastTimeout = 0;
 
     gameState.hasRestarted = true;
 };
