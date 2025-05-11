@@ -1,18 +1,23 @@
-name: Deploy
+name: github pages
+
 on:
   push:
     branches: main
-  pull_request:
-    branches: main
+  # pull_request:
+  #   branches: main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deployment.outputs.page_url }}
 
-    permissions:
-      id-token: write # Needed for auth with Deno Deploy
-      contents: read # Needed to clone the repository
+    runs-on: ubuntu-latest
 
     steps:
       - name: Clone repository
@@ -29,10 +34,13 @@ jobs:
       - name: Build step
         run: "deno task build"
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "build"
+          path: "./build"
 
       - name: Deploy to GitHub Pages
         id: deployment
