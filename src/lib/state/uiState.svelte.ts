@@ -1,6 +1,6 @@
 import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles, setNextGuessTiles, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess } from "./gameState.svelte.ts";
 import { Tile, TileColor } from "$lib/types/Tile.ts";
-import { guessMatches, guessMatchResults, isValidGuess, nextWord, recordGuess, updateKnownInfoFromTiles } from "./roundState.svelte.ts";
+import { guessMatches, matchResults, isValidGuess, nextWord, recordGuess, updateKnownLetterInfo } from "./roundState.svelte.ts";
 import { TileTag } from "$lib/types/TileTag.ts";
 
 export const uiState = $state({
@@ -20,15 +20,18 @@ const resetGuessTiles = () => {
         .map((char, i) => new Tile(gameState.guessTileIds[i], TileColor.Empty, char === " " ? "" : char));
 };
 
-export const checkIfTilesNeedTagging = () => {
+const checkIfTilesNeedTagging = () => {
     const newAssignments: TileTag[] = [];
 
     const maxColumnHeight = Math.max(...gameState.board.map(column => column.length));
     for (let y = 0; y < maxColumnHeight; y++) {
         const existingTiles = gameState.board.map(column => column[y] ?? null);
+        const mockGuess = existingTiles.map(tile => tile?.letter ?? " ").join("");
 
-        const tiles = tilesFromMatchResults(uiState.guess, guessMatchResults(existingTiles.map(tile => tile?.letter ?? " ").join("")), existingTiles);
-        updateKnownInfoFromTiles(tiles);
+        const results = matchResults(mockGuess);
+        const tiles = tilesFromMatchResults(mockGuess, results, existingTiles);
+
+        updateKnownLetterInfo(mockGuess, results);
 
         for (const [x, tile] of tiles.entries()) {
             if (tile === null) continue;
@@ -68,16 +71,17 @@ export const consumeGuess = async () => {
     if (!await isValidGuess(uiState.guess)) return;
 
     recordGuess(uiState.guess);
-    const results = tilesFromMatchResults(uiState.guess, guessMatchResults(uiState.guess));
+    const results = matchResults(uiState.guess);
+    const tiles = tilesFromMatchResults(uiState.guess, results);
 
     uiState.inputLocked = true;
     uiState.flipping = true;
-    uiState.guessTiles = <Tile[]>results;
+    uiState.guessTiles = <Tile[]>tiles;
 
-    await wait(isFirstGuess() ? 1750 : 850); // wait for the flipping animation
+    await wait(isFirstGuess() ? 2250 : 850); // wait for the flipping animation
 
-    placeNewTiles(results);
-    updateKnownInfoFromTiles(results);
+    updateKnownLetterInfo(uiState.guess, results);
+    placeNewTiles(tiles);
 
     if (guessMatches(uiState.guess)) {
         nextWord();
@@ -88,7 +92,7 @@ export const consumeGuess = async () => {
     uiState.flipping = false;
     resetGuessTiles();
 
-    await wait(isFirstGuess() ? 1000 : 0); // 0 is so the send:receive transition works; can't set guess tile ids too early
+    await wait(isFirstGuess() ? 1500 : 0); // 0 is so the send:receive transition works; can't set guess tile ids too early
 
     setNextGuessTiles();
     resetGuessTiles();

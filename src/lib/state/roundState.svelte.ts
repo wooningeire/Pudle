@@ -63,35 +63,32 @@ export const guessMatches = (guess: string) => {
 }
 
 
-const updateInfoFromTile = (i: number, tile: Tile) => {
-    if (tile.letter === "") return;
+const updateInfoFromResult = (i: number, char: string, result: MatchResult) => {
+    if (char === " " || result === MatchResult.Empty) return;
 
-    const info = roundState.knownLetterInfo[tile.letter];
+    const info = roundState.knownLetterInfo[char];
 
-    switch (tile.color) {
-        case TileColor.Empty:
-            return;
-
-        case TileColor.Green:
-            forEachLetter(char => {
-                roundState.knownLetterInfo[char].positionInfo[i] = PositionType.MustNotBeInPosition;
+    switch (result) {
+        case MatchResult.Match:
+            forEachLetter(letter => {
+                roundState.knownLetterInfo[letter].positionInfo[i] = PositionType.MustNotBeInPosition;
             });
 
             const newPositionInfo = [...info.positionInfo];
             newPositionInfo[i] = PositionType.MustBeInPosition;
 
 
-            roundState.knownLetterInfo[tile.letter] = {
+            roundState.knownLetterInfo[char] = {
                 type: TileColor.Green,
                 positionInfo: newPositionInfo,
             };
             return;
 
-        case TileColor.Yellow: {
+        case MatchResult.Misplaced: {
             const newPositionInfo = [...info.positionInfo];
             newPositionInfo[i] = PositionType.MustNotBeInPosition;
 
-            roundState.knownLetterInfo[tile.letter] = {
+            roundState.knownLetterInfo[char] = {
                 type: info.type === TileColor.Green
                     ? TileColor.Green
                     : TileColor.Yellow,
@@ -100,8 +97,8 @@ const updateInfoFromTile = (i: number, tile: Tile) => {
             return;
         }
 
-        case TileColor.Gray:
-            roundState.knownLetterInfo[tile.letter] = {
+        case MatchResult.Absent:
+            roundState.knownLetterInfo[char] = {
                 type: info.type === TileColor.Empty
                     ? TileColor.Gray
                     : info.type,
@@ -115,11 +112,11 @@ const updateInfoFromTile = (i: number, tile: Tile) => {
     }
 };
 
-export const updateKnownInfoFromTiles = (tiles: (Tile | null)[]) => {
-    for (const [i, tile] of tiles.entries()) {
-        if (tile === null) continue;
+export const updateKnownLetterInfo = (guess: string, matchResults: MatchResult[]) => {
+    for (const [i, result] of matchResults.entries()) {
+        if (guess[i] === " " || result === MatchResult.Empty) continue;
 
-        updateInfoFromTile(i, tile);
+        updateInfoFromResult(i, guess[i], result);
     }
 };
 
@@ -135,7 +132,7 @@ export const recordGuess = (guess: string) => {
     roundState.guessedWords.set(guess, []);
 };
 
-export const guessMatchResults = (guess: string) => {
+export const matchResults = (guess: string) => {
     const chars = guess.split("");
     const results = chars.map(() => MatchResult.Absent);
 

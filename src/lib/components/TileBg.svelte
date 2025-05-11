@@ -90,7 +90,7 @@ tile-bg {
         transition-delay: 0.35s;
 
         &.is-first-guess {
-            transition-delay: 0.7s;
+            transition-delay: 1.5s;
         }
     }
 

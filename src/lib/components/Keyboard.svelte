@@ -1,5 +1,5 @@
 <script lang="ts">
-import { backspaceGuess, consumeGuess, extendGuess } from "$lib/state/uiState.svelte.ts";
+import { backspaceGuess, consumeGuess, extendGuess, uiState } from "$lib/state/uiState.svelte.ts";
 import Key from "#/Key.svelte";
 
 const keyRows = [
@@ -17,6 +17,7 @@ const keyRows = [
                     label="DEL"
                     onClick={backspaceGuess}
                     small
+                    forceDisabled={uiState.guess.length === 0}
                 />
             {/if}
 
@@ -25,6 +26,7 @@ const keyRows = [
                     label={char}
                     onClick={() => extendGuess(char)}
                     colorable
+                    forceDisabled={uiState.guess.length === 5}
                 />
             {/each}
 
@@ -33,6 +35,7 @@ const keyRows = [
                     label="GO"
                     onClick={consumeGuess}
                     small
+                    forceDisabled={uiState.guess.length !== 5}
                 />
             {/if}
         </key-row>

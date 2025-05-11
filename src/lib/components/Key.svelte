@@ -10,11 +10,13 @@ const {
     label,
     small = false,
     colorable = false,
+    forceDisabled = false,
 }: {
     onClick: () => void,
     label: string,
     small?: boolean,
     colorable?: boolean,
+    forceDisabled?: boolean,
 } = $props();
 
 const inputingWhichLetter = $derived(uiState.guess.length);
@@ -32,20 +34,19 @@ const must = $derived(
         && currentLetterPositionInfo === PositionType.MustBeInPosition
 );
 const mustNot = $derived(
-    uiState.inputLocked
-        || (colorable
-            && (inputingWhichLetter === 5 || currentLetterPositionInfo === PositionType.MustNotBeInPosition)
-        )
+    colorable && currentLetterPositionInfo === PositionType.MustNotBeInPosition
 );
+const disabled = $derived(uiState.inputLocked || forceDisabled);
 </script>
 
 <key-view
-    onclick={onClick}
+    onclick={() => !disabled && onClick()}
     tabindex="0"
     class:small
-    class:has-info={hasInfo && info!.type !== TileColor.Empty}
+    class:has-color={hasInfo && info!.type !== TileColor.Empty}
     class:must
     class:must-not={mustNot}
+    class:disabled
     style:background={bgColor}
     style:--box-shadow-color={bgColorDark}
 >
@@ -69,7 +70,8 @@ key-view {
         box-shadow 0.175s ease-in-out,
         color 0.175s ease-in-out,
         opacity 0.5s cubic-bezier(.14,.67,.2,1.43),
-        transform 0.5s cubic-bezier(.14,.67,.2,1.43);
+        transform 0.5s cubic-bezier(.14,.67,.2,1.43),
+        filter 0.25s ease-in-out;
 
     &.small {
         font-size: 1rem;
@@ -93,12 +95,17 @@ key-view {
     }
 
     &.must-not {
-        opacity: 0.3333333;
-        transform: scale(0.85);
+        filter: brightness(0.85);
     }
 
-    &.has-info {
+    &.has-color {
         color: #fff;
+    }
+
+    &.disabled {
+        opacity: 0.3333333;
+        transform: scale(0.85);
+        pointer-events: none;
     }
 
     cursor: pointer;

@@ -20,13 +20,13 @@ const hasTab = $derived(tile.currentWordColor !== null && tile.currentWordColor 
 const bgColor = $derived(getTileTypeCssColor(tile.color));
 const tabColor = $derived(tile.currentWordColor !== null ? getTileTypeCssColor(tile.currentWordColor!) : bgColor);
 
-const fallDuration = $derived(isFirstGuess() ? 700 : 500)
+const transitionDuration = $derived(isFirstGuess() ? 1500 : 500);
 </script>
 
 
 <tile-content
-    in:receive|global={{key: tile.id, easing: cubicInOut, duration: fallDuration}}
-    out:send|global={{key: tile.id, easing: cubicInOut, duration: fallDuration}}
+    in:receive|global={{key: tile.id, easing: cubicInOut, duration: transitionDuration}}
+    out:send|global={{key: tile.id, easing: cubicInOut, duration: transitionDuration}}
     class:flipping
     style:--bg-color={bgColor}
     class:has-tab={hasTab}
@@ -45,6 +45,7 @@ tile-content {
     display: grid;
     place-items: center;
     color: #fff;
+    z-index: 1;
 
 
     background: linear-gradient(135deg, var(--bg-color) 80%, #0000 80%, #0000 85%, var(--tab-color) 85%);

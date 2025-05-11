@@ -1,10 +1,10 @@
 <script>
-    import { gameState } from "$lib/state/gameState.svelte.ts";
+    import { gameState, isFirstGuess } from "$lib/state/gameState.svelte.ts";
 
 </script>
 
 
-<game-status>
+<game-status class:hidden={isFirstGuess()}>
     <game-stat>
         <stat-label>word</stat-label>
         <stat-number>{gameState.stats.nthWord}</stat-number>
@@ -28,6 +28,12 @@ game-status {
 
     text-align: right;
     line-height: 0.8;
+
+
+    transition: opacity 2s ease-in-out;
+    &.hidden {
+        opacity: 0;
+    }
 }
 
 game-stat {
