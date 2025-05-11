@@ -49,7 +49,7 @@ import { gameState } from "$lib/state/gameState.svelte.ts";
 }
 
 letter-board {
-    grid-area: 3/2;
+    grid-area: 3/2 / 5/3;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;

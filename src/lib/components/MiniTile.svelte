@@ -7,13 +7,15 @@
 const {
     letter = " ",
     matchResult,
-    x,
-    y,
+    x = 0,
+    y = 0,
+    smaller = false,
 }: {
     letter?: string,
     matchResult: MatchResult,
-    x: number,
-    y: number,
+    x?: number,
+    y?: number,
+    smaller?: boolean,
 } = $props();
 
 const bgColor = $derived(getMatchResultCssColor(matchResult));
@@ -24,6 +26,7 @@ const bgColor = $derived(getMatchResultCssColor(matchResult));
     style:background={bgColor}
     in:halfFlipLeft|global={{duration: 500, delay: x * 50, easing: cubicInOut}}
     out:halfFlipRight|global={{duration: 500, delay: x * 50 + y * 50, easing: cubicInOut}}
+    class:smaller
 >{letter}</mini-tile>
 
 
@@ -32,7 +35,13 @@ mini-tile {
     width: 1.25rem;
     height: 1.25rem;
     color: #fff;
-    display: grid;
+    display: inline-grid;
+    vertical-align: middle;
     place-items: center;
+
+    &.smaller {
+        width: 1rem;
+        height: 1rem;
+    }
 }
 </style>

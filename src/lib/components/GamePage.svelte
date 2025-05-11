@@ -26,8 +26,8 @@ game-page {
     align-items: center;
     justify-items: center;
 
-    grid-template-columns: 10rem auto 10rem;
-    grid-template-rows: auto auto;
+    grid-template-columns: 15rem auto 15rem;
+    grid-template-rows: auto auto 20rem;
 
     gap: 2rem;
     perspective: 50rem;

@@ -1,0 +1,30 @@
+<script>
+    import { MatchResult } from "../types/MatchResult";
+    import MiniTile from "./MiniTile.svelte";
+
+</script>
+<instructions-text>
+    <p>
+        Create groups of 4 <MiniTile matchResult={MatchResult.Match} smaller /> or 4 <MiniTile matchResult={MatchResult.Misplaced} smaller />!
+    </p>
+
+    <!-- <p>
+        Groups will destroy nearby <MiniTile matchResult={MatchResult.Absent} smaller />!
+    </p>
+
+    <p>
+        If the timer runs out, more <MiniTile matchResult={MatchResult.Absent} smaller /> will drop!
+    </p> -->
+</instructions-text>
+
+<style lang="scss">
+instructions-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+p {
+    margin: 0;
+}
+</style>

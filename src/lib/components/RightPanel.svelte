@@ -4,11 +4,14 @@
     import PrevGuessesDisplay from "./PrevGuessesDisplay.svelte";
     import { fly } from "svelte/transition";
     import { flipRight, halfFlipRight } from "./transition";
+    import Instructions from "./Instructions.svelte";
 
 </script>
 
 {#if !isFirstGuess()}
     <right-panel in:halfFlipRight={{duration: 3000, easing: elasticOut, baseRot: "-35deg"}}>
+        <Instructions />
+
         <PrevGuessesDisplay />
     </right-panel>
 {/if}
@@ -23,7 +26,6 @@ right-panel {
     place-self: stretch;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     gap: 1.5rem;
 
     transform: rotateY(-35deg) scale(var(--scale-fac));
