@@ -10,6 +10,6 @@ export class Tile {
         readonly id: bigint,
         readonly color: TileColor = TileColor.Empty,
         readonly letter: string = "",
-        readonly currentWordColor: TileColor | null = null,
+        readonly tagColor: TileColor | null = null,
     ) {}
 }

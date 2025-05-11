@@ -22,6 +22,7 @@
 
 
 <style lang="scss">
+@import "#/constants.scss";
 game-status {
     grid-area: 1/1 / 3/2;
     align-self: start;
@@ -39,8 +40,16 @@ game-status {
         opacity: 0;
     }
 
-    transform: rotateY(25deg);
+    transform: rotateY(25deg) scale(var(--scale-fac));
     transform-origin: right;
+
+    --scale-fac: 1;
+    @media screen and (max-width: $small-view) {
+        --scale-fac: 0.75;
+    }
+    @media screen and (max-width: $xsmall-view) {
+        display: none;
+    }
 }
 
 game-stat {
@@ -56,31 +65,21 @@ stat-number {
 }
 
 .nth-word {
-    animation: pulse-green 1s ease-out;
+    animation: pulse-green 1s linear;
 
     @keyframes pulse-green {
         0% {
-            color: #fff;
-            text-shadow: 0 0 1rem var(--tile-green);
-        }
-        50% {
             color: var(--tile-green);
-            text-shadow: 0 0 01rem #0000;
         }
     }
 }
 
 .nth-guess {
-    animation: pulse-yellow 1s ease-out;
+    animation: pulse-yellow 1s linear;
 
     @keyframes pulse-yellow {
         0% {
-            color: #fff;
-            text-shadow: 0 0 1rem var(--tile-yellow);
-        }
-        50% {
             color: var(--tile-yellow);
-            text-shadow: 0 0 1rem #0000;
         }
     }
 }

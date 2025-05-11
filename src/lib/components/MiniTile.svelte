@@ -3,12 +3,12 @@
     import { getMatchResultCssColor } from "../types/tileColors";
 
 const {
-    letter,
+    letter = " ",
     matchResult,
     x,
     y,
 }: {
-    letter: string,
+    letter?: string,
     matchResult: MatchResult,
     x: number,
     y: number,
@@ -38,7 +38,7 @@ const flipRight = (node: HTMLElement, {duration, delay}: {duration: number, dela
 <mini-tile
     style:background={bgColor}
     in:flipLeft|global={{duration: 500, delay: x * 50}}
-    out:flipRight|global={{duration: 500, delay: x * 25 + y * 25}}
+    out:flipRight|global={{duration: 500, delay: x * 50 + y * 50}}
 >{letter}</mini-tile>
 
 

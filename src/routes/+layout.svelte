@@ -26,3 +26,12 @@ const {
         rel="stylesheet"
     />
 </svelte:head>
+
+<style lang="scss">
+@import "#/constants.scss";
+:global(:root) {
+    @media screen and (max-width: $xxsmall-view) {
+        font-size: 0.85em;
+    }
+}
+</style>

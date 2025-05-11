@@ -19,10 +19,10 @@ const {
     x: number,
 } = $props();
 
-const hasTab = $derived(tile.currentWordColor !== null && tile.currentWordColor !== tile.color);
+const hasTab = $derived(tile.tagColor !== null && tile.tagColor !== tile.color);
 
 const bgColor = $derived(getTileTypeCssColor(tile.color));
-const tabColor = $derived(tile.currentWordColor !== null ? getTileTypeCssColor(tile.currentWordColor!) : bgColor);
+const tabColor = $derived(tile.tagColor !== null ? getTileTypeCssColor(tile.tagColor!) : bgColor);
 
 const fallDistance = $derived(N_ROWS - gameState.board[x].length);
 const transitionDuration = $derived((isFirstGuess() ? 1500 : 1250) * Math.sqrt(fallDistance / N_ROWS));
@@ -51,9 +51,9 @@ tile-content {
     place-items: center;
     color: #fff;
 
-    background: linear-gradient(135deg, var(--bg-color) 80%, #0000 80%, #0000 85%, var(--tab-color) 85%);
+    background: linear-gradient(135deg, var(--bg-color) 80%, #0000 80%, #0000 82.5%, var(--tab-color) 82.5%);
     background-repeat: no-repeat;
-    background-size: 4.5rem 4.5rem;
+    background-size: 5rem 5rem;
 
     transition: background-position 0.25s cubic-bezier(.04,.64,.2,1.43);
 
@@ -61,7 +61,7 @@ tile-content {
         background-position: 0;
     }
     &.has-tab {
-        background-position: -1.25rem -1.25rem;
+        background-position: -1.75rem -1.75rem;
     }
 
     &.flipping {

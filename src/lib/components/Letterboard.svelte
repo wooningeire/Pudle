@@ -30,7 +30,7 @@ import { gameState } from "$lib/state/gameState.svelte.ts";
             {#each gameState.board as column, x}
                 {#each column as tile, y (tile.id)}
                     <tile-view-container
-                        animate:flip={{duration: 1000, easing: bounceOut}}
+                        animate:flip={{duration: 750, easing: bounceOut}}
                         style:grid-area="{N_ROWS - y}/{x + 1}"
                     >
                         {#if y < N_ROWS}

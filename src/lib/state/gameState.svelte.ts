@@ -36,9 +36,17 @@ export const setNextGuessTiles = () => {
 };
 setNextGuessTiles();
 
-export const applyTags = (assignments: TileTag[]) => {
-    for (const assignment of assignments) {
-        gameState.board[assignment.x][assignment.y] = new Tile(assignment.existingTile.id, assignment.existingTile.color, assignment.existingTile.letter, assignment.tagColor);
+export const removeTags = (tags: TileTag[]) => {
+    for (const tag of tags) {
+        const tile = gameState.board[tag.x][tag.y];
+        gameState.board[tag.x][tag.y] = new Tile(tile.id, tile.color, tile.letter, null);
+    }
+};
+
+export const applyTags = (tags: TileTag[]) => {
+    for (const tag of tags) {
+        const tile = gameState.board[tag.x][tag.y];
+        gameState.board[tag.x][tag.y] = new Tile(tile.id, tile.color, tile.letter, tag.tagColor);
     }
 };
 

@@ -5,15 +5,16 @@
 
 </script>
 
-<current-word-info class:hidden={isFirstGuess()}>
+<right-panel class:hidden={isFirstGuess()}>
     <PrevGuessesDisplay />
-</current-word-info>
+</right-panel>
 
 
 
 
 <style lang="scss">
-current-word-info {
+@import "#/constants.scss";
+right-panel {
     grid-area: 1/3 / 3/4;
     align-self: start;
     justify-self: start;
@@ -27,7 +28,16 @@ current-word-info {
         opacity: 0;
     }
 
-    transform: rotateY(-25deg);
+    transform: rotateY(-25deg) scale(var(--scale-fac));
     transform-origin: left;
+
+
+    --scale-fac: 1;
+    @media screen and (max-width: $small-view) {
+        --scale-fac: 0.75;
+    }
+    @media screen and (max-width: $xsmall-view) {
+        display: none;
+    }
 }
 </style>

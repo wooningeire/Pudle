@@ -1,6 +1,6 @@
 <script lang="ts">
-    import CurrentWordInfo from "#/CurrentWordInfo.svelte";
-    import GameStatus from "#/GameStatus.svelte";
+    import RightPanel from "#/RightPanel.svelte";
+    import LeftPanel from "#/LeftPanel.svelte";
 import Keyboard from "#/Keyboard.svelte";
 import Letterboard from "#/Letterboard.svelte";
     import { onMount } from "svelte";
@@ -25,9 +25,9 @@ let initialLoadPromise = $state<Promise<void>>(new Promise(resolve => {
 
             <Letterboard />
 
-            <GameStatus />
+            <LeftPanel />
 
-            <CurrentWordInfo />
+            <RightPanel />
         </center-content>
     {:catch}
         Error, please reload

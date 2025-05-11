@@ -90,9 +90,7 @@ tile-bg {
     }
 
     &.hidden {
-        opacity: 0;
-        transition-delay: 2s;
-
+        opacity: 0.5;
         &.is-first-guess {
             transition-delay: 3s;
         }
