@@ -142,11 +142,10 @@ export const getAdjacentGrays = (islands: Point[][]) => {
 
     const checkGray = (x: number, y: number) => {
         if (!pointIsInBoard(x, y)) return;
-        if (visited[x][y]) return;
 
         visited[x][y] = true;
         const tile = gameState.board[x][y];
-        if (tile.color !== TileColor.Gray) return;
+        if (visited[x][y] && tile.color !== TileColor.Gray) return;
 
         eliminatedGrays.push({x, y});
     };

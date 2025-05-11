@@ -20,6 +20,9 @@
 </game-stats>
 
 <style lang="scss">
+* {
+    transform-style: preserve-3d;
+}
 
 game-stats {
     display: flex;
@@ -34,16 +37,34 @@ game-stat {
 
 stat-label {
     font-size: 2rem;
+
+    animation: push-forward-label 0.75s ease-out;
+
+    @keyframes push-forward-label {
+        20% {
+            transform: translateZ(2rem);
+        }
+    }
 }
+
 stat-number {
     font-size: 4rem;
     font-weight: 700;
+
+    animation: push-forward-number 0.75s ease-out;
+    animation-delay: 0.125s;
+
+    @keyframes push-forward-number {
+        20% {
+            transform: translateZ(4rem);
+        }
+    }
 }
 
 .nth-word {
-    animation: pulse-green 1s linear;
+    animation: flash-green 1s ease-out;
 
-    @keyframes pulse-green {
+    @keyframes flash-green {
         0% {
             color: var(--tile-green);
         }
@@ -51,12 +72,13 @@ stat-number {
 }
 
 .nth-guess {
-    animation: pulse-yellow 1s linear;
+    animation: flash-yellow 1s ease-out;
 
-    @keyframes pulse-yellow {
+    @keyframes flash-yellow {
         0% {
             color: var(--tile-yellow);
         }
     }
 }
+
 </style>

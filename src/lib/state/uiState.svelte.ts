@@ -98,9 +98,15 @@ const nextGuessTimeLimit = () => {
     return timeLimitByGuessNo * 1000;
 };
 
-const autoDrop = () => {
+const autoDrop = async () => {
+    const lastGuess = uiState.guess;
+
     uiState.guess = "×".repeat(WORD_LENGTH);
-    consumeGuess(true);
+    await consumeGuess(true);
+
+    if (!isGameOver()) {
+        uiState.guess = lastGuess;
+    }
 };
 
 export const consumeGuess = async (isGarbage=false) => {
@@ -163,7 +169,7 @@ export const consumeGuess = async (isGarbage=false) => {
 
 
     if (isGameOver()) {
-        await wait(500);
+        await wait(1000);
 
         uiState.gameOver = true;
         return;

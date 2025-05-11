@@ -52,7 +52,7 @@ const replay = () => {
 </script>
 
 <game-over-options
-    in:halfFlipRight|global={{duration: 3000, easing: elasticOut}}
+    in:halfFlipRight|global={{duration: 4000, easing: elasticOut}}
     out:halfFlipLeft|global={{duration: 500, easing: backIn}}
 >
     <game-over-label>game over</game-over-label>
