@@ -60,12 +60,7 @@ button-container {
 button {
     --button-color: var(--button-bg);
 
-    display: block;
-    border: none;
     background: var(--button-color);
-    font-family: inherit;
-    font-size: 1em;
-    color: inherit;
     width: 100%;
     backface-visibility: hidden;
 

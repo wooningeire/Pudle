@@ -31,10 +31,10 @@ export const gameState = $state({
 
 export const nextTileId = () => gameState.nextTileId++;
 
-export const setNextGuessTiles = () => {
+export const setNextGuessTileIds = () => {
     gameState.guessTileIds = new Array(5).fill(0).map(() => nextTileId());
 };
-setNextGuessTiles();
+setNextGuessTileIds();
 
 export const removeTags = (tags: TileTag[]) => {
     for (const tag of tags) {
@@ -221,7 +221,8 @@ export const resetGameState = () => {
         absent: TileColor.Gray,
     };
 
-    gameState.guessTileIds = [];
+    setNextGuessTileIds();
+    
 
     gameState.stats = {
         nthWord: 1,

@@ -1,7 +1,8 @@
-import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles, setNextGuessTiles, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess, removeTags, resetGameState } from "./gameState.svelte.ts";
+import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles, setNextGuessTileIds, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess, removeTags, resetGameState } from "./gameState.svelte.ts";
 import { Tile, TileColor } from "$lib/types/Tile.ts";
 import { guessMatches, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, resetRoundState } from "./roundState.svelte.ts";
 import { TileTag } from "$lib/types/TileTag.ts";
+import type { MatchResult } from "../types/MatchResult.ts";
 
 export const uiState = $state({
     guess: "",
@@ -13,25 +14,37 @@ export const uiState = $state({
     gameOver: false,
 });
 
-const resetGuessTiles = () => {
-    uiState.guessTiles = uiState.guess
+const resetGuessTiles = (guess=uiState.guess) => {
+    uiState.guessTiles = guess
         .padEnd(5, " ")
         .split("")
         .map((char, i) => new Tile(gameState.guessTileIds[i], TileColor.Empty, char === " " ? "" : char));
 };
 
-const checkIfTilesNeedTagging = () => {
-    const tags: TileTag[] = [];
+type ExistingRowEvaluation = {
+    y: number,
+    mockGuess: string,
+    results: MatchResult[],
+    existingTiles: Tile[],
+};
 
+const reevaluateExistingRows = function* () {
     const maxColumnHeight = Math.max(...gameState.board.map(column => column.length));
     for (let y = 0; y < maxColumnHeight; y++) {
         const existingTiles = gameState.board.map(column => column[y] ?? null);
         const mockGuess = existingTiles.map(tile => tile?.letter ?? " ").join("");
 
         const results = matchResults(mockGuess);
-        const tiles = tilesFromMatchResults(mockGuess, results, existingTiles);
 
-        updateKnownLetterInfo(mockGuess, results);
+        yield {y, mockGuess, results, existingTiles};
+    }
+};
+
+const checkIfTilesNeedTagging = (evaluations: ExistingRowEvaluation[]) => {
+    const tags: TileTag[] = [];
+
+    for (const {y, mockGuess, results, existingTiles} of evaluations) {
+        const tiles = tilesFromMatchResults(mockGuess, results, existingTiles);
 
         for (const [x, tile] of tiles.entries()) {
             if (tile === null) continue;
@@ -44,6 +57,12 @@ const checkIfTilesNeedTagging = () => {
     }
 
     return tags;
+};
+
+const updateInfoFromReevaluation = (evaluations: ExistingRowEvaluation[]) => {
+    for (const {mockGuess, results} of evaluations) {
+        updateKnownLetterInfo(mockGuess, results);
+    }
 };
 
 resetGuessTiles();
@@ -69,13 +88,11 @@ const destroyCellsIfApplicable = async () => {
 };
 
 export const consumeGuess = async () => {
-    const guess = uiState.guess;
-
     if (uiState.inputLocked) return;
-    if (!await isValidGuess(guess)) return;
+    if (!await isValidGuess(uiState.guess)) return;
 
-    const results = matchResults(guess);
-    const tiles = tilesFromMatchResults(guess, results);
+    const results = matchResults(uiState.guess);
+    const tiles = tilesFromMatchResults(uiState.guess, results);
 
     uiState.inputLocked = true;
     uiState.flipping = true;
@@ -84,23 +101,22 @@ export const consumeGuess = async () => {
     await wait(isFirstGuess() ? 2250 : 875); // wait for the flipping animation
 
     if (!isFirstGuess()) {
-        updateKnownLetterInfo(guess, results); // delay this until later for the first guess
+        updateKnownLetterInfo(uiState.guess, results); // delay this until later for the first guess
     }
     placeNewTiles(tiles);
-    recordGuessResults(guess, results);
+    recordGuessResults(uiState.guess, results);
 
-    uiState.guess = "";
     uiState.flipping = false;
-    resetGuessTiles();
+    resetGuessTiles(""); // make sure the letters don't render in their original spots
 
     await wait(isFirstGuess() ? 1500 : 500); // falling animation
 
-    setNextGuessTiles();
-    resetGuessTiles();
+    setNextGuessTileIds();
+    resetGuessTiles(""); // switch to the new ids of the guess tiles
 
     await destroyCellsIfApplicable();
 
-    if (guessMatches(guess)) {
+    if (guessMatches(uiState.guess)) {
         await wait(500);
 
         await nextWord();
@@ -109,7 +125,13 @@ export const consumeGuess = async () => {
 
     await wait(250);
 
-    const tags = checkIfTilesNeedTagging();
+    const evaluationsOfExistingRows = [...reevaluateExistingRows()];
+
+    const tags = checkIfTilesNeedTagging(evaluationsOfExistingRows);
+    if (!isFirstGuess()) {
+        updateInfoFromReevaluation(evaluationsOfExistingRows);
+    }
+
 
     if (tags.length > 0) {
         removeTags(tags);
@@ -128,10 +150,12 @@ export const consumeGuess = async () => {
     }
 
     if (isFirstGuess()) {
-        updateKnownLetterInfo(guess, results);
+        updateKnownLetterInfo(uiState.guess, results);
+        updateInfoFromReevaluation(evaluationsOfExistingRows);
     }
 
     gameState.stats.nthGuess++;
+    uiState.guess = "";
     uiState.inputLocked = false;
 };
 
@@ -157,8 +181,8 @@ export const reset = async () => {
     uiState.guess = "";
     uiState.inputLocked = false;
     uiState.flipping = false;
-    resetGuessTiles();
     uiState.currentIslands = [];
     uiState.currentGrays = [];
     uiState.gameOver = false;
+    resetGuessTiles();
 };

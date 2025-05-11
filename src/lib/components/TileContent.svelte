@@ -55,14 +55,16 @@ tile-content {
     background-repeat: no-repeat;
     background-size: 5rem 5rem;
 
-    transition: background-position 0.25s cubic-bezier(.04,.64,.2,1.43);
-
     backface-visibility: hidden;
 
     &:not(.has-tab) {
+        transition: background-position 0.25s cubic-bezier(.65,0,1,.45);
+
         background-position: -0.5rem -0.5rem;
     }
     &.has-tab {
+        transition: background-position 0.25s cubic-bezier(.04,.64,.2,1.43);
+
         background-position: -1.75rem -1.75rem;
     }
 

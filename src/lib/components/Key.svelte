@@ -39,28 +39,28 @@ const mustNot = $derived(
 const disabled = $derived(uiState.inputLocked || forceDisabled);
 </script>
 
-<key-view
+<button
     onclick={() => !disabled && onClick()}
-    tabindex="0"
     class:small
     class:has-color={hasInfo && info!.type !== MatchResult.Empty}
     class:must
     class:must-not={mustNot}
-    class:disabled
     style:background={bgColor}
     style:--box-shadow-color={bgColorDark}
+    {disabled}
 >
     {label}
-</key-view>
+</button>
 
 <style lang="scss">
-key-view {
+button {
     --box-shadow-color: var(--button-bg-dark);
 
     display: grid;
     place-items: center;
     background: var(--button-bg);
     box-shadow: 0 0.25rem var(--box-shadow-color);
+    border: none;
     width: 2rem;
     height: 3rem;
     border-radius: 0.5rem;
@@ -106,14 +106,14 @@ key-view {
     }
 
     &.must-not {
-        filter: brightness(0.85);
+        filter: brightness(0.75);
     }
 
     &.has-color {
         color: #fff;
     }
 
-    &.disabled {
+    &[disabled] {
         opacity: 0.3333333;
         transform: scale(0.85);
         pointer-events: none;

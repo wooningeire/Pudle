@@ -1,6 +1,6 @@
 <script lang="ts">
     import { cubicInOut } from "svelte/easing";
-    import type { MatchResult } from "../types/MatchResult";
+    import { MatchResult } from "../types/MatchResult";
     import { getMatchResultCssColor } from "../types/tileColors";
     import { flipLeft, flipRight, halfFlipLeft, halfFlipRight } from "./transition";
 
@@ -27,6 +27,7 @@ const bgColor = $derived(getMatchResultCssColor(matchResult));
     in:halfFlipLeft|global={{duration: 500, delay: x * 50, easing: cubicInOut}}
     out:halfFlipRight|global={{duration: 500, delay: x * 50 + y * 50, easing: cubicInOut}}
     class:smaller
+    class:empty={matchResult === MatchResult.Empty}
 >{letter}</mini-tile>
 
 
@@ -34,14 +35,22 @@ const bgColor = $derived(getMatchResultCssColor(matchResult));
 mini-tile {
     width: 1.25rem;
     height: 1.25rem;
-    color: #fff;
     display: inline-grid;
     vertical-align: middle;
     place-items: center;
+    line-height: 0.8;
 
     &.smaller {
         width: 1rem;
         height: 1rem;
+    }
+
+    &:not(.empty) {
+        color: #fff;
+    }
+
+    &.empty {
+        border: 2px solid #aaa;
     }
 }
 </style>

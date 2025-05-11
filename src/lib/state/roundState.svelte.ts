@@ -42,13 +42,6 @@ const resetKnownLetterInfo = () => {
 }
 
 
-resetKnownLetterInfo();
-(async () => {
-    roundState.word = (await initialLoadState.services).words.getRandomTargetWord();
-    roundState.ready = true;
-})();
-
-
 
 
 export const nextWord = async () => {
@@ -62,30 +55,20 @@ export const guessMatches = (guess: string) => {
 }
 
 
-const updateInfoFromResult = (i: number, char: string, result: MatchResult) => {
-    if (char === " " || result === MatchResult.Empty) return;
-
+const updateInfoFromResult = (index: number, char: string, result: MatchResult) => {
     const info = roundState.knownLetterInfo[char];
+
 
     switch (result) {
         case MatchResult.Match:
-            forEachLetter(letter => {
-                roundState.knownLetterInfo[letter].positionInfo[i] = PositionType.MustNotBeInPosition;
-            });
-
-            const newPositionInfo = [...info.positionInfo];
-            newPositionInfo[i] = PositionType.MustBeInPosition;
-
-
-            roundState.knownLetterInfo[char] = {
-                type: MatchResult.Match,
-                positionInfo: newPositionInfo,
-            };
+            updateInfoFromKnownChar(index, char);
+    
+            roundState.knownLetterInfo[char].type = MatchResult.Match;
             return;
 
         case MatchResult.Misplaced: {
             const newPositionInfo = [...info.positionInfo];
-            newPositionInfo[i] = PositionType.MustNotBeInPosition;
+            newPositionInfo[index] = PositionType.MustNotBeInPosition;
 
             roundState.knownLetterInfo[char] = {
                 type: info.type === MatchResult.Match
@@ -96,40 +79,94 @@ const updateInfoFromResult = (i: number, char: string, result: MatchResult) => {
             return;
         }
 
-        case MatchResult.Absent:
-            roundState.knownLetterInfo[char] = {
-                type: info.type === MatchResult.Empty
-                    ? MatchResult.Absent
-                    : info.type,
-                positionInfo: info.positionInfo.map(
-                    positionType => positionType === PositionType.MustBeInPosition
-                        ? PositionType.MustBeInPosition
-                        : PositionType.MustNotBeInPosition
-                ),
-            };
-            return;
+        // Absent must be handled after processing the rest of these
     }
 };
 
+const updateInfoFromAbsentResult = (index: number, guess: string) => {
+    const char = guess[index];
+
+    const info = roundState.knownLetterInfo[char];
+
+    // Absent appears when there are more instances of a letter than in the guess
+    const nActualAppearances = roundState.word.split("").filter(letter => letter === char).length;
+    const nKnownPositions = info.positionInfo.filter(positionType => positionType === PositionType.MustBeInPosition).length;
+
+    let newPositionInfo: PositionType[];
+    if (nActualAppearances === nKnownPositions) {
+        // We know where those instances should be already
+        newPositionInfo = info.positionInfo.map(
+            positionType => positionType === PositionType.MustBeInPosition
+                ? PositionType.MustBeInPosition
+                : PositionType.MustNotBeInPosition
+        );
+    } else {
+        // We just know it's not at this index
+        newPositionInfo = [...info.positionInfo];
+        newPositionInfo[index] = PositionType.MustNotBeInPosition;
+    }
+
+    roundState.knownLetterInfo[char] = {
+        type: info.type === MatchResult.Empty
+            ? MatchResult.Absent
+            : info.type,
+        positionInfo: newPositionInfo,
+    };
+};
+
 const updateInfoFromElimination = () => {
-    for (const info of Object.values(roundState.knownLetterInfo)) {
+    let changeOccurred = false;
+
+    for (const [char, info] of Object.entries(roundState.knownLetterInfo)) {
         if (info.type !== MatchResult.Misplaced) continue;
         if (info.positionInfo.filter(positionType => positionType === PositionType.MustNotBeInPosition).length !== 4) continue;
 
-        const lastIndex = info.positionInfo.findIndex(positionType => positionType === PositionType.NoInfo);
-        if (lastIndex === -1) continue;
+        const lastUnknownIndex = info.positionInfo.findIndex(positionType => positionType === PositionType.NoInfo);
+        if (lastUnknownIndex === -1) continue;
 
-        info.positionInfo[lastIndex] = PositionType.MustBeInPosition;
+        updateInfoFromKnownChar(lastUnknownIndex, char);
+        changeOccurred = true;
+    }
+
+    return changeOccurred;
+};
+
+const updateInfoFromKnownChar = (index: number, char: string) => {
+    forEachLetter(letter => {
+        if (letter === char) return;
+        roundState.knownLetterInfo[letter].positionInfo[index] = PositionType.MustNotBeInPosition;
+    });
+
+    const newPositionInfo = [...roundState.knownLetterInfo[char].positionInfo];
+    newPositionInfo[index] = PositionType.MustBeInPosition;
+
+    roundState.knownLetterInfo[char].positionInfo[index] = PositionType.MustBeInPosition;
+};
+
+const updateInfoFromExistingInfo = () => {
+    while (true) {
+        const changeOccurred = updateInfoFromElimination();
+        if (!changeOccurred) return;
     }
 };
 
 export const updateKnownLetterInfo = (guess: string, matchResults: MatchResult[]) => {
+    let absentIndices: number[] = [];
     for (const [i, result] of matchResults.entries()) {
         if (guess[i] === " " || result === MatchResult.Empty) continue;
 
         updateInfoFromResult(i, guess[i], result);
+
+        if (result === MatchResult.Absent) {
+            absentIndices.push(i);
+        }
     }
-    updateInfoFromElimination();
+
+    for (const index of absentIndices) {
+        updateInfoFromAbsentResult(index, guess);
+    }
+
+    updateInfoFromExistingInfo();
 };
 
 export const isValidGuess = async (guess: string) => {
@@ -180,11 +217,22 @@ export const matchResults = (guess: string) => {
     return results;
 };
 
+
+const init = async () => {
+    resetKnownLetterInfo();
+    await (async () => {
+        roundState.word = (await initialLoadState.services).words.getRandomTargetWord();
+        roundState.ready = true;
+    })();
+};
+
 export const resetRoundState = async () => {
-    const word = (await initialLoadState.services).words.getRandomTargetWord();
+    roundState.word = "";
     roundState.guessedWords.clear();
     roundState.knownLetterInfo = {};
-    resetKnownLetterInfo();
-    roundState.ready = true;
-    roundState.word = word;
+    roundState.ready = false;
+
+    await init();
 };
+
+init();

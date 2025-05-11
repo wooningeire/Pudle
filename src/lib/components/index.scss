@@ -6,9 +6,11 @@
     --off-black: #42444b;
         
     --light-green: #8dc28d;
+    
     --tile-green: #66a166;
     --tile-yellow: #bbb660;
     --tile-gray: #7c7c81;
+    --tile-empty: #0000;
 
     --tile-green-dark: #457462;
     --tile-yellow-dark: #75704c;
@@ -42,4 +44,12 @@ a {
 
     text-decoration: none;
     border-bottom: currentcolor 2px solid;
+}
+
+button {
+    display: block;
+    border: none;
+    font-family: inherit;
+    font-size: 1em;
+    color: inherit;
 }

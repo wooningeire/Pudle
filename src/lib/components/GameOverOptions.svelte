@@ -6,7 +6,7 @@ import { TileColor } from "$lib/types/Tile";
     import { reset } from "../state/uiState.svelte";
 import Button from "./Button.svelte";
     import { flipLeft, flipRight, halfFlipLeft, halfFlipRight } from "./transition";
-    import { cubicIn, cubicInOut, cubicOut, elasticIn, elasticOut } from "svelte/easing";
+    import { backIn, backOut, cubicIn, cubicInOut, cubicOut, elasticIn, elasticOut } from "svelte/easing";
 
 const resultsString = () => `**Pudle**
 word ${gameState.stats.nthWord} / guess ${gameState.stats.nthGuess} 
@@ -53,7 +53,7 @@ const replay = () => {
 
 <game-over-options
     in:halfFlipRight|global={{duration: 3000, easing: elasticOut}}
-    out:halfFlipLeft|global={{duration: 1000, easing: cubicOut}}
+    out:halfFlipLeft|global={{duration: 500, easing: backIn}}
 >
     <game-over-label>game over</game-over-label>
 
