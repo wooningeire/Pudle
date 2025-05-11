@@ -1,5 +1,5 @@
 <script lang="ts">
-import { getTileTypeCssColor, getTileTypeCssColorDark } from "$lib/types/tileColors.ts";
+import { getMatchResultCssColor, getMatchResultCssColorDark } from "$lib/types/tileColors.ts";
 import { uiState } from "$lib/state/uiState.svelte.ts";
 import { PositionType, roundState } from "../state/roundState.svelte";
     import { MatchResult } from "../types/MatchResult";
@@ -25,8 +25,8 @@ const hasInfo = $derived(colorable && Object.hasOwn(roundState.knownLetterInfo, 
 const info = $derived(hasInfo ? roundState.knownLetterInfo[label] : null);
 const currentLetterPositionInfo = $derived(info?.positionInfo[inputingWhichLetter] ?? null);
 
-const bgColor = $derived(hasInfo ? getTileTypeCssColor(info!.type) : "");
-const bgColorDark = $derived(hasInfo ? getTileTypeCssColorDark(info!.type) : "");
+const bgColor = $derived(hasInfo ? getMatchResultCssColor(info!.type) : "");
+const bgColorDark = $derived(hasInfo ? getMatchResultCssColorDark(info!.type) : "");
 
 const must = $derived(
     !uiState.inputLocked
@@ -43,7 +43,7 @@ const disabled = $derived(uiState.inputLocked || forceDisabled);
     onclick={() => !disabled && onClick()}
     tabindex="0"
     class:small
-    class:has-color={hasInfo && info!.type !== TileColor.Empty}
+    class:has-color={hasInfo && info!.type !== MatchResult.Empty}
     class:must
     class:must-not={mustNot}
     class:disabled

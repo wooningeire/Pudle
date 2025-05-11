@@ -1,6 +1,6 @@
 import { crossfade, fade } from "svelte/transition";
 
-export const [send, receive] = crossfade({
+export const [sendWithFade, receiveWithFade] = crossfade({
     fallback(node, {duration, delay, easing}, intro) {
         return {
             duration: typeof duration === "function" ? duration(0) : duration,
@@ -10,20 +10,42 @@ export const [send, receive] = crossfade({
         };
     },
 });
+export const [send, receive] = crossfade({});
 
 
-export const flipLeft = (node: HTMLElement, {duration, delay}: {duration: number, delay: number}) => {
+export const flipLeft = (node: HTMLElement, {duration, delay, easing, baseRot="0deg"}: {duration?: number, delay?: number, easing?: (t: number) => number, baseRot?: string}) => {
     return {
         duration,
         delay,
-        css: (t: number, u: number) => `transform: rotateY(${u * 0.25}turn);`,
+        easing,
+        css: (t: number, u: number) => `transform: rotateY(calc(${u * 0.5}turn + ${baseRot}));`,
     };
 };
 
-export const flipRight = (node: HTMLElement, {duration, delay}: {duration: number, delay: number}) => {
+export const flipRight = (node: HTMLElement, {duration, delay, easing, baseRot="0deg"}: {duration?: number, delay?: number, easing?: (t: number) => number, baseRot?: string}) => {
     return {
         duration,
         delay,
-        css: (t: number, u: number) => `transform: rotateY(-${u * 0.25}turn);`,
+        easing,
+        css: (t: number, u: number) => `transform: rotateY(calc(${u * -0.5}turn + ${baseRot}));`,
+    };
+};
+
+
+export const halfFlipLeft = (node: HTMLElement, {duration, delay, easing, baseRot="0deg"}: {duration?: number, delay?: number, easing?: (t: number) => number, baseRot?: string}) => {
+    return {
+        duration,
+        delay,
+        easing,
+        css: (t: number, u: number) => `transform: rotateY(calc(${u * 0.25}turn + ${baseRot}));`,
+    };
+};
+
+export const halfFlipRight = (node: HTMLElement, {duration, delay, easing, baseRot="0deg"}: {duration?: number, delay?: number, easing?: (t: number) => number, baseRot?: string}) => {
+    return {
+        duration,
+        delay,
+        easing,
+        css: (t: number, u: number) => `transform: rotateY(calc(${u * -0.25}turn + ${baseRot}));`,
     };
 };

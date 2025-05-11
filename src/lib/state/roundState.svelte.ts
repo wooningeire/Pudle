@@ -13,18 +13,16 @@ export enum PositionType {
 }
 
 export type KnownLetterInfo = {
-    type: TileColor,
+    type: MatchResult,
     positionInfo: PositionType[],
 };
 
-const roundStateInitial = {
+export const roundState = $state({
     word: "",
     guessedWords: new SvelteMap<string, MatchResult[]>(),
     knownLetterInfo: <Record<string, KnownLetterInfo>>{},
     ready: false,
-};
-
-export const roundState = $state(structuredClone(roundStateInitial));
+});
 
 
 const forEachLetter = (fn: (char: string) => void) => {
@@ -37,7 +35,7 @@ const forEachLetter = (fn: (char: string) => void) => {
 const resetKnownLetterInfo = () => {
     forEachLetter(char => {
         roundState.knownLetterInfo[char] = {
-            type: TileColor.Empty,
+            type: MatchResult.Empty,
             positionInfo: new Array(5).fill(0).map(() => PositionType.NoInfo)
         };
     });
@@ -80,7 +78,7 @@ const updateInfoFromResult = (i: number, char: string, result: MatchResult) => {
 
 
             roundState.knownLetterInfo[char] = {
-                type: TileColor.Green,
+                type: MatchResult.Match,
                 positionInfo: newPositionInfo,
             };
             return;
@@ -90,9 +88,9 @@ const updateInfoFromResult = (i: number, char: string, result: MatchResult) => {
             newPositionInfo[i] = PositionType.MustNotBeInPosition;
 
             roundState.knownLetterInfo[char] = {
-                type: info.type === TileColor.Green
-                    ? TileColor.Green
-                    : TileColor.Yellow,
+                type: info.type === MatchResult.Match
+                    ? MatchResult.Match
+                    : MatchResult.Misplaced,
                 positionInfo: newPositionInfo,
             };
             return;
@@ -100,8 +98,8 @@ const updateInfoFromResult = (i: number, char: string, result: MatchResult) => {
 
         case MatchResult.Absent:
             roundState.knownLetterInfo[char] = {
-                type: info.type === TileColor.Empty
-                    ? TileColor.Gray
+                type: info.type === MatchResult.Empty
+                    ? MatchResult.Absent
                     : info.type,
                 positionInfo: info.positionInfo.map(
                     positionType => positionType === PositionType.MustBeInPosition
@@ -115,6 +113,7 @@ const updateInfoFromResult = (i: number, char: string, result: MatchResult) => {
 
 const updateInfoFromElimination = () => {
     for (const info of Object.values(roundState.knownLetterInfo)) {
+        if (info.type !== MatchResult.Misplaced) continue;
         if (info.positionInfo.filter(positionType => positionType === PositionType.MustNotBeInPosition).length !== 4) continue;
 
         const lastIndex = info.positionInfo.findIndex(positionType => positionType === PositionType.NoInfo);
@@ -182,5 +181,9 @@ export const matchResults = (guess: string) => {
 };
 
 export const resetRoundState = () => {
-    Object.assign(roundState, structuredClone(roundStateInitial));
+    roundState.word = "";
+    roundState.guessedWords.clear();
+    roundState.knownLetterInfo = {};
+    resetKnownLetterInfo();
+    roundState.ready = true;
 };

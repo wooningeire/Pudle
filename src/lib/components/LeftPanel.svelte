@@ -5,12 +5,13 @@ import { uiState } from "../state/uiState.svelte";
 import Button from "./Button.svelte";
 import GameOverOptions from "./GameOverOptions.svelte";
 import GameStats from "./GameStats.svelte";
-    import { quartOut } from "svelte/easing";
+    import { elasticOut, quartOut } from "svelte/easing";
+    import { flipLeft, halfFlipLeft } from "./transition";
 </script>
 
 
 {#if !isFirstGuess()}
-    <left-panel in:fly={{duration: 2000, easing: quartOut}}>
+    <left-panel in:halfFlipLeft={{duration: 3000, easing: elasticOut, baseRot: "35deg"}}>
         <GameStats />
 
         {#if uiState.gameOver}
@@ -33,6 +34,9 @@ left-panel {
 
     transform: rotateY(35deg) scale(var(--scale-fac));
     transform-origin: right;
+    backface-visibility: hidden;
+    
+    transform-style: preserve-3d;
 
     --scale-fac: 1;
     @media screen and (max-width: $small-width) {

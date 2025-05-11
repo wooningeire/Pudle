@@ -3,7 +3,7 @@ import { Tile, TileColor } from "$lib/types/Tile.ts";
 import { guessMatches, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, resetRoundState } from "./roundState.svelte.ts";
 import { TileTag } from "$lib/types/TileTag.ts";
 
-const uiStateInitial = {
+export const uiState = $state({
     guess: "",
     inputLocked: false,
     flipping: false,
@@ -11,9 +11,7 @@ const uiStateInitial = {
     currentIslands: <Point[][]>[],
     currentGrays: <Point[]>[],
     gameOver: false,
-};
-
-export const uiState = $state(structuredClone(uiStateInitial));
+});
 
 const resetGuessTiles = () => {
     uiState.guessTiles = uiState.guess
@@ -85,7 +83,9 @@ export const consumeGuess = async () => {
 
     await wait(isFirstGuess() ? 2250 : 875); // wait for the flipping animation
 
-    updateKnownLetterInfo(guess, results);
+    if (!isFirstGuess()) {
+        updateKnownLetterInfo(guess, results); // delay this until later for the first guess
+    }
     placeNewTiles(tiles);
     recordGuessResults(guess, results);
 
@@ -127,6 +127,10 @@ export const consumeGuess = async () => {
         return;
     }
 
+    if (isFirstGuess()) {
+        updateKnownLetterInfo(guess, results);
+    }
+
     gameState.stats.nthGuess++;
     uiState.inputLocked = false;
 };
@@ -147,7 +151,14 @@ export const extendGuess = (char: string) => {
 };
 
 export const reset = () => {
-    Object.assign(uiState, structuredClone(uiStateInitial));
+    uiState.guess = "";
+    uiState.inputLocked = false;
+    uiState.flipping = false;
+    resetGuessTiles();
+    uiState.currentIslands = [];
+    uiState.currentGrays = [];
+    uiState.gameOver = false;
+
     resetGameState();
     resetRoundState();
 };

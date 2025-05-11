@@ -27,3 +27,19 @@ body {
 
     color: var(--off-black);
 }
+
+a {
+    color: var(--tile-green-dark);
+
+    &:hover,
+    &:focus {
+        color: var(--tile-green);
+    }
+
+    &:active {
+        color: var(--off-black);
+    }
+
+    text-decoration: none;
+    border-bottom: currentcolor 2px solid;
+}

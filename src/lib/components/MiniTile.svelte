@@ -1,7 +1,8 @@
 <script lang="ts">
+    import { cubicInOut } from "svelte/easing";
     import type { MatchResult } from "../types/MatchResult";
     import { getMatchResultCssColor } from "../types/tileColors";
-    import { flipLeft, flipRight } from "./transition";
+    import { flipLeft, flipRight, halfFlipLeft, halfFlipRight } from "./transition";
 
 const {
     letter = " ",
@@ -21,8 +22,8 @@ const bgColor = $derived(getMatchResultCssColor(matchResult));
 
 <mini-tile
     style:background={bgColor}
-    in:flipLeft|global={{duration: 500, delay: x * 50}}
-    out:flipRight|global={{duration: 500, delay: x * 50 + y * 50}}
+    in:halfFlipLeft|global={{duration: 500, delay: x * 50, easing: cubicInOut}}
+    out:halfFlipRight|global={{duration: 500, delay: x * 50 + y * 50, easing: cubicInOut}}
 >{letter}</mini-tile>
 
 

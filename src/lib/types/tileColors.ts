@@ -19,4 +19,4 @@ const matchColorsMap = new Map<MatchResult, string>([
 ]);
 
 export const getMatchResultCssColor = (result: MatchResult) => matchColorsMap.has(result) ? `var(${matchColorsMap.get(result)!})` : "";
-export const getmatchResultCssColorDark = (result: MatchResult) => matchColorsMap.has(result) ? `var(${matchColorsMap.get(result)!}-dark)` : "";
+export const getMatchResultCssColorDark = (result: MatchResult) => matchColorsMap.has(result) ? `var(${matchColorsMap.get(result)!}-dark)` : "";

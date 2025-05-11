@@ -78,6 +78,8 @@ tile-bg {
     outline: 2px solid #aaa;
     outline-offset: -0.5rem;
 
+    backface-visibility: hidden;
+
     &.filled {
         outline: 2px solid var(--off-black);
         outline-offset: 0;
@@ -97,9 +99,7 @@ tile-bg {
     }
 
     &.flipping {
-        opacity: 1;
-        transform: rotateX(0deg);
-        animation: flip-bg 0.5s ease-in forwards;
+        animation: flip-bg 0.5s ease-in-out forwards;
         animation-delay: var(--reveal-animation-delay);
 
         &.is-first-guess {
@@ -108,20 +108,14 @@ tile-bg {
         
         @keyframes flip-bg {
             0% {
-                opacity: 1;
-                transform: rotateX(0deg);
+                transform: rotateX(0turn);
             }
             50% {
-                opacity: 1;
-                transform: rotateX(-90deg);
-            }
-            50.00001% {
-                opacity: 0;
                 outline-offset: 0rem;
                 outline-color: var(--off-black);
             }
             100% {
-                opacity: 0;
+                transform: rotateX(-0.5turn);
                 outline-offset: -2rem;
                 outline-color: #0000;
             }

@@ -57,6 +57,8 @@ tile-content {
 
     transition: background-position 0.25s cubic-bezier(.04,.64,.2,1.43);
 
+    backface-visibility: hidden;
+
     &:not(.has-tab) {
         background-position: -0.5rem -0.5rem;
     }
@@ -65,9 +67,8 @@ tile-content {
     }
 
     &.flipping {
-        opacity: 0;
-        transform: rotateX(90deg);
-        animation: flip-content 0.5s ease-out forwards;
+        transform: rotateX(0.5turn);
+        animation: flip-content 0.5s ease-in-out forwards;
         animation-delay: var(--reveal-animation-delay);
 
         &.is-first-guess {
@@ -76,18 +77,10 @@ tile-content {
 
         @keyframes flip-content {
             0% {
-                opacity: 0;
-            }
-            49.99999% {
-                opacity: 0;
-            }
-            50% {
-                opacity: 1;
-                transform: rotateX(90deg);
+                transform: rotateX(0.5turn);
             }
             100% {
-                opacity: 1;
-                transform: rotateX(0deg);
+                transform: rotateX(0turn);
             }
         }
     }

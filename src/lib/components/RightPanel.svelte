@@ -1,13 +1,14 @@
 <script>
-    import { quartOut } from "svelte/easing";
+    import { elasticOut, quartOut } from "svelte/easing";
     import { isFirstGuess } from "../state/gameState.svelte";
     import PrevGuessesDisplay from "./PrevGuessesDisplay.svelte";
     import { fly } from "svelte/transition";
+    import { flipRight, halfFlipRight } from "./transition";
 
 </script>
 
 {#if !isFirstGuess()}
-    <right-panel in:fly={{duration: 2000, easing: quartOut}}>
+    <right-panel in:halfFlipRight={{duration: 3000, easing: elasticOut, baseRot: "-35deg"}}>
         <PrevGuessesDisplay />
     </right-panel>
 {/if}
@@ -27,6 +28,7 @@ right-panel {
 
     transform: rotateY(-35deg) scale(var(--scale-fac));
     transform-origin: left;
+    backface-visibility: hidden;
 
 
     --scale-fac: 1;

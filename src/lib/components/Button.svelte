@@ -22,10 +22,11 @@ const handleClick = async () => {
 };
 </script>
 
-<button-container>
+<button-container
+    class:success={shouldFlash}
+>
     <button
         onclick={handleClick}
-        class:success={shouldFlash}
         bind:this={buttonEl}
     >
         {@render children()}
@@ -37,55 +38,99 @@ const handleClick = async () => {
 </button-container>
 
 <style lang="scss">
+button-container {
+    display: grid;
+    place-items: stretch;
+    transform-style: preserve-3d;
+
+    > * {
+        grid-area: 1/1;
+        border-radius: 1rem;
+    }
+
+    transition:
+        transform 0.25s cubic-bezier(.14,1.51,.35,1),
+        filter 0.125s ease-in-out;
+        
+    &:has(button:hover, button:focus-within) {
+        transform: translateX(0.5rem);
+    }
+}
+
 button {
-    --box-shadow-color: var(--button-bg-dark);
+    --button-color: var(--button-bg);
 
     display: block;
     border: none;
-    background: var(--button-bg);
+    background: var(--button-color);
     font-family: inherit;
     font-size: 1em;
     color: inherit;
     width: 100%;
+    backface-visibility: hidden;
 
     padding: 0.5rem 1rem;
     cursor: pointer;
-    border-radius: 1rem;
-    box-shadow: -0.25rem -0.25rem var(--box-shadow-color);
 
     transition:
-        transform 0.25s cubic-bezier(.14,1.51,.35,1),
-        filter 0.125s ease-in-out,
-        box-shadow 0.125s ease-in-out;
+        background 0.125s ease-in-out,
+        filter 0.125s ease-in-out;
 
     &:hover,
     &:focus {
-        transform: translateX(0.5rem);
         filter: brightness(1.125);
+
+        + button-shadow {
+            filter: brightness(1.125);
+        }
     }
 
     &:active {
         filter: brightness(0.85);
-        animation: click-in 0.25s ease-out forwards;
+        
 
-        @keyframes click-in {
+        + button-shadow {
+            filter: brightness(0.85);
+        }
+    }
+}
+
+button-shadow {
+    --box-shadow-color: var(--button-bg-dark);
+
+    transform: translateZ(-1.5rem);
+    background: var(--box-shadow-color);
+    backface-visibility: hidden;
+
+    transition:
+        background 0.125s ease-in-out,
+        filter 0.125s ease-in-out;
+}
+
+.success {
+    button {
+        animation: flash-green-button 0.5s forwards;
+
+        @keyframes flash-green-button {
             0% {
-                transform: translate(0rem -0.5rem);
+                background: var(--light-green);
+            }
+            50% {
+                background: var(--light-green);
             }
         }
     }
 
-    &.success {
-        animation: flash-green 0.5s forwards;
+    
+    button-shadow {
+        animation: flash-green-shadow 0.5s forwards;
 
-        @keyframes flash-green {
+        @keyframes flash-green-shadow {
             0% {
-                background: var(--light-green);
-                --box-shadow-color: var(--tile-green);
+                background: var(--tile-green);
             }
             50% {
-                background: var(--light-green);
-                --box-shadow-color: var(--tile-green);
+                background: var(--tile-green);
             }
         }
     }

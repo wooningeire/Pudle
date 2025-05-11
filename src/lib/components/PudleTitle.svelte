@@ -26,7 +26,15 @@ const {
 
         <title-text>
             <pudle-title>Pudle</pudle-title>
-            <pudle-credit>by vaiezzell</pudle-credit>
+            <pudle-credit>
+                by
+                <a
+                    href="https://vaie.art"
+                    target="_blank"
+                >
+                    vaiezzell
+                </a>
+            </pudle-credit>
         </title-text>
     </title-container>
 {/key}
