@@ -1,11 +1,13 @@
+import {base} from "$app/paths";
+
 const parseResponse = async (response: Response) => {
     return (await response.text()).split(/\s+/);
 }
 
 export const createWordGetter = async () => {
     const [canBeAnswer, cannotBeAnswer] = await Promise.all([
-        fetch("/words/can-be-answer.txt").then(parseResponse),
-        fetch("/words/cannot-be-answer.txt").then(parseResponse),
+        fetch(`${base}/words/can-be-answer.txt`).then(parseResponse),
+        fetch(`${base}/words/cannot-be-answer.txt`).then(parseResponse),
     ]);
 
     const validGuesses = new Set([...canBeAnswer, ...cannotBeAnswer]);

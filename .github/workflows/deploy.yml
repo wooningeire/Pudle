@@ -32,7 +32,7 @@ jobs:
         run: "deno install"
 
       - name: Build step
-        run: "deno task build"
+        run: "deno task build:relative"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
