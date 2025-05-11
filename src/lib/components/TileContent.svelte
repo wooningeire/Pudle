@@ -3,7 +3,7 @@ import {Tile, TileColor} from "$lib/types/Tile.ts";
     import { getTileTypeCssColor } from "$lib/types/tileColors.ts";
 import { receive, send } from "#/transition.ts";
     import { cubicIn, cubicInOut, cubicOut, quadIn } from "svelte/easing";
-    import { gameState } from "../state/gameState.svelte";
+    import { gameState, isFirstGuess } from "../state/gameState.svelte";
 
 const {
     tile,
@@ -20,7 +20,7 @@ const hasTab = $derived(tile.currentWordColor !== null && tile.currentWordColor 
 const bgColor = $derived(getTileTypeCssColor(tile.color));
 const tabColor = $derived(tile.currentWordColor !== null ? getTileTypeCssColor(tile.currentWordColor!) : bgColor);
 
-const fallDuration = $derived(gameState.stats.nthGuess === 1 ? 1000 : 500)
+const fallDuration = $derived(isFirstGuess() ? 700 : 500)
 </script>
 
 
@@ -32,7 +32,7 @@ const fallDuration = $derived(gameState.stats.nthGuess === 1 ? 1000 : 500)
     class:has-tab={hasTab}
     style:--reveal-animation-delay="{revealAnimationDelay}ms"
     style:--tab-color={tabColor}
-    class:is-first-guess={gameState.stats.nthGuess === 1}
+    class:is-first-guess={isFirstGuess()}
 >
     <div>{tile.letter}</div>
 </tile-content>

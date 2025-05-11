@@ -1,10 +1,10 @@
 <script>
-    import { gameState } from "$lib/state/gameState.svelte.ts";
+    import { roundState } from "../state/roundState.svelte";
 
 </script>
 
 <current-word-info>
-    {#each gameState.guessedWordsThisRound as word}
+    {#each roundState.guessedWords as [word, matchResults]}
         <prev-guess>{word}</prev-guess>
     {/each}
 </current-word-info>

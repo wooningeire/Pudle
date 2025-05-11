@@ -1,7 +1,9 @@
 <script lang="ts">
-    import { gameState } from "$lib/state/gameState.svelte.ts";
-    import { getTileTypeCssColor, getTileTypeCssColorDark } from "$lib/types/tileColors.ts";
-    import { uiState } from "$lib/state/uiState.svelte.ts";
+import { getTileTypeCssColor, getTileTypeCssColorDark } from "$lib/types/tileColors.ts";
+import { uiState } from "$lib/state/uiState.svelte.ts";
+import { PositionType, roundState } from "../state/roundState.svelte";
+    import { MatchResult } from "../types/MatchResult";
+    import { TileColor } from "../types/Tile";
 
 const {
     onClick,
@@ -15,20 +17,33 @@ const {
     colorable?: boolean,
 } = $props();
 
-const hasInfo = $derived(colorable && gameState.knownLetterInfo.has(label));
-const info = $derived(hasInfo ? gameState.knownLetterInfo.get(label)! : null);
+const inputingWhichLetter = $derived(uiState.guess.length);
+
+const hasInfo = $derived(colorable && Object.hasOwn(roundState.knownLetterInfo, label));
+const info = $derived(hasInfo ? roundState.knownLetterInfo[label] : null);
+const currentLetterPositionInfo = $derived(info?.positionInfo[inputingWhichLetter] ?? null);
+
 const bgColor = $derived(hasInfo ? getTileTypeCssColor(info!.type) : "");
 const bgColorDark = $derived(hasInfo ? getTileTypeCssColorDark(info!.type) : "");
 
-const must = $derived(!uiState.gameOver && colorable && (info?.mustBeInPositions.has(uiState.guess.length) ?? false));
-const mustNot = $derived(uiState.gameOver || (colorable && (uiState.guess.length === 5 || (info?.mustNotBeInPositions.has(uiState.guess.length) ?? false))));
+const must = $derived(
+    !uiState.inputLocked
+        && colorable
+        && currentLetterPositionInfo === PositionType.MustBeInPosition
+);
+const mustNot = $derived(
+    uiState.inputLocked
+        || (colorable
+            && (inputingWhichLetter === 5 || currentLetterPositionInfo === PositionType.MustNotBeInPosition)
+        )
+);
 </script>
 
 <key-view
     onclick={onClick}
     tabindex="0"
     class:small
-    class:has-info={hasInfo}
+    class:has-info={hasInfo && info!.type !== TileColor.Empty}
     class:must
     class:must-not={mustNot}
     style:background={bgColor}
@@ -78,7 +93,7 @@ key-view {
     }
 
     &.must-not {
-        opacity: 0.4;
+        opacity: 0.3333333;
         transform: scale(0.85);
     }
 

@@ -37,7 +37,7 @@ const keydown = (event: KeyboardEvent) => {
         {tile}
         isInputRow
         flipping={uiState.flipping}
-        revealAnimationDelay={i * (gameState.stats.nthGuess === 1 ? 200 : 100)}
+        revealAnimationDelay={i * (gameState.stats.nthGuess === 1 ? 150 : 100)}
         hidden={gameState.board[i].length >= N_ROWS}
     />
 {/each}

@@ -1,10 +1,10 @@
 <script lang="ts">
     import CurrentWordInfo from "#/CurrentWordInfo.svelte";
-import { gameState, setupInitialLoad } from "$lib/state/gameState.svelte.ts";
     import GameStatus from "#/GameStatus.svelte";
 import Keyboard from "#/Keyboard.svelte";
 import Letterboard from "#/Letterboard.svelte";
     import { onMount } from "svelte";
+    import { setupInitialLoad } from "$lib/state/initialLoadState.svelte";
 
 
 let initialLoadPromise = $state<Promise<void>>(new Promise(resolve => {

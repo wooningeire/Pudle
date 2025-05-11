@@ -1,28 +1,10 @@
-import { SvelteMap, SvelteSet } from "svelte/reactivity";
 import { emplace, update } from "$lib/emplace.ts";
 import { TileColor, Tile } from "$lib/types/Tile.ts";
-import { createWordGetter } from "$lib/words.ts";
 import { ISLAND_SIZE_THRESHOLD, N_ROWS } from "$lib/constants.ts";
-
-
-type InitialLoad = {
-    words: Awaited<ReturnType<typeof createWordGetter>>,
-};
-
-type KnownLetterInfo = {
-    type: TileColor,
-    mustBeInPositions: Set<number>,
-    mustNotBeInPositions: Set<number>,
-};
+import { MatchResult } from "$lib/types/MatchResult.ts";
+import type { TileTag } from "../types/TileTag";
 
 export const gameState = $state({
-    initialLoad: <InitialLoad | null>null,
-
-    currentWord: "",
-    currentGuess: "",
-    guessedWordsThisRound: new SvelteSet<string>(),
-    knownLetterInfo: new SvelteMap<string, KnownLetterInfo>(),
-    
     board: new Array(5).fill(0).map(() => <Tile[]>[]),
 
     currentColors: {
@@ -43,6 +25,8 @@ export const gameState = $state({
     lastTimerOffset: 0,
     timerPaused: true,
     lastTimeout: 0,
+
+    hasRestarted: false,
 });
 
 export const nextTileId = () => gameState.nextTileId++;
@@ -52,166 +36,23 @@ export const setNextGuessTiles = () => {
 };
 setNextGuessTiles();
 
-export const setupInitialLoad = async () => {
-    const initialLoad = {
-        words: await createWordGetter(),
-    };
-
-    gameState.initialLoad = initialLoad;
-    gameState.currentWord = initialLoad.words.getRandomTargetWord();
-};
-
-enum MatchResult {
-    Empty,
-    Match,
-    Misplaced,
-    Absent,
-}
-
-class TileTagAssignment {
-    constructor(
-        readonly x: number,
-        readonly y: number,
-        readonly existingTile: Tile,
-        readonly tagColor: TileColor,
-    ) {}
-    
-
-    apply() {
-        gameState.board[this.x][this.y] = new Tile(this.existingTile.id, this.existingTile.color, this.existingTile.letter, this.tagColor);
-    }
-}
-
-export const checkIfTilesNeedTagging = () => {
-    const newAssignments: TileTagAssignment[] = [];
-
-    const maxColumnHeight = Math.max(...gameState.board.map(column => column.length));
-    for (let y = 0; y < maxColumnHeight; y++) {
-        const existingTiles = gameState.board.map(column => column[y] ?? null);
-
-        const tiles = createTilesFromGuess(existingTiles.map(tile => tile?.letter ?? " ").join(""), existingTiles);
-        updateKnownInfoFromTiles(tiles);
-
-        for (const [x, tile] of tiles.entries()) {
-            if (tile === null) continue;
-
-            const existingTile = gameState.board[x][y];
-            newAssignments.push(new TileTagAssignment(x, y, existingTile, tile.color));
-        }
-    }
-
-    return newAssignments;
-};
-
-
-export const applyTags = (assignments: TileTagAssignment[]) => {
+export const applyTags = (assignments: TileTag[]) => {
     for (const assignment of assignments) {
-        assignment.apply();
+        gameState.board[assignment.x][assignment.y] = new Tile(assignment.existingTile.id, assignment.existingTile.color, assignment.existingTile.letter, assignment.tagColor);
     }
 };
 
-const nextWord = () => {
-    gameState.guessedWordsThisRound.clear();
-    gameState.knownLetterInfo.clear();
-    gameState.currentWord = gameState.initialLoad!.words.getRandomTargetWord();
-    gameState.stats.nthWord++;
-};
 
-export const nextWordIfGuessMatched = (guess: string) => {
-    if (guess !== gameState.currentWord) return false;
-
-    nextWord();
-
-    return true;
-};
-
-const getInfoFromTile = (i: number, tile: Tile): KnownLetterInfo => {
-    const info = gameState.knownLetterInfo.get(tile.letter) ?? {
-        type: TileColor.Gray,
-        mustBeInPositions: new Set(),
-        mustNotBeInPositions: new Set(),
-    };
-
-    switch (tile.color) {
-        case TileColor.Green:
-            return {
-                type: TileColor.Green,
-                mustBeInPositions: new Set([...info.mustBeInPositions, i]),
-                mustNotBeInPositions: new Set([...info.mustNotBeInPositions]),
-            };
-
-        case TileColor.Yellow: {
-            const type = info.type === TileColor.Green
-                ? TileColor.Green
-                : TileColor.Yellow;
-
-            return {
-                type: type,
-                mustBeInPositions: new Set([...info.mustBeInPositions]),
-                mustNotBeInPositions: new Set([...info.mustNotBeInPositions, i]),
-            };
-        }
-
-        case TileColor.Gray:
-            return {
-                type: info.type,
-                mustBeInPositions: new Set([...info.mustBeInPositions]),
-                mustNotBeInPositions: new Set([...info.mustNotBeInPositions, ...[0, 1, 2, 3, 4].filter(index => !info.mustBeInPositions.has(index))]),
-            };
-    }
-
-    throw new TypeError();
-};
-
-export const updateKnownInfoFromTiles = (tiles: (Tile | null)[]) => {
+export const placeNewTiles = (tiles: (Tile | null)[]) => {
     for (const [i, tile] of tiles.entries()) {
         if (tile === null) continue;
 
-        gameState.knownLetterInfo.set(tile.letter, getInfoFromTile(i, tile));
+        gameState.board[i].push(tile);
     }
 };
 
-export const isValidGuess = (guess: string) => {
-    return (
-        guess.length === 5
-        && gameState.initialLoad!.words.isValidGuess(guess)
-        && !gameState.guessedWordsThisRound.has(guess)
-    );
-};
 
-export const createTilesFromGuess = (guess: string, existingTiles: (Tile | null)[] | null=null) => {
-    const chars = guess.split("");
-    const results = chars.map(() => MatchResult.Absent);
-
-    const letterCounts = new Map<string, number>();
-    for (const char of gameState.currentWord) {
-        if (char === " ") continue;
-
-        emplace(letterCounts, char, {
-            insert: () => 1,
-            update: existing => existing + 1,
-        });
-    }
-
-    for (const [i, char] of chars.entries()) {
-        if (char === " ") {
-            results[i] = MatchResult.Empty;
-            continue;
-        }
-        if (char !== gameState.currentWord[i]) continue;
-
-        update(letterCounts, char, existing => existing - 1);
-        results[i] = MatchResult.Match;
-    }
-
-    for (const [i, char] of chars.entries()) {
-        if ([MatchResult.Match, MatchResult.Empty].includes(results[i])) continue;
-        if ((letterCounts.get(char) ?? 0) === 0) continue;
-
-        update(letterCounts, char, existing => existing - 1);
-        results[i] = MatchResult.Misplaced;
-    }
-
+export const tilesFromMatchResults = (guess: string, results: MatchResult[], existingTiles: (Tile | null)[] | null=null) => {
     const ids = existingTiles !== null
         ? existingTiles.map(tile => tile?.id ?? null)
         : gameState.guessTileIds;
@@ -228,21 +69,7 @@ export const createTilesFromGuess = (guess: string, existingTiles: (Tile | null)
                 return new Tile(ids[i]!, gameState.currentColors.absent, guess[i]);
         }
     });
-};
-
-export const recordGuess = (guess: string) => {
-    gameState.guessedWordsThisRound.add(guess);
-};
-
-
-
-export const placeNewTiles = (tiles: (Tile | null)[]) => {
-    for (const [i, tile] of tiles.entries()) {
-        if (tile === null) continue;
-
-        gameState.board[i].push(tile);
-    }
-};
+}
 
 
 export type Point = {
@@ -370,3 +197,5 @@ export const pauseTimer = () => {
     gameState.timerPaused = true;
     clearTimeout(gameState.lastTimeout);
 };
+
+export const isFirstGuess = () => !gameState.hasRestarted && gameState.stats.nthGuess === 1;
