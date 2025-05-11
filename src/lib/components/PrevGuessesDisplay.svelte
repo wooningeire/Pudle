@@ -1,4 +1,5 @@
 <script>
+    import { WORD_LENGTH } from "../constants";
     import { roundState } from "../state/roundState.svelte";
     import { uiState } from "../state/uiState.svelte";
     import { MatchResult } from "../types/MatchResult";
@@ -15,7 +16,7 @@
     {#if uiState.gameOver}
         <MiniWordRow
             word={roundState.word}
-            matchResults={new Array(5).fill(0).map(_ => MatchResult.Empty)}
+            matchResults={new Array(WORD_LENGTH).fill(0).map(_ => MatchResult.Empty)}
             y={roundState.guessedWords.size}
         />
     {/if}

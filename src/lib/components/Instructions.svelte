@@ -1,11 +1,13 @@
 <script>
+    import { ISLAND_SIZE_THRESHOLD } from "../constants";
     import { MatchResult } from "../types/MatchResult";
     import MiniTile from "./MiniTile.svelte";
 
 </script>
 <instructions-text>
     <p>
-        Create groups of 4 <MiniTile matchResult={MatchResult.Match} smaller /> or 4 <MiniTile matchResult={MatchResult.Misplaced} smaller />!
+        Create groups of {ISLAND_SIZE_THRESHOLD} <MiniTile matchResult={MatchResult.Match} smaller />
+        or {ISLAND_SIZE_THRESHOLD} <MiniTile matchResult={MatchResult.Misplaced} smaller />!
     </p>
 
     <!-- <p>

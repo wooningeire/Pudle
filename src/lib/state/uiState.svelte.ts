@@ -3,6 +3,7 @@ import { Tile, TileColor } from "$lib/types/Tile.ts";
 import { guessMatches, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, resetRoundState } from "./roundState.svelte.ts";
 import { TileTag } from "$lib/types/TileTag.ts";
 import type { MatchResult } from "../types/MatchResult.ts";
+import { WORD_LENGTH } from "../constants.ts";
 
 export const uiState = $state({
     guess: "",
@@ -16,7 +17,7 @@ export const uiState = $state({
 
 const resetGuessTiles = (guess=uiState.guess) => {
     uiState.guessTiles = guess
-        .padEnd(5, " ")
+        .padEnd(WORD_LENGTH, " ")
         .split("")
         .map((char, i) => new Tile(gameState.guessTileIds[i], TileColor.Empty, char === " " ? "" : char));
 };
@@ -168,7 +169,7 @@ export const backspaceGuess = () => {
 
 export const extendGuess = (char: string) => {
     if (uiState.inputLocked) return;
-    if (uiState.guess.length >= 5) return;
+    if (uiState.guess.length >= WORD_LENGTH) return;
 
     uiState.guess += char;
     resetGuessTiles();

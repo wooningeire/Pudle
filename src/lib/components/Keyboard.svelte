@@ -1,6 +1,7 @@
 <script lang="ts">
 import { backspaceGuess, consumeGuess, extendGuess, uiState } from "$lib/state/uiState.svelte.ts";
 import Key from "#/Key.svelte";
+import {WORD_LENGTH} from "$lib/constants.ts";
 
 const keyRows = [
     "QWERTYUIOP",
@@ -26,7 +27,7 @@ const keyRows = [
                     label={char}
                     onClick={() => extendGuess(char)}
                     colorable
-                    forceDisabled={uiState.guess.length === 5}
+                    forceDisabled={uiState.guess.length === WORD_LENGTH}
                 />
             {/each}
 
@@ -35,7 +36,7 @@ const keyRows = [
                     label="GO"
                     onClick={consumeGuess}
                     small
-                    forceDisabled={uiState.guess.length !== 5}
+                    forceDisabled={uiState.guess.length !== WORD_LENGTH}
                 />
             {/if}
         </key-row>

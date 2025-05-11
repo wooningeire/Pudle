@@ -22,7 +22,7 @@ const explode = (node: HTMLElement, params: TransitionConfig, options: {directio
 
 
 <tile-view
-    out:explode|global={{duration: 500, easing: cubicOut}}
+    out:explode|global={{duration: 500, easing: cubicOut, delay: Math.random() * 125}}
 >
     <TileContent
         {tile}

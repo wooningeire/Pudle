@@ -58,7 +58,7 @@ tile-content {
     backface-visibility: hidden;
 
     &:not(.has-tab) {
-        transition: background-position 0.25s cubic-bezier(.65,0,1,.45);
+        transition: background-position 0.25s cubic-bezier(.35,0,0.6,.45);
 
         background-position: -0.5rem -0.5rem;
     }

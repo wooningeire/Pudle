@@ -1,7 +1,8 @@
 import {base} from "$app/paths";
+import { WORD_LENGTH } from "./constants";
 
 const parseResponse = async (response: Response) => {
-    return (await response.text()).split(/\s+/).filter(word => word.length === 5);
+    return (await response.text()).split(/\s+/).filter(word => word.length === WORD_LENGTH);
 }
 
 export const createWordGetter = async () => {

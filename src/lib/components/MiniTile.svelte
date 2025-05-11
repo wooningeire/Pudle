@@ -50,7 +50,7 @@ mini-tile {
     }
 
     &.empty {
-        border: 2px solid #aaa;
+        border: 1px solid #aaa;
     }
 }
 </style>

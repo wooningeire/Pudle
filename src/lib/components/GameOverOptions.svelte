@@ -8,8 +8,8 @@ import Button from "./Button.svelte";
     import { flipLeft, flipRight, halfFlipLeft, halfFlipRight } from "./transition";
     import { backIn, backOut, cubicIn, cubicInOut, cubicOut, elasticIn, elasticOut } from "svelte/easing";
 
-const resultsString = () => `**Pudle**
-word ${gameState.stats.nthWord} / guess ${gameState.stats.nthGuess} 
+const resultsString = () => `**Pudle • https://wooningeire.github.io/Pudle**
+word ${gameState.stats.nthWord} • guess ${gameState.stats.nthGuess}
 ${
     new Array(N_ROWS).fill(0)
         .map((_, i) => {
@@ -17,7 +17,7 @@ ${
             return gameState.board
                 .map(column => {
                     if (y >= column.length) {
-                        return "◻️";
+                        return "◽";
                     }
 
                     switch (column[y].color) {
@@ -58,7 +58,7 @@ const replay = () => {
     <game-over-label>game over</game-over-label>
 
     <Button onClick={copyResults}>
-        copy final board
+        copy results
     </Button>
 
     <Button onClick={replay}>replay</Button>

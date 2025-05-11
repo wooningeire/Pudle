@@ -1,6 +1,6 @@
 <script lang="ts">
 import TileGuessRow from "#/TileGuessRow.svelte";
-import { N_ROWS } from "$lib/constants.ts";
+import { N_ROWS, WORD_LENGTH } from "$lib/constants.ts";
 import TileView from "#/TileView.svelte";
 import { gameState } from "$lib/state/gameState.svelte.ts";
     import TileBg from "#/TileBg.svelte";
@@ -10,6 +10,7 @@ import { gameState } from "$lib/state/gameState.svelte.ts";
 
 <letter-board
     style:--n-rows={N_ROWS}
+    style:--word-length={WORD_LENGTH}
 >
     <tile-grids>
         <tile-grid>
@@ -67,7 +68,7 @@ tile-grids {
 
 tile-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(var(--word-length), 1fr);
     grid-template-rows: repeat(var(--n-rows), 1fr);
     gap: 0.5rem;
 }

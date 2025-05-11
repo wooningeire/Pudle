@@ -4,6 +4,7 @@ import { Tile, TileColor } from "$lib/types/Tile";
 import { initialLoadState } from "./initialLoadState.svelte";
 import { TileTag } from "$lib/types/TileTag";
 import { emplace, update } from "$lib/emplace";
+import { WORD_LENGTH } from "../constants";
 
 
 export enum PositionType {
@@ -36,7 +37,7 @@ const resetKnownLetterInfo = () => {
     forEachLetter(char => {
         roundState.knownLetterInfo[char] = {
             type: MatchResult.Empty,
-            positionInfo: new Array(5).fill(0).map(() => PositionType.NoInfo)
+            positionInfo: new Array(WORD_LENGTH).fill(0).map(() => PositionType.NoInfo)
         };
     });
 }
@@ -83,52 +84,53 @@ const updateInfoFromResult = (index: number, char: string, result: MatchResult) 
     }
 };
 
-const updateInfoFromAbsentResult = (index: number, guess: string) => {
+const updateInfoFromMismatchResults = (index: number, guess: string, result: MatchResult) => {
     const char = guess[index];
 
     const info = roundState.knownLetterInfo[char];
-
+    
     // Absent appears when there are more instances of a letter than in the guess
     const nActualAppearances = roundState.word.split("").filter(letter => letter === char).length;
     const nKnownPositions = info.positionInfo.filter(positionType => positionType === PositionType.MustBeInPosition).length;
 
-    let newPositionInfo: PositionType[];
-    if (nActualAppearances === nKnownPositions) {
-        // We know where those instances should be already
-        newPositionInfo = info.positionInfo.map(
-            positionType => positionType === PositionType.MustBeInPosition
-                ? PositionType.MustBeInPosition
-                : PositionType.MustNotBeInPosition
-        );
-    } else {
-        // We just know it's not at this index
-        newPositionInfo = [...info.positionInfo];
-        newPositionInfo[index] = PositionType.MustNotBeInPosition;
+    switch (result) {
+        case MatchResult.Misplaced: {
+            const nRemainingPositions = info.positionInfo.filter(positionType => positionType === PositionType.NoInfo).length;
+            if (nActualAppearances - nKnownPositions !== nRemainingPositions) return false;
+
+            // The remaining instances must be in the remaining spots
+            for (const [i, positionType] of info.positionInfo.entries()) {
+                if (positionType === PositionType.MustNotBeInPosition) continue;
+                updateInfoFromKnownChar(i, char);
+            }
+        }
+
+        case MatchResult.Absent: {
+            let newPositionInfo: PositionType[];
+            if (nActualAppearances === nKnownPositions) {
+                // We know where those instances should be already
+                newPositionInfo = info.positionInfo.map(
+                    positionType => positionType === PositionType.MustBeInPosition
+                        ? PositionType.MustBeInPosition
+                        : PositionType.MustNotBeInPosition
+                );
+            } else {
+                // We just know it's not at this index
+                newPositionInfo = [...info.positionInfo];
+                newPositionInfo[index] = PositionType.MustNotBeInPosition;
+            }
+
+            if (newPositionInfo.every((positionType, i) => positionType === info.positionInfo[i])) return false;
+        
+            roundState.knownLetterInfo[char] = {
+                type: info.type === MatchResult.Empty
+                    ? MatchResult.Absent
+                    : info.type,
+                positionInfo: newPositionInfo,
+            };
+        }
     }
-
-    roundState.knownLetterInfo[char] = {
-        type: info.type === MatchResult.Empty
-            ? MatchResult.Absent
-            : info.type,
-        positionInfo: newPositionInfo,
-    };
-};
-
-const updateInfoFromElimination = () => {
-    let changeOccurred = false;
-
-    for (const [char, info] of Object.entries(roundState.knownLetterInfo)) {
-        if (info.type !== MatchResult.Misplaced) continue;
-        if (info.positionInfo.filter(positionType => positionType === PositionType.MustNotBeInPosition).length !== 4) continue;
-
-        const lastUnknownIndex = info.positionInfo.findIndex(positionType => positionType === PositionType.NoInfo);
-        if (lastUnknownIndex === -1) continue;
-
-        updateInfoFromKnownChar(lastUnknownIndex, char);
-        changeOccurred = true;
-    }
-
-    return changeOccurred;
+    return true;
 };
 
 const updateInfoFromKnownChar = (index: number, char: string) => {
@@ -143,35 +145,31 @@ const updateInfoFromKnownChar = (index: number, char: string) => {
     roundState.knownLetterInfo[char].positionInfo[index] = PositionType.MustBeInPosition;
 };
 
-const updateInfoFromExistingInfo = () => {
-    while (true) {
-        const changeOccurred = updateInfoFromElimination();
-        if (!changeOccurred) return;
-    }
-};
-
 export const updateKnownLetterInfo = (guess: string, matchResults: MatchResult[]) => {
-    let absentIndices: number[] = [];
+    let mismatchIndices: number[] = [];
     for (const [i, result] of matchResults.entries()) {
         if (guess[i] === " " || result === MatchResult.Empty) continue;
 
         updateInfoFromResult(i, guess[i], result);
 
-        if (result === MatchResult.Absent) {
-            absentIndices.push(i);
+        if ([MatchResult.Absent, MatchResult.Misplaced].includes(result)) {
+            mismatchIndices.push(i);
         }
     }
 
-    for (const index of absentIndices) {
-        updateInfoFromAbsentResult(index, guess);
-    }
+    while (true) {
+        let changeOccurred = false;
 
-    updateInfoFromExistingInfo();
+        for (const index of mismatchIndices) {
+            changeOccurred ||= updateInfoFromMismatchResults(index, guess, matchResults[index]);
+        }
+        if (!changeOccurred) break;
+    }
 };
 
 export const isValidGuess = async (guess: string) => {
     return (
-        guess.length === 5
+        guess.length === WORD_LENGTH
         && !roundState.guessedWords.has(guess)
         && (await initialLoadState.services).words.isValidGuess(guess)
     );

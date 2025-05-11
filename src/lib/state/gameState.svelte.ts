@@ -1,11 +1,11 @@
 import { emplace, update } from "$lib/emplace.ts";
 import { TileColor, Tile } from "$lib/types/Tile.ts";
-import { ISLAND_SIZE_THRESHOLD, N_ROWS } from "$lib/constants.ts";
+import { ISLAND_SIZE_THRESHOLD, N_ROWS, WORD_LENGTH } from "$lib/constants.ts";
 import { MatchResult } from "$lib/types/MatchResult.ts";
 import type { TileTag } from "../types/TileTag";
 
 export const gameState = $state({
-    board: new Array(5).fill(0).map(() => <Tile[]>[]),
+    board: new Array(WORD_LENGTH).fill(0).map(() => <Tile[]>[]),
 
     currentColors: {
         match: TileColor.Green,
@@ -32,7 +32,7 @@ export const gameState = $state({
 export const nextTileId = () => gameState.nextTileId++;
 
 export const setNextGuessTileIds = () => {
-    gameState.guessTileIds = new Array(5).fill(0).map(() => nextTileId());
+    gameState.guessTileIds = new Array(WORD_LENGTH).fill(0).map(() => nextTileId());
 };
 setNextGuessTileIds();
 
@@ -94,7 +94,7 @@ const hash = (point: Point) => {
 
 
 const pointIsInBoard = (x: number, y: number) => {
-    if (x < 0 || x >= 5) return false;
+    if (x < 0 || x >= WORD_LENGTH) return false;
     if (y < 0 || y >= gameState.board[x].length) return false;
 
     return true;
@@ -124,7 +124,7 @@ export const locateIslands = () => {
         dfsExplore(x, y + 1, targetColor, currentIsland);
     };
 
-    for (let x = 0; x < 5; x++) {
+    for (let x = 0; x < WORD_LENGTH; x++) {
         for (let y = 0; y < gameState.board[x].length; y++) {
             const lookingForColor = gameState.board[x][y].color;
 
@@ -213,7 +213,7 @@ export const isFirstGuess = () => !gameState.hasRestarted && gameState.stats.nth
 
 
 export const resetGameState = () => {
-    gameState.board = new Array(5).fill(0).map(() => []);
+    gameState.board = new Array(WORD_LENGTH).fill(0).map(() => []);
 
     gameState.currentColors = {
         match: TileColor.Green,
