@@ -150,7 +150,10 @@ export const extendGuess = (char: string) => {
     resetGuessTiles();
 };
 
-export const reset = () => {
+export const reset = async () => {
+    await resetRoundState();
+    resetGameState();
+    
     uiState.guess = "";
     uiState.inputLocked = false;
     uiState.flipping = false;
@@ -158,7 +161,4 @@ export const reset = () => {
     uiState.currentIslands = [];
     uiState.currentGrays = [];
     uiState.gameOver = false;
-
-    resetGameState();
-    resetRoundState();
 };

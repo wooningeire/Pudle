@@ -53,7 +53,7 @@ const replay = () => {
 
 <game-over-options
     in:halfFlipRight|global={{duration: 3000, easing: elasticOut}}
-    out:halfFlipLeft|global={{duration: 500, easing: cubicOut}}
+    out:halfFlipLeft|global={{duration: 1000, easing: cubicOut}}
 >
     <game-over-label>game over</game-over-label>
 
@@ -75,8 +75,6 @@ game-over-options {
     align-items: stretch;
     backface-visibility: hidden;
     transform-style: preserve-3d;
-
-    transform-origin: right;
 }
 game-over-label {
     font-size: 2rem;

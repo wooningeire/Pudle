@@ -180,10 +180,11 @@ export const matchResults = (guess: string) => {
     return results;
 };
 
-export const resetRoundState = () => {
-    roundState.word = "";
+export const resetRoundState = async () => {
+    const word = (await initialLoadState.services).words.getRandomTargetWord();
     roundState.guessedWords.clear();
     roundState.knownLetterInfo = {};
     resetKnownLetterInfo();
     roundState.ready = true;
+    roundState.word = word;
 };

@@ -1,7 +1,7 @@
 import {base} from "$app/paths";
 
 const parseResponse = async (response: Response) => {
-    return (await response.text()).split(/\s+/);
+    return (await response.text()).split(/\s+/).filter(word => word.length === 5);
 }
 
 export const createWordGetter = async () => {
