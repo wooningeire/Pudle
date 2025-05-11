@@ -2,17 +2,21 @@
 import {Tile, TileColor} from "$lib/types/Tile.ts";
     import { getTileTypeCssColor } from "$lib/types/tileColors.ts";
 import { receive, send } from "#/transition.ts";
-    import { cubicIn, cubicInOut, cubicOut, quadIn } from "svelte/easing";
+    import { backOut, bounceOut, cubicIn, cubicInOut, cubicOut, elasticOut, quadIn } from "svelte/easing";
     import { gameState, isFirstGuess } from "../state/gameState.svelte";
+    import { roundState } from "../state/roundState.svelte";
+    import { N_ROWS } from "../constants";
 
 const {
     tile,
     flipping = false,
     revealAnimationDelay = 0,
+    x,
 }: {
     tile: Tile,
     flipping?: boolean,
     revealAnimationDelay?: number,
+    x: number,
 } = $props();
 
 const hasTab = $derived(tile.currentWordColor !== null && tile.currentWordColor !== tile.color);
@@ -20,13 +24,14 @@ const hasTab = $derived(tile.currentWordColor !== null && tile.currentWordColor 
 const bgColor = $derived(getTileTypeCssColor(tile.color));
 const tabColor = $derived(tile.currentWordColor !== null ? getTileTypeCssColor(tile.currentWordColor!) : bgColor);
 
-const transitionDuration = $derived(isFirstGuess() ? 1500 : 500);
+const fallDistance = $derived(N_ROWS - gameState.board[x].length);
+const transitionDuration = $derived((isFirstGuess() ? 1500 : 1250) * Math.sqrt(fallDistance / N_ROWS));
 </script>
 
 
 <tile-content
-    in:receive|global={{key: tile.id, easing: cubicInOut, duration: transitionDuration}}
-    out:send|global={{key: tile.id, easing: cubicInOut, duration: transitionDuration}}
+    in:receive|global={{key: tile.id, easing: bounceOut, duration: transitionDuration, delay: x * 50}}
+    out:send|global={{key: tile.id, easing: bounceOut, duration: transitionDuration, delay: x * 50}}
     class:flipping
     style:--bg-color={bgColor}
     class:has-tab={hasTab}
@@ -45,8 +50,6 @@ tile-content {
     display: grid;
     place-items: center;
     color: #fff;
-    z-index: 1;
-
 
     background: linear-gradient(135deg, var(--bg-color) 80%, #0000 80%, #0000 85%, var(--tab-color) 85%);
     background-repeat: no-repeat;

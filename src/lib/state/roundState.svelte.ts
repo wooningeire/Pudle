@@ -128,8 +128,8 @@ export const isValidGuess = async (guess: string) => {
     );
 };
 
-export const recordGuess = (guess: string) => {
-    roundState.guessedWords.set(guess, []);
+export const recordGuessResults = (guess: string, matchResults: MatchResult[]) => {
+    roundState.guessedWords.set(guess, matchResults);
 };
 
 export const matchResults = (guess: string) => {

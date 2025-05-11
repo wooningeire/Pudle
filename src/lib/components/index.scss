@@ -3,6 +3,8 @@
 }
 
 :root {
+    --off-black: #42444b;
+        
     --tile-green: #66a166;
     --tile-yellow: #bbb660;
     --tile-gray: #7c7c81;
@@ -18,4 +20,6 @@ body {
     margin: 0;
     font-family: Belanosima, sans-serif;
     font-weight: 400;
+
+    color: var(--off-black);
 }

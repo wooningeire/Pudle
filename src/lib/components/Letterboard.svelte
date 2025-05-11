@@ -5,7 +5,7 @@ import TileView from "#/TileView.svelte";
 import { gameState } from "$lib/state/gameState.svelte.ts";
     import TileBg from "#/TileBg.svelte";
     import { flip } from "svelte/animate";
-    import { cubicInOut } from "svelte/easing";
+    import { bounceOut, cubicInOut } from "svelte/easing";
 </script>
 
 <letter-board
@@ -30,11 +30,11 @@ import { gameState } from "$lib/state/gameState.svelte.ts";
             {#each gameState.board as column, x}
                 {#each column as tile, y (tile.id)}
                     <tile-view-container
-                        animate:flip={{duration: 500, easing: cubicInOut}}
+                        animate:flip={{duration: 1000, easing: bounceOut}}
                         style:grid-area="{N_ROWS - y}/{x + 1}"
                     >
                         {#if y < N_ROWS}
-                            <TileView {tile} />
+                            <TileView {tile} {x} />
                         {/if}
                     </tile-view-container>
                 {/each}
@@ -44,6 +44,10 @@ import { gameState } from "$lib/state/gameState.svelte.ts";
 </letter-board>
 
 <style lang="scss">
+* {
+    transform-style: preserve-3d;
+}
+
 letter-board {
     grid-area: 2/2;
     display: flex;
@@ -72,4 +76,5 @@ tile-view-container {
     display: grid;
     place-items: stretch;
 }
+
 </style>

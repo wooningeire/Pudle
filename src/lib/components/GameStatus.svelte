@@ -5,15 +5,19 @@
 
 
 <game-status class:hidden={isFirstGuess()}>
-    <game-stat>
-        <stat-label>word</stat-label>
-        <stat-number>{gameState.stats.nthWord}</stat-number>
-    </game-stat>
+    {#key gameState.stats.nthWord}
+        <game-stat class="nth-word">
+            <stat-label>word</stat-label>
+            <stat-number>{gameState.stats.nthWord}</stat-number>
+        </game-stat>
+    {/key}
 
-    <game-stat>
-        <stat-label>guess</stat-label>
-        <stat-number>{gameState.stats.nthGuess}</stat-number>
-    </game-stat>
+    {#key gameState.stats.nthGuess}
+        <game-stat class="nth-guess">
+            <stat-label>guess</stat-label>
+            <stat-number>{gameState.stats.nthGuess}</stat-number>
+        </game-stat>
+    {/key}
 </game-status>
 
 
@@ -34,6 +38,9 @@ game-status {
     &.hidden {
         opacity: 0;
     }
+
+    transform: rotateY(25deg);
+    transform-origin: right;
 }
 
 game-stat {
@@ -46,5 +53,35 @@ stat-label {
 }
 stat-number {
     font-size: 4rem;
+}
+
+.nth-word {
+    animation: pulse-green 1s ease-out;
+
+    @keyframes pulse-green {
+        0% {
+            color: #fff;
+            text-shadow: 0 0 1rem var(--tile-green);
+        }
+        50% {
+            color: var(--tile-green);
+            text-shadow: 0 0 01rem #0000;
+        }
+    }
+}
+
+.nth-guess {
+    animation: pulse-yellow 1s ease-out;
+
+    @keyframes pulse-yellow {
+        0% {
+            color: #fff;
+            text-shadow: 0 0 1rem var(--tile-yellow);
+        }
+        50% {
+            color: var(--tile-yellow);
+            text-shadow: 0 0 1rem #0000;
+        }
+    }
 }
 </style>

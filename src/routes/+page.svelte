@@ -52,5 +52,6 @@ center-content {
     grid-template-rows: auto auto;
 
     gap: 2rem;
+    perspective: 50rem;
 }
 </style>

@@ -1,6 +1,6 @@
 import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles, setNextGuessTiles, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess } from "./gameState.svelte.ts";
 import { Tile, TileColor } from "$lib/types/Tile.ts";
-import { guessMatches, matchResults, isValidGuess, nextWord, recordGuess, updateKnownLetterInfo } from "./roundState.svelte.ts";
+import { guessMatches, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo } from "./roundState.svelte.ts";
 import { TileTag } from "$lib/types/TileTag.ts";
 
 export const uiState = $state({
@@ -60,7 +60,7 @@ const destroyCellsIfApplicable = async () => {
         uiState.currentIslands = islands;
         uiState.currentGrays = grays;
 
-        await wait(500);
+        await wait(1000);
 
         eliminateTiles(islands, grays);
     }
@@ -70,7 +70,6 @@ export const consumeGuess = async () => {
     if (uiState.inputLocked) return;
     if (!await isValidGuess(uiState.guess)) return;
 
-    recordGuess(uiState.guess);
     const results = matchResults(uiState.guess);
     const tiles = tilesFromMatchResults(uiState.guess, results);
 
@@ -78,10 +77,11 @@ export const consumeGuess = async () => {
     uiState.flipping = true;
     uiState.guessTiles = <Tile[]>tiles;
 
-    await wait(isFirstGuess() ? 2250 : 850); // wait for the flipping animation
+    await wait(isFirstGuess() ? 2250 : 875); // wait for the flipping animation
 
     updateKnownLetterInfo(uiState.guess, results);
     placeNewTiles(tiles);
+    recordGuessResults(uiState.guess, results);
 
     if (guessMatches(uiState.guess)) {
         nextWord();
@@ -92,7 +92,7 @@ export const consumeGuess = async () => {
     uiState.flipping = false;
     resetGuessTiles();
 
-    await wait(isFirstGuess() ? 1500 : 0); // 0 is so the send:receive transition works; can't set guess tile ids too early
+    await wait(isFirstGuess() ? 1500 : 250);
 
     setNextGuessTiles();
     resetGuessTiles();

@@ -6,8 +6,10 @@ import TileContent from "#/TileContent.svelte";
 
 const {
     tile,
+    x = null,
 }: {
     tile: Tile,
+    x?: number | null,
 } = $props();
 
 const explode = (node: HTMLElement, params: TransitionConfig, options: {direction: "in" | "out" | "both"}) => {
@@ -24,6 +26,7 @@ const explode = (node: HTMLElement, params: TransitionConfig, options: {directio
 >
     <TileContent
         {tile}
+        x={x ?? 0}
     />
 </tile-view>
 
@@ -33,6 +36,8 @@ tile-view {
     @include tile;
     display: grid;
     place-items: stretch;
+
+    transform-style: preserve-3d;
 
     > :global(*) {
         grid-area: 1/1;

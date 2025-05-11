@@ -1,13 +1,12 @@
 <script>
     import { isFirstGuess } from "../state/gameState.svelte";
     import { roundState } from "../state/roundState.svelte";
+    import PrevGuessesDisplay from "./PrevGuessesDisplay.svelte";
 
 </script>
 
 <current-word-info class:hidden={isFirstGuess()}>
-    {#each roundState.guessedWords as [word, matchResults]}
-        <prev-guess>{word}</prev-guess>
-    {/each}
+    <PrevGuessesDisplay />
 </current-word-info>
 
 
@@ -27,5 +26,8 @@ current-word-info {
     &.hidden {
         opacity: 0;
     }
+
+    transform: rotateY(-25deg);
+    transform-origin: left;
 }
 </style>

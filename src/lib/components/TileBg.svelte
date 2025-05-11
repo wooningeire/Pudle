@@ -22,6 +22,7 @@ const {
     x?: number | null,
     y?: number | null,
 } = $props();
+
 </script>
 
 
@@ -44,6 +45,7 @@ const {
             {tile}
             {flipping}
             {revealAnimationDelay}
+            x={x ?? 0}
         />
     {/if}
 </tile-bg-container>
@@ -61,6 +63,8 @@ tile-bg-container {
     > :global(*) {
         grid-area: 1/1;
     }
+
+    transform-style: preserve-3d;
 }
 
 tile-bg {
@@ -75,7 +79,7 @@ tile-bg {
     outline-offset: -0.5rem;
 
     &.filled {
-        outline: 2px solid #333;
+        outline: 2px solid var(--off-black);
         outline-offset: 0;
         animation: pulse .175s ease-in-out;
         @keyframes pulse {
@@ -87,10 +91,10 @@ tile-bg {
 
     &.hidden {
         opacity: 0;
-        transition-delay: 0.35s;
+        transition-delay: 2s;
 
         &.is-first-guess {
-            transition-delay: 1.5s;
+            transition-delay: 3s;
         }
     }
 
@@ -115,9 +119,13 @@ tile-bg {
             }
             50.00001% {
                 opacity: 0;
+                outline-offset: 0rem;
+                outline-color: var(--off-black);
             }
             100% {
                 opacity: 0;
+                outline-offset: -2rem;
+                outline-color: #0000;
             }
         }
     }
