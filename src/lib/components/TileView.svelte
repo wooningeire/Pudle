@@ -1,3 +1,7 @@
+<script lang="ts" module>
+let whichBlueTileIsOpen = $state<Tile | null>(null);
+</script>
+
 <script lang="ts">
 import {Tile, TileColor} from "$lib/types/Tile.ts";
 import TileContent from "#/TileContent.svelte";
@@ -26,13 +30,12 @@ const explode = (node: HTMLElement, params: TransitionConfig, options: {directio
 };
 
 const isBlue = $derived(tile.color === TileColor.Blue);
-
-let isSelectingAction = $state(false);
+const isSelectingAction = $derived(whichBlueTileIsOpen === tile);
 
 $effect(() => {
     if (!uiState().inputLocked) return;
     if (tile.color !== TileColor.Blue) return;
-    isSelectingAction = false;
+    whichBlueTileIsOpen = null;
 });
 
 const handleBlueClick = (event: MouseEvent | null=null) => {
@@ -40,7 +43,7 @@ const handleBlueClick = (event: MouseEvent | null=null) => {
     if (!isBlue) return;
 
     event?.stopPropagation();
-    isSelectingAction = true;
+    whichBlueTileIsOpen = tile;
 };
 
 const performBlueSelect = (action: BlueTileAction) => {
@@ -49,12 +52,12 @@ const performBlueSelect = (action: BlueTileAction) => {
 
     blueTileAction(x, y, action);
 
-    isSelectingAction = false;
+    whichBlueTileIsOpen = null;
 };
 
 const handleBlueBlur = () => {
     if (!isBlue) return;
-    isSelectingAction = false;
+    whichBlueTileIsOpen = null;
 };
 
 </script>
