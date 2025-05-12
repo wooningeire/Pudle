@@ -10,13 +10,14 @@ export type SwapoutParams = {
     easing?: (time: number) => number,
 };
 
-export const swapout = ({ fallback, ...defaults }: CrossfadeParams & {
+export const swapout = ({ fallback, swapAt=0.5, ...defaults }: CrossfadeParams & {
     fallback?: (node: Element, params: CrossfadeParams, into: boolean) => TransitionConfig,
+    swapAt?: number,
 }) => {
     const nodesToBeReceived: Map<any, Element> = new Map();
     const nodesToBeSent: Map<any, Element> = new Map();
 
-    const createTransitionConfig = (fromNode: Element, toNode: Element, params: CrossfadeParams): TransitionConfig => {
+    const createTransitionConfig = (fromNode: Element, toNode: Element, params: CrossfadeParams & {intro: boolean}): TransitionConfig => {
         const {
             delay = 0,
             duration = (distance: number) => Math.sqrt(distance) * 30,
@@ -37,7 +38,7 @@ export const swapout = ({ fallback, ...defaults }: CrossfadeParams & {
             css: (t, u) => `
 transform-origin: top left;
 transform: translate(${u * distanceX}px, ${u * distanceY}px);
-opacity: ${t < 0.5 ? "0" : "1"};
+opacity: ${(params.intro ? (t <= swapAt) : (u > swapAt)) ? "1" : "0"};
 `
         };
     };
@@ -50,7 +51,8 @@ opacity: ${t < 0.5 ? "0" : "1"};
                     const otherNode = counterparts.get(params.key);
                     counterparts.delete(params.key);
 
-                    return createTransitionConfig(<Element>otherNode, node, params);
+                    const swapAt = 0;
+                    return createTransitionConfig(<Element>otherNode, node, {...params, intro});
                 }
                 items.delete(params.key);
                 return fallback && fallback(node, params, intro);

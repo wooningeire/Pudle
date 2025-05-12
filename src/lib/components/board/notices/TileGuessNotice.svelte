@@ -14,7 +14,7 @@ const {
     {:else if message === NoticeMessage.LoadingFailed}
         Loading failed &gt;.=.&lt;" … please reload!
     {:else if message === NoticeMessage.SelectBlueTile}
-        Select a tile from the word to convert into a blue tile!
+        Pick which tile above to make blue!
     {:else if message === NoticeMessage.AlreadyGuessedThisRound}
         Already guessed this word this round!
     {:else if message === NoticeMessage.NotInWordList}
