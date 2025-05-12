@@ -93,8 +93,9 @@ tile-content {
         grid-area: 1/1;
     }
 
-    &.flipping {
-        animation: flip-content 0.5s ease-in-out;
+    &.flipping:not(.selecting-blue-tile) {
+        transform: rotateX(0.5turn);
+        animation: flip-content 0.5s ease-in-out forwards;
         animation-delay: var(--reveal-animation-delay);
 
         &.is-first-guess {
@@ -104,6 +105,9 @@ tile-content {
         @keyframes flip-content {
             0% {
                 transform: rotateX(0.5turn);
+            }
+            100% {
+                transform: rotateX(0turn);
             }
         }
     }

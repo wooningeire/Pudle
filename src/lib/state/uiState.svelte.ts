@@ -200,13 +200,11 @@ const requestBlueTileSelection = async () => {
     if (state.selectingBlueTile) throw new Error();
 
     const {promise, resolve} = Promise.withResolvers<number>();
-    state.selectingBlueTile = true;
     state.currentBlueTileSelectionResolver = resolve;
     const removeMessage = addMessage(NoticeMessage.SelectBlueTile);
 
     const index = await promise;
 
-    state.selectingBlueTile = false;
     state.currentBlueTileSelectionResolver = null;
     removeMessage();
 
@@ -226,6 +224,7 @@ const execConsumeGuess = async (isGarbage=false) => {
     if (results.every(result => result === MatchResult.Match)) {
         await wait(250);
 
+        state.selectingBlueTile = true;
         const blueTileIndex = await requestBlueTileSelection();
 
         const originalTile = tiles[blueTileIndex];
@@ -246,6 +245,7 @@ const execConsumeGuess = async (isGarbage=false) => {
         recordGuessResults(state.guess, results);
     }
 
+    state.selectingBlueTile = false;
     state.flipping = false;
     resetGuessTiles(""); // make sure the letters don't render in their original spots
 
