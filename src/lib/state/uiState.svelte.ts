@@ -187,7 +187,7 @@ const boardChangeChecks = async () => {
 
 
     if (isGameOver()) {
-        await wait(1000);
+        await wait(500);
 
         state.gameOver = true;
         return {shouldContinue: false, evaluationsOfExistingRows};

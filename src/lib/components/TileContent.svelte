@@ -94,8 +94,7 @@ tile-content {
     }
 
     &.flipping {
-        transform: rotateX(0.5turn);
-        animation: flip-content 0.5s ease-in-out forwards;
+        animation: flip-content 0.5s ease-in-out;
         animation-delay: var(--reveal-animation-delay);
 
         &.is-first-guess {
@@ -105,9 +104,6 @@ tile-content {
         @keyframes flip-content {
             0% {
                 transform: rotateX(0.5turn);
-            }
-            100% {
-                transform: rotateX(0turn);
             }
         }
     }
@@ -136,7 +132,7 @@ tile-content {
     }
 
     &.in-destroy-range {
-        filter: brightness(1.5);
+        filter: saturate(0.5) brightness(1.5);
     }
 }
 
