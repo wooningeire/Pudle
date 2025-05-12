@@ -108,7 +108,8 @@ button {
 
     transition:
         background 0.125s ease-in-out,
-        filter 0.125s ease-in-out;
+        filter 0.125s ease-in-out,
+        color 0.125s ease-in-out;
 }
 
 button-shadow {
@@ -133,13 +134,11 @@ button-shadow {
         animation: flash-green-button 0.5s forwards;
 
         @keyframes flash-green-button {
-            0% {
-                background: var(--tile-green);
-                border-color: var(--tile-green-dark);
-            }
+            0%,
             50% {
                 background: var(--tile-green);
                 border-color: var(--tile-green-dark);
+                color: #fff;
             }
         }
     }
@@ -149,9 +148,7 @@ button-shadow {
         animation: flash-green-shadow 0.5s forwards;
 
         @keyframes flash-green-shadow {
-            0% {
-                background: var(--tile-green-dark);
-            }
+            0%,
             50% {
                 background: var(--tile-green-dark);
             }

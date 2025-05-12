@@ -74,14 +74,15 @@ mini-word-row {
 }
 
 .already-guessed-flash {
-    animation: already-guessed-flash 0.75s cubic-bezier(.01,-0.42,1,-1.23);
+    animation: already-guessed-flash 1s cubic-bezier(.28,.01,0,1);
 
     transform-origin: center;
     position: relative;
 
     @keyframes already-guessed-flash {
-        30% {
-            transform: scale(1.125);
+        30%,
+        40% {
+            transform: scale(1.15);
             filter: sepia(1) hue-rotate(-55deg) saturate(2);
         }
     }

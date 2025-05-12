@@ -18,8 +18,6 @@ import { boardState } from "@/lib/state/boardState.svelte";
 >
     <tile-grids>
         <tile-grid>
-            <TileGuessRow />
-
             {#each boardState.board as column, x}
                 {#each new Array(N_ROWS - 1).fill(0) as _, y}
                     <TilePlaceholder
@@ -29,6 +27,8 @@ import { boardState } from "@/lib/state/boardState.svelte";
                     />
                 {/each}
             {/each}
+
+            <TileGuessRow />
         </tile-grid>
 
         <tile-grid>

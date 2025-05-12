@@ -8,6 +8,7 @@ import {Tile} from "$lib/types/Tile.ts";
     import { onDestroy, onMount, tick } from "svelte";
     import { uiState } from "$lib/state/uiState.svelte";
     import { isFirstGuess, statsState } from "$lib/state/statsState.svelte";
+    import { backOut } from "svelte/easing";
 
 const {
     tile = null,
@@ -53,6 +54,15 @@ onDestroy(() => {
 });
 
 let containerEl = $state<HTMLDivElement | null>(null);
+
+const grow = (node: Element, {duration=250, delay=0, easing=backOut}: {duration?: number, delay?: number, easing?: (time: number) => number}) => {
+    return {
+        duration,
+        delay,
+        easing,
+        css: (t: number) => `transform: scale(${Math.max(0, t)})`,
+    };
+};
 </script>
 
 
@@ -70,8 +80,8 @@ let containerEl = $state<HTMLDivElement | null>(null);
         style:--reveal-animation-delay="{revealAnimationDelay}ms"
         class:is-first-guess={isFirstGuess()}
     >
-        {#if tile !== null && isInputRow && !uiState().paused}
-            <span transition:fade={{duration: 50}}>{tile.letter}</span>
+        {#if tile !== null && isInputRow && !uiState().paused && tile.letter.length > 0}
+            <tile-text transition:grow>{tile.letter}</tile-text>
         {/if}
     </tile-placeholder>
 

@@ -137,8 +137,7 @@ tile-content {
     }
 
     &.in-destroy-range {
-        filter: saturate(0.5) brightness(1.375);
-        box-shadow: 0 0.125rem 0.5rem 0.125rem #0000003f;
+        filter: sepia(1) hue-rotate(105deg) saturate(2);
     }
 }
 

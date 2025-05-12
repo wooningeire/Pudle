@@ -1,4 +1,5 @@
 import { crossfade, fade } from "svelte/transition";
+import { swapout } from "./custom-crossfade";
 
 export const [sendWithFade, receiveWithFade] = crossfade({
     fallback(node, {duration, delay, easing}, intro) {
@@ -10,7 +11,7 @@ export const [sendWithFade, receiveWithFade] = crossfade({
         };
     },
 });
-export const [send, receive] = crossfade({});
+export const {send, receive} = swapout({});
 
 
 export const flipLeft = (node: HTMLElement, {duration, delay, easing, baseRot="0deg"}: {duration?: number, delay?: number, easing?: (t: number) => number, baseRot?: string}) => {
