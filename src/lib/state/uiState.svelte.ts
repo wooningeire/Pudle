@@ -428,7 +428,7 @@ export const reset = async () => {
     setTimeLimit(MAX_TIME_LIMIT_S_BY_WORD_NO * 1000);
     
     state.guess = "";
-    state.boardsLocked = true;
+    state.boardsLocked = false;
     state.flipping = false;
     state.previewRange = null;
 
