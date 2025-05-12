@@ -63,6 +63,8 @@ right-panel-top {
 }
 
 right-panel-bottom {
-    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 </style>

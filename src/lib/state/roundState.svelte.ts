@@ -19,6 +19,7 @@ export enum PositionType {
 export type KnownLetterInfo = {
     type: MatchResult,
     positionInfo: PositionType[],
+    nKnownAppearances: number,
 };
 
 export const roundState = $state({
@@ -40,10 +41,11 @@ const resetKnownLetterInfo = () => {
     forEachLetter(char => {
         roundState.knownLetterInfo[char] = {
             type: MatchResult.Empty,
-            positionInfo: new Array(WORD_LENGTH).fill(0).map(() => PositionType.NoInfo)
+            positionInfo: new Array(WORD_LENGTH).fill(0).map(() => PositionType.NoInfo),
+            nKnownAppearances: 0,
         };
     });
-}
+};
 
 
 
@@ -74,12 +76,10 @@ const updateInfoFromResult = (index: number, char: string, result: MatchResult) 
             const newPositionInfo = [...info.positionInfo];
             newPositionInfo[index] = PositionType.MustNotBeInPosition;
 
-            roundState.knownLetterInfo[char] = {
-                type: info.type === MatchResult.Match
-                    ? MatchResult.Match
-                    : MatchResult.Misplaced,
-                positionInfo: newPositionInfo,
-            };
+            info.type = info.type === MatchResult.Match
+                ? MatchResult.Match
+                : MatchResult.Misplaced;
+            info.positionInfo = newPositionInfo;
             return;
         }
 
@@ -87,12 +87,10 @@ const updateInfoFromResult = (index: number, char: string, result: MatchResult) 
             const newPositionInfo = [...info.positionInfo];
             newPositionInfo[index] = PositionType.MustNotBeInPosition;
         
-            roundState.knownLetterInfo[char] = {
-                type: info.type === MatchResult.Empty
-                    ? MatchResult.Absent
-                    : info.type,
-                positionInfo: newPositionInfo,
-            };
+            info.type = info.type === MatchResult.Empty
+                ? MatchResult.Absent
+                : info.type;
+            info.positionInfo = newPositionInfo;
         }
     }
 };
@@ -101,15 +99,12 @@ const updateInfoFromMismatchResults = (index: number, guess: string, result: Mat
     const char = guess[index];
 
     const info = roundState.knownLetterInfo[char];
-    
-    // Absent appears when there are more instances of a letter than in the guess
-    const nActualAppearances = roundState.word.split("").filter(letter => letter === char).length;
     const nKnownPositions = info.positionInfo.filter(positionType => positionType === PositionType.MustBeInPosition).length;
 
     switch (result) {
         case MatchResult.Misplaced: {
             const nRemainingPositions = info.positionInfo.filter(positionType => positionType === PositionType.NoInfo).length;
-            if (nActualAppearances - nKnownPositions !== nRemainingPositions) return false;
+            if (info.nKnownAppearances - nKnownPositions !== nRemainingPositions) return false; // User doesn't know where this should go yet
 
             // The remaining instances must be in the remaining spots
             for (const [i, positionType] of info.positionInfo.entries()) {
@@ -119,6 +114,8 @@ const updateInfoFromMismatchResults = (index: number, guess: string, result: Mat
         }
 
         case MatchResult.Absent: {
+            // Absent appears when there are more instances of a letter than in the guess
+            const nActualAppearances = roundState.word.split("").filter(letter => letter === char).length;
             if (nActualAppearances !== nKnownPositions) return false;
 
             // We know where those instances should be already
@@ -147,12 +144,21 @@ const updateInfoFromKnownChar = (index: number, char: string) => {
     roundState.knownLetterInfo[char].positionInfo[index] = PositionType.MustBeInPosition;
 };
 
+const findNKnownAppearances = (char: string, guess: string, matchResults: MatchResult[]) => {
+    return Math.max(
+        matchResults.filter((result, i) => guess[i] === char && [MatchResult.Match, MatchResult.Misplaced].includes(result)).length,
+        roundState.knownLetterInfo[char].positionInfo.filter(positionType => positionType === PositionType.MustBeInPosition).length,
+    );
+};
+
 export const updateKnownLetterInfo = (guess: string, matchResults: MatchResult[]) => {
     let mismatchIndices: number[] = [];
     for (const [i, result] of matchResults.entries()) {
-        if (!ALPHABET.has(guess[i]) || result === MatchResult.Empty) continue;
+        const char = guess[i];
+        if (!ALPHABET.has(char) || result === MatchResult.Empty) continue;
 
-        updateInfoFromResult(i, guess[i], result);
+        updateInfoFromResult(i, char, result);
+        roundState.knownLetterInfo[char].nKnownAppearances = findNKnownAppearances(char, guess, matchResults);
 
         if ([MatchResult.Absent, MatchResult.Misplaced].includes(result)) {
             mismatchIndices.push(i);
