@@ -12,7 +12,7 @@
 {#if !isFirstGuess()}
     <right-panel in:halfFlipLeft={{duration: 5000, easing: elasticOut, baseRot: "-35deg"}}>
         <Instructions />
-        
+
         <PrevGuessesDisplay />
     </right-panel>
 {/if}
@@ -22,6 +22,11 @@
 
 <style lang="scss">
 @import "#/constants.scss";
+
+* {
+    transform-style: preserve-3d;
+}
+
 right-panel {
     grid-area: 2/3 / 4/4;
     place-self: stretch;

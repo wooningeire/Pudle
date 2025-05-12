@@ -17,7 +17,7 @@ import GameStats from "./GameStats.svelte";
 
         <AutoDropTimer />
 
-        {#if uiState.gameOver}
+        {#if uiState().gameOver}
             <GameOverOptions />
         {/if}
     </left-panel>

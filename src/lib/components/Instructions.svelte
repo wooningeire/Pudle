@@ -15,9 +15,9 @@
         or {ISLAND_SIZE_THRESHOLD} <MiniTile tileColor={TileColor.Yellow} smaller />!
     </p>
 
-    {#if uiState.discoveredBlueTiles}
+    {#if uiState().discoveredBlueTiles}
         <p in:halfFlipLeft={{duration: 4000, easing: elasticOut}}>
-            Click <MiniTile tileColor={TileColor.Blue} smaller /> to select an adjacent color to destroy!
+            Click <MiniTile tileColor={TileColor.Blue} smaller /> to set its color or destroy nearby tiles!
         </p>
     {/if}
 
@@ -31,6 +31,10 @@
 </instructions-text>
 
 <style lang="scss">
+* {
+    transform-style: preserve-3d;
+}
+
 instructions-text {
     display: flex;
     flex-direction: column;

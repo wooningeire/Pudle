@@ -19,7 +19,7 @@ const {
     forceDisabled?: boolean,
 } = $props();
 
-const inputingWhichLetter = $derived(uiState.guess.length);
+const inputingWhichLetter = $derived(uiState().guess.length);
 
 const hasInfo = $derived(colorable && Object.hasOwn(roundState.knownLetterInfo, label));
 const info = $derived(hasInfo ? roundState.knownLetterInfo[label] : null);
@@ -29,14 +29,14 @@ const bgColor = $derived(hasInfo ? getMatchResultCssColor(info!.type) : "");
 const bgColorDark = $derived(hasInfo ? getMatchResultCssColorDark(info!.type) : "");
 
 const must = $derived(
-    !uiState.inputLocked
+    !uiState().inputLocked
         && colorable
         && currentLetterPositionInfo === PositionType.MustBeInPosition
 );
 const mustNot = $derived(
     colorable && currentLetterPositionInfo === PositionType.MustNotBeInPosition
 );
-const disabled = $derived(uiState.inputLocked || forceDisabled);
+const disabled = $derived(uiState().inputLocked || forceDisabled || uiState().nextColumnBlocked);
 
 let transitionDelay = $state(0);
 const rerollTransitionDelay = () => {

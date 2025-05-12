@@ -3,7 +3,7 @@ import {Tile, TileColor} from "$lib/types/Tile.ts";
 import TileContent from "#/TileContent.svelte";
     import { fade, type TransitionConfig } from "svelte/transition";
     import { backOut, cubicOut } from "svelte/easing";
-    import { selectColorOfBlueTile, uiState } from "../state/uiState.svelte";
+    import { BlueTileAction, blueTileAction, uiState } from "../state/uiState.svelte";
 
 const {
     tile,
@@ -24,30 +24,32 @@ const explode = (node: HTMLElement, params: TransitionConfig, options: {directio
 
 const isBlue = $derived(tile.color === TileColor.Blue);
 
-let isSelectingColor = $state(false);
+let isSelectingAction = $state(false);
 
 $effect(() => {
-    if (!uiState.inputLocked) return;
-    if (tile.color === TileColor.Blue) return;
-    isSelectingColor = false;
+    if (!uiState().inputLocked) return;
+    if (tile.color !== TileColor.Blue) return;
+    isSelectingAction = false;
 });
 
 const handleBlueClick = () => {
-    if (uiState.inputLocked) return;
+    if (uiState().inputLocked) return;
     if (!isBlue) return;
-    isSelectingColor = true;
+    isSelectingAction = true;
 };
 
-const performBlueSelect = (color: TileColor) => {
-    if (uiState.inputLocked) return;
-    if (!isBlue || !isSelectingColor) return;
+const performBlueSelect = (action: BlueTileAction) => {
+    if (uiState().inputLocked) return;
+    if (!isBlue || !isSelectingAction) return;
 
-    selectColorOfBlueTile(x, y, color);
+    blueTileAction(x, y, action);
+
+    isSelectingAction = false;
 };
 
 const handleBlueBlur = () => {
     if (!isBlue) return;
-    isSelectingColor = false;
+    isSelectingAction = false;
 };
 
 const handleBlueKeydown = (event: KeyboardEvent) => {
@@ -64,7 +66,7 @@ const handleBlueKeydown = (event: KeyboardEvent) => {
     onblur={handleBlueBlur}
     tabindex={isBlue ? 0 : -1}
     class:blue={isBlue}
-    class:selecting-color={isSelectingColor}
+    class:selecting-color={isSelectingAction}
 >
     <TileContent
         {tile}
@@ -72,17 +74,23 @@ const handleBlueKeydown = (event: KeyboardEvent) => {
         {y}
     />
 
-    {#if isSelectingColor}
-        <color-selector transition:fade={{duration: 500, easing: backOut}}>
-            <color-option
+    {#if isSelectingAction}
+        <blue-tile-action-selector transition:fade={{duration: 500, easing: backOut}}>
+            <blue-tile-action-option
                 class="green"
-                onclick={() => performBlueSelect(TileColor.Green)}
-            ></color-option>
-            <color-option
+                onclick={() => performBlueSelect(BlueTileAction.SetGreen)}
+            ></blue-tile-action-option>
+            <blue-tile-action-option
                 class="yellow"
-                onclick={() => performBlueSelect(TileColor.Yellow)}
-            ></color-option>
-        </color-selector>
+                onclick={() => performBlueSelect(BlueTileAction.SetYellow)}
+            ></blue-tile-action-option>
+            <blue-tile-action-option
+                class="destroy"
+                onclick={() => performBlueSelect(BlueTileAction.DestroyNearby)}
+            >
+                destroy
+            </blue-tile-action-option>
+        </blue-tile-action-selector>
     {/if}
 </tile-view>
 
@@ -118,33 +126,42 @@ tile-view {
     }
 }
 
-color-selector {
-    display: flex;
-    align-items: stretch;
+blue-tile-action-selector {
+    display: grid;
+    place-items: stretch;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     position: relative;
     gap: 0.25rem;
-
-    > color-option {
-        flex-grow: 1;
-    }
 }
 
-color-option {
+blue-tile-action-option {
     box-shadow:
         0 0.125rem 0.5rem var(--tile-green-dark),
         0 0 0 2px #fff inset;
     cursor: pointer;
+    color: #fff;
+    font-size: 0.8rem;
+
+    display: grid;
+    place-items: center;
 
     &.green {
         background: var(--light-green);
+        grid-area: 1/1;
     }
     &.yellow {
         background: var(--light-yellow);
+        grid-area: 1/2;
+    }
+    &.destroy {
+        background: var(--tile-blue-dark);
+        grid-area: 2/1 / 3/3;
     }
 
     transition:
         filter 0.125s ease-in-out,
-        transform 0.125s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        transform 0.125s cubic-bezier(0.1, 0.6, 0.265, 1.55);
 
     &:hover,
     &:focus {

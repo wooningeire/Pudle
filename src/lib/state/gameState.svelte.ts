@@ -135,6 +135,26 @@ export const locateIslands = () => {
     return islands;
 };
 
+export const getBlueTileExplodeRange = (start: Point) => {
+    const points: Point[] = [start];
+
+    const add = (x: number, y: number) => {
+        if (!pointIsInBoard(x, y)) return;
+        points.push({x, y});
+    };
+
+    add(start.x - 2, start.y);
+    add(start.x - 1, start.y);
+    add(start.x + 1, start.y);
+    add(start.x + 2, start.y);
+    add(start.x, start.y - 2);
+    add(start.x, start.y - 1);
+    add(start.x, start.y + 1);
+    // add(start.x, start.y + 2);
+
+    return(points);
+};
+
 export const getIslandOfColor = (start: Point, color: TileColor) => {
     const island: Point[] = [];
 
@@ -205,13 +225,26 @@ export const eliminateTiles = (...tileCoords: Point[]) => {
 
 const hasBlueTiles = () => {
     return gameState.board.some(column => column.some(tile => tile.color === TileColor.Blue));
-}
+};
 
 export const hasColumnAtTop = () => gameState.board.some(column => column.length >= N_ROWS);
 
 export const isGameOver = () => !hasBlueTiles() && hasColumnAtTop();
 
 export const isFirstGuess = () => !gameState.hasRestarted && gameState.stats.nthGuess === 1;
+
+export const allBlueTileCoords = function* () {
+    const maxColumnHeight = Math.max(...gameState.board.map(column => column.length));
+
+    for (let y = maxColumnHeight - 1; y >= 0; y--) {
+        for (const [x, column] of gameState.board.entries()) {
+            if (y >= column.length) continue;
+            if (column[y].color !== TileColor.Blue) continue;
+
+            yield {x, y};
+        }
+    }
+};
 
 
 export const resetGameState = () => {

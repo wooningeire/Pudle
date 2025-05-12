@@ -13,7 +13,7 @@
         <MiniWordRow {word} {matchResults} {y} />
     {/each}
     
-    {#if uiState.gameOver}
+    {#if uiState().gameOver}
         <MiniWordRow
             word={roundState.word}
             matchResults={new Array(WORD_LENGTH).fill(0).map(_ => MatchResult.Empty)}

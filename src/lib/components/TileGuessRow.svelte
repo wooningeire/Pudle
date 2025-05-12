@@ -32,11 +32,11 @@ const keydown = (event: KeyboardEvent) => {
 
 <svelte:window onkeydown={keydown} />
 
-{#each uiState.guessTiles as tile, x}
+{#each uiState().guessTiles as tile, x}
     <TileBg
         {tile}
         isInputRow
-        flipping={uiState.flipping}
+        flipping={uiState().flipping}
         revealAnimationDelay={x * (isFirstGuess() ? 300 : 100)}
         hidden={gameState.board[x].length >= N_ROWS}
         {x}

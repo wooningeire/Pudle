@@ -18,7 +18,7 @@ const keyRows = [
                     label="DEL"
                     onClick={backspaceGuess}
                     small
-                    forceDisabled={uiState.guess.length === 0}
+                    forceDisabled={uiState().guess.length === 0}
                 />
             {/if}
 
@@ -27,7 +27,7 @@ const keyRows = [
                     label={char}
                     onClick={() => extendGuess(char)}
                     colorable
-                    forceDisabled={uiState.guess.length === WORD_LENGTH}
+                    forceDisabled={uiState().guess.length === WORD_LENGTH}
                 />
             {/each}
 
@@ -36,7 +36,7 @@ const keyRows = [
                     label="GO"
                     onClick={consumeGuess}
                     small
-                    forceDisabled={uiState.guess.length !== WORD_LENGTH}
+                    forceDisabled={uiState().guess.length !== WORD_LENGTH}
                 />
             {/if}
         </key-row>

@@ -1,4 +1,4 @@
-import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles as destroyTiles, setNextGuessTileIds, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess, removeTags, resetGameState, getIslandOfColor } from "./gameState.svelte.ts";
+import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles as destroyTiles, setNextGuessTileIds, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess, removeTags, resetGameState, getIslandOfColor, getBlueTileExplodeRange, hasColumnAtTop, allBlueTileCoords } from "./gameState.svelte.ts";
 import { Tile, TileColor } from "$lib/types/Tile.ts";
 import { guessedCorrectly, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, getRoundStateResetter, roundState } from "./roundState.svelte.ts";
 import { TileTag } from "$lib/types/TileTag.ts";
@@ -6,7 +6,8 @@ import { MatchResult } from "../types/MatchResult.ts";
 import { GUESS_TIME_BY_GUESS_NO_DECAY_FAC, GUESS_TIME_BY_WORD_NO_DECAY_FAC, MAX_TIME_LIMIT_S_BY_WORD_NO, MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO, MIN_TIME_LIMIT_S_BY_WORD_NO, WORD_LENGTH, MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO, EMPTY_TILE_CHAR, N_ROWS } from "../constants.ts";
 import { pauseTimer, resetTimerState, restartTimer, setTimeLimit, startTimer, timerState } from "./timerState.svelte.ts";
 
-export const uiState = $state({
+
+const state = $state({
     guess: "",
     inputLocked: false,
     flipping: false,
@@ -17,8 +18,28 @@ export const uiState = $state({
     discoveredBlueTiles: false,
 });
 
-const resetGuessTiles = (guess=uiState.guess) => {
-    uiState.guessTiles = guess
+const stateDerived = $derived({
+    guess: state.guess,
+    inputLocked: state.inputLocked,
+    flipping: state.flipping,
+    guessTiles: state.guessTiles,
+    currentIslands: state.currentIslands,
+    currentGrays: state.currentGrays,
+    gameOver: state.gameOver,
+    discoveredBlueTiles: state.discoveredBlueTiles,
+    nextColumnBlocked: state.guess.length >= WORD_LENGTH
+        ? true
+        : gameState.board[state.guess.length].length >= N_ROWS,
+    firstBlockedColumnIndex: (() => {
+        const index = gameState.board.findIndex(column => column.length >= N_ROWS);
+        return index === -1 ? null : index;
+    })(),
+});
+
+export const uiState = () => stateDerived;
+
+const resetGuessTiles = (mockGuess=state.guess) => {
+    state.guessTiles = mockGuess
         .padEnd(WORD_LENGTH, EMPTY_TILE_CHAR)
         .split("")
         .map((char, i) => new Tile(gameState.guessTileIds[i], TileColor.Empty, char === EMPTY_TILE_CHAR ? "" : char));
@@ -83,8 +104,8 @@ const locateAndDestroyLargeGroups = async () => {
         
         await wait(750);
         
-        uiState.currentIslands = islands;
-        uiState.currentGrays = grays;
+        state.currentIslands = islands;
+        state.currentGrays = grays;
 
         destroyTiles(...islands.flat(), ...grays);
     }
@@ -100,15 +121,34 @@ const nextGuessTimeLimit = () => {
 };
 
 const dropGarbage = async () => {
-    const lastGuess = uiState.guess;
+    state.inputLocked = true;
+    pauseTimer();
 
-    uiState.guess = "×".repeat(WORD_LENGTH);
-    await consumeGuess(true);
+    const lastGuess = state.guess;
+    
+    for (const {x, y} of allBlueTileCoords()) {
+        if (!hasColumnAtTop()) break;
 
-    if (!isGameOver()) {
-        uiState.guess = lastGuess;
-        resetGuessTiles();
+        await wait(500);
+
+        await executeBlueTileAction(x, y, BlueTileAction.DestroyNearby);
     }
+
+    let {shouldContinue} = await boardChangeChecks();
+    if (!shouldContinue) return;
+
+    state.guess = "_".repeat(WORD_LENGTH);
+    await execConsumeGuess(true);
+
+    ({shouldContinue} = await boardChangeChecks());
+    if (!shouldContinue) return;
+
+    state.guess = lastGuess.slice(0, stateDerived.firstBlockedColumnIndex ?? WORD_LENGTH);
+    resetGuessTiles();
+
+
+    state.inputLocked = false;
+    restartTimer(dropGarbage, nextGuessTimeLimit());
 };
 
 /**
@@ -136,25 +176,20 @@ const boardChangeChecks = async () => {
     if (isGameOver()) {
         await wait(1000);
 
-        uiState.gameOver = true;
+        state.gameOver = true;
         return {shouldContinue: false, evaluationsOfExistingRows};
     }
 
     return {shouldContinue: true, evaluationsOfExistingRows};
 };
 
-export const consumeGuess = async (isGarbage=false) => {
-    if (uiState.inputLocked) return;
-    if (!isGarbage && !await isValidGuess(uiState.guess)) return;
+const execConsumeGuess = async (isGarbage=false) => {
+    const results = matchResults(state.guess);
+    let tiles = <Tile[]>tilesFromMatchResults(state.guess, results);
 
-    pauseTimer();
-
-    const results = matchResults(uiState.guess);
-    let tiles = <Tile[]>tilesFromMatchResults(uiState.guess, results);
-
-    uiState.inputLocked = true;
-    uiState.flipping = true;
-    uiState.guessTiles = tiles;
+    state.inputLocked = true;
+    state.flipping = true;
+    state.guessTiles = tiles;
 
     await wait(isFirstGuess() ? 2250 : 875); // wait for the flipping animation
 
@@ -162,21 +197,21 @@ export const consumeGuess = async (isGarbage=false) => {
         await wait(250);
 
         tiles = tiles.map(tile => new Tile(tile.id, TileColor.Blue, tile.letter, tile.tagColor));
-        uiState.guessTiles = tiles;
-        uiState.discoveredBlueTiles = true;
+        state.guessTiles = tiles;
+        state.discoveredBlueTiles = true;
 
         await wait(750);
     }
 
     if (!isGarbage && !isFirstGuess()) {
-        updateKnownLetterInfo(uiState.guess, results); // delay this until later for the first guess
+        updateKnownLetterInfo(state.guess, results); // delay this until later for the first guess
     }
     placeNewTiles(tiles);
     if (!isGarbage) {
-        recordGuessResults(uiState.guess, results);
+        recordGuessResults(state.guess, results);
     }
 
-    uiState.flipping = false;
+    state.flipping = false;
     resetGuessTiles(""); // make sure the letters don't render in their original spots
 
     await wait(isFirstGuess() ? 1500 : 500); // falling animation
@@ -186,7 +221,7 @@ export const consumeGuess = async (isGarbage=false) => {
 
     await locateAndDestroyLargeGroups();
 
-    if (guessedCorrectly(uiState.guess)) {
+    if (guessedCorrectly(state.guess)) {
         await wait(500);
 
         await nextWord();
@@ -196,58 +231,103 @@ export const consumeGuess = async (isGarbage=false) => {
     await wait(250);
 
     const {shouldContinue, evaluationsOfExistingRows} = await boardChangeChecks();
-    if (!shouldContinue) return;
+    if (!shouldContinue) return {shouldContinue};
 
     if (isFirstGuess()) {
-        updateKnownLetterInfo(uiState.guess, results);
+        updateKnownLetterInfo(state.guess, results);
         updateInfoFromReevaluation(evaluationsOfExistingRows);
     }
 
+    return {
+        shouldContinue: true,
+    };
+}
+
+export const consumeGuess = async () => {
+    if (state.inputLocked) return;
+    if (!await isValidGuess(state.guess)) return;
+
+    pauseTimer();
+
+    const {shouldContinue} = await execConsumeGuess();
+    if (!shouldContinue) return;
+
     restartTimer(dropGarbage, nextGuessTimeLimit());
 
-    if (!isGarbage) {
-        gameState.stats.nthGuess++;
-    }
-    uiState.guess = "";
-    uiState.inputLocked = false;
+    gameState.stats.nthGuess++;
+    state.guess = "";
+    state.inputLocked = false;
 };
 
 export const backspaceGuess = () => {
-    if (uiState.inputLocked) return;
+    if (state.inputLocked) return;
 
-    uiState.guess = uiState.guess.slice(0, -1);
+    state.guess = state.guess.slice(0, -1);
     resetGuessTiles();
 };
 
 export const extendGuess = (char: string) => {
-    if (uiState.inputLocked) return;
-    if (uiState.guess.length >= WORD_LENGTH) return;
-    if (gameState.board[uiState.guess.length].length >= N_ROWS) return;
+    if (state.inputLocked) return;
+    if (state.guess.length >= WORD_LENGTH) return;
+    if (stateDerived.nextColumnBlocked) return;
 
-    uiState.guess += char;
+    state.guess += char;
     resetGuessTiles();
 };
 
-export const selectColorOfBlueTile = async (x: number, y: number, color: TileColor) => {
-    if (uiState.inputLocked) return;
+export enum BlueTileAction {
+    SetGreen,
+    SetYellow,
+    DestroyNearby,
+}
 
-    uiState.inputLocked = true;
+const executeBlueTileAction = async (x: number, y: number, action: BlueTileAction) => {
+    
+    switch (action) {
+        case BlueTileAction.DestroyNearby: {
+            const points = getBlueTileExplodeRange({x, y});
+            destroyTiles(...points);
 
-    pauseTimer();
+            await wait(500);
 
-    const island = getIslandOfColor({x, y}, color);
-    const grays = getAdjacentGrays([island]);
-    destroyTiles(...island.flat(), ...grays);
+            break;
+        }
 
-    await wait(500);
+        case BlueTileAction.SetGreen:
+        case BlueTileAction.SetYellow: {
+            const color = action === BlueTileAction.SetGreen
+                ? TileColor.Green
+                : TileColor.Yellow;
+
+            const island = getIslandOfColor({x, y}, color);
+
+            for (const point of island) {
+                const tile = gameState.board[point.x][point.y];
+                gameState.board[point.x][point.y] = new Tile(tile.id, color, tile.letter, tile.tagColor);
+            }
+
+            break;
+        }
+    }
 
     await locateAndDestroyLargeGroups();
 
     const {shouldContinue} = await boardChangeChecks();
+    return {shouldContinue};
+};
+
+export const blueTileAction = async (x: number, y: number, action: BlueTileAction) => {
+    if (state.inputLocked) return;
+
+    state.inputLocked = true;
+
+    pauseTimer();
+
+    const {shouldContinue} = await executeBlueTileAction(x, y, action);
     if (!shouldContinue) return;
 
     startTimer(dropGarbage);
-    uiState.inputLocked = false;
+    state.inputLocked = false;
 };
 
 export const reset = async () => {
@@ -258,11 +338,11 @@ export const reset = async () => {
 
     setTimeLimit(MAX_TIME_LIMIT_S_BY_WORD_NO * 1000);
     
-    uiState.guess = "";
-    uiState.inputLocked = false;
-    uiState.flipping = false;
-    uiState.currentIslands = [];
-    uiState.currentGrays = [];
-    uiState.gameOver = false;
+    state.guess = "";
+    state.inputLocked = false;
+    state.flipping = false;
+    state.currentIslands = [];
+    state.currentGrays = [];
+    state.gameOver = false;
     resetGuessTiles();
 };
