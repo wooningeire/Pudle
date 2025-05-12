@@ -28,15 +28,16 @@ const currentLetterPositionInfo = $derived(info?.positionInfo[inputingWhichLette
 const bgColor = $derived(hasInfo ? getMatchResultCssColor(info!.type) : "");
 const bgColorDark = $derived(hasInfo ? getMatchResultCssColorDark(info!.type) : "");
 
+const disabled = $derived(uiState().inputLocked || forceDisabled);
+
 const must = $derived(
-    !uiState().inputLocked
+    !disabled
         && colorable
         && currentLetterPositionInfo === PositionType.MustBeInPosition
 );
 const mustNot = $derived(
     colorable && currentLetterPositionInfo === PositionType.MustNotBeInPosition
 );
-const disabled = $derived(uiState().inputLocked || forceDisabled);
 
 let transitionDelay = $state(0);
 const rerollTransitionDelay = () => {

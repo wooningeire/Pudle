@@ -10,19 +10,19 @@ import { setupInitialLoad } from "../state/initialLoadState.svelte";
 import { onMount } from "svelte";
 import { addMessage, NoticeMessage, noticeState } from "../state/noticeState.svelte";
 
-onMount(async () => {
-    const removeMessage = addMessage(NoticeMessage.Loading);
+const removeLoadingMessage = addMessage(NoticeMessage.Loading);
 
+onMount(async () => {
     try {
         await setupInitialLoad();
     } catch {
-        removeMessage();
+        removeLoadingMessage();
 
         addMessage(NoticeMessage.LoadingFailed);
         return;
     }
 
-    removeMessage();
+    removeLoadingMessage();
     onDataLoad();
 });
 </script>

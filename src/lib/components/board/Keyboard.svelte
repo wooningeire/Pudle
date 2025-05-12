@@ -27,7 +27,7 @@ const keyRows = [
                     label={char}
                     onClick={() => extendGuess(char)}
                     colorable
-                    forceDisabled={uiState().nextColumnBlocked}
+                    forceDisabled={uiState().guess.length === WORD_LENGTH}
                 />
             {/each}
 

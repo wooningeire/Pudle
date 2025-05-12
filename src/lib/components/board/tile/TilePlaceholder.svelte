@@ -55,7 +55,7 @@ onDestroy(() => {
 
 let containerEl = $state<HTMLDivElement | null>(null);
 
-const grow = (node: Element, {duration=250, delay=0, easing=backOut}: {duration?: number, delay?: number, easing?: (time: number) => number}) => {
+const grow = (node: Element, {duration=250, delay=0, easing=backOut}: {duration?: number, delay?: number, easing?: (time: number) => number}={}) => {
     return {
         duration,
         delay,
@@ -70,7 +70,7 @@ const grow = (node: Element, {duration=250, delay=0, easing=backOut}: {duration?
     style:grid-area={x !== null && y !== null ? `${N_ROWS - y}/${x + 1}` : ""}
     class:guess-reject-shake={isDoingGuessRejectShake}
     bind:this={containerEl}
-    onanimationend={(event: Event) => event.currentTarget === containerEl && (isDoingGuessRejectShake = false)}
+    onanimationend={(event: Event) => event.target === containerEl && (isDoingGuessRejectShake = false)}
 >
     <tile-placeholder
         class:filled={isInputRow && (tile?.letter.length ?? 0) > 0}
@@ -128,53 +128,56 @@ tile-placeholder {
 
     backface-visibility: hidden;
 
-    &.filled:not(.paused) {
-        outline: 2px solid var(--off-black);
-        outline-offset: 0;
-        animation: pulse .175s ease-in-out;
-        @keyframes pulse {
-            20% {
-                transform: scale(1.125);
-            }
-        }
-    }
-
-    &.hidden:not(.paused) {
-        opacity: 0.5;
-        &.is-first-guess {
-            transition-delay: 3s;
-        }
-    }
 
     &.paused {
         opacity: 0.25;
     }
 
-    &.flipping:not(.paused) {
-        animation: flip-bg 0.5s ease-in-out forwards;
-        animation-delay: var(--reveal-animation-delay);
-
-        &.is-first-guess {
-            animation-duration: var(--tile-flip-duration-first-guess);
+    &:not(.paused) {
+        &.filled {
+            outline: 2px solid var(--off-black);
+            outline-offset: 0;
+            animation: pulse .175s ease-in-out;
+            @keyframes pulse {
+                20% {
+                    transform: scale(1.125);
+                }
+            }
         }
-        
-        @keyframes flip-bg {
-            0% {
-                transform: rotateX(0turn);
+
+        &.hidden {
+            opacity: 0.5;
+            &.is-first-guess {
+                transition-delay: 3s;
             }
-            50% {
-                outline-offset: 0rem;
-                outline-color: var(--off-black);
+        }
+
+
+        &.flipping {
+            animation: flip-bg 0.5s ease-in-out forwards;
+            animation-delay: var(--reveal-animation-delay);
+
+            &.is-first-guess {
+                animation-duration: var(--tile-flip-duration-first-guess);
             }
-            100% {
-                transform: rotateX(-0.5turn);
-                outline-offset: -2rem;
-                outline-color: #0000;
+            
+            @keyframes flip-bg {
+                0% {
+                    transform: rotateX(0turn);
+                }
+                50% {
+                    outline-offset: 0rem;
+                    outline-color: var(--off-black);
+                }
+                100% {
+                    transform: rotateX(-0.5turn);
+                    outline-offset: -2rem;
+                    outline-color: #0000;
+                }
             }
         }
     }
 }
-
 
 .guess-reject-shake {
     animation: shake 0.5s ease-in-out;
@@ -200,5 +203,6 @@ tile-placeholder {
         }
     }
 }
+
 </style>
 
