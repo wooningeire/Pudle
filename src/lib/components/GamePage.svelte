@@ -28,7 +28,6 @@ game-page {
 
     grid-template-columns: 15rem auto 15rem;
     grid-template-rows: auto auto auto 5rem;
-    width: 100vw;
     padding: 0 5rem;
 
     gap: 2rem;
