@@ -395,18 +395,24 @@ export const stopPreviewBlueTileRange = () => {
     state.previewRange = null;
 };
 
+let timerWasPausedWhenGamePaused = false;
 export const pauseGame = () => {
     if (state.paused) return;
 
+    timerWasPausedWhenGamePaused = timerState.paused;
     state.paused = true;
-    pauseTimer();
+    if (!timerWasPausedWhenGamePaused) {
+        pauseTimer();
+    }
 };
 
 export const unpauseGame = () => {
     if (!state.paused) return;
 
     state.paused = false;
-    resumeTimer(dropGarbage);
+    if (!timerWasPausedWhenGamePaused) {
+        resumeTimer(dropGarbage);
+    }
 };
 
 export const reset = async () => {

@@ -10,5 +10,5 @@ export const resetStatsState = () => {
     statsState.nthGuess = 1;
     statsState.nthWord = 1;
 
-    statsState.hasRestarted = false;
+    statsState.hasRestarted = true;
 };
