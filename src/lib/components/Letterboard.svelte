@@ -3,10 +3,12 @@ import TileGuessRow from "#/TileGuessRow.svelte";
 import { N_ROWS, WORD_LENGTH } from "$lib/constants.ts";
 import TileView from "#/TileView.svelte";
 import { gameState } from "$lib/state/gameState.svelte.ts";
-    import TileBg from "#/TileBg.svelte";
+    import TilePlaceholder from "@/lib/components/TilePlaceholder.svelte";
     import { flip } from "svelte/animate";
     import { bounceOut, cubicInOut } from "svelte/easing";
     import TileGuessNotice from "./TileGuessNotice.svelte";
+    import { noticeState } from "../state/noticeState.svelte";
+    import NoticeList from "./NoticeList.svelte";
 </script>
 
 <letter-board
@@ -19,7 +21,7 @@ import { gameState } from "$lib/state/gameState.svelte.ts";
 
             {#each gameState.board as column, x}
                 {#each new Array(N_ROWS - 1).fill(0) as _, y}
-                    <TileBg
+                    <TilePlaceholder
                         hidden={column.length > y}
                         {x}
                         {y}
@@ -43,8 +45,8 @@ import { gameState } from "$lib/state/gameState.svelte.ts";
             {/each}
         </tile-grid>
     </tile-grids>
-    
-    <TileGuessNotice>a</TileGuessNotice>
+
+    <NoticeList />
 </letter-board>
 
 <style lang="scss">

@@ -1,3 +1,6 @@
+import { tick } from "svelte";
+import { SvelteMap, SvelteSet } from "svelte/reactivity";
+
 export enum NoticeMessage {
     SelectBlueTile,
     NotInWordList,
@@ -5,19 +8,35 @@ export enum NoticeMessage {
     ColumnBlocked,
 }
 
+
 export const noticeState = $state({
-    currentMessage: <NoticeMessage | null>null,
+    messages: new SvelteMap<bigint, NoticeMessage>(),
+    newestMessage: <{id: bigint, message: NoticeMessage} | null>null,
 });
 
-let currentTimeout = <number | null>null;
+let nextId = 0n;
 
-export const setTemporaryMessage = (message: NoticeMessage) => {
-    if (currentTimeout !== null) {
-        clearTimeout(currentTimeout);
+const getNextId = () => nextId++;
+
+
+export const addTemporaryMessage = async (message: NoticeMessage) => {
+    const remove = await addMessage(message);
+    setTimeout(remove, 2000);
+};
+
+export const addMessage = async (message: NoticeMessage) => {
+    const id = getNextId();
+
+    noticeState.messages.set(id, message);
+    
+
+    if (noticeState.newestMessage !== null) {
+        noticeState.newestMessage = null;
+        await tick();
     }
+    noticeState.newestMessage = {id, message};
 
-    noticeState.currentMessage = message;
-    currentTimeout = setTimeout(() => {
-        noticeState.currentMessage = null;
-    }, 2000);
+    return () => {
+        noticeState.messages.delete(id);
+    }
 };

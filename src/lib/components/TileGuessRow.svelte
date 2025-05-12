@@ -1,8 +1,9 @@
 <script lang="ts">
 import {backspaceGuess, consumeGuess, extendGuess, uiState } from "$lib/state/uiState.svelte.ts";
-import TileBg from "#/TileBg.svelte";
-    import { gameState, isFirstGuess } from "../state/gameState.svelte";
-    import { N_ROWS } from "../constants";
+import TilePlaceholder from "@/lib/components/TilePlaceholder.svelte";
+import { gameState, isFirstGuess } from "../state/gameState.svelte";
+import { N_ROWS } from "../constants";
+import {NoticeMessage, noticeState} from "$lib/state/noticeState.svelte";
 
 
 const keydown = (event: KeyboardEvent) => {
@@ -27,19 +28,25 @@ const keydown = (event: KeyboardEvent) => {
 
     extendGuess(key);
 };
+
 </script>
 
 
 <svelte:window onkeydown={keydown} />
 
 {#each uiState().guessTiles as tile, x}
-    <TileBg
+    <TilePlaceholder
         {tile}
         isInputRow
         flipping={uiState().flipping}
         revealAnimationDelay={x * (isFirstGuess() ? 300 : 100)}
         hidden={gameState.board[x].length >= N_ROWS}
         {x}
+        y={N_ROWS - 1}
+        doGuessRejectShake={
+            noticeState.newestMessage !== null
+                && [NoticeMessage.AlreadyGuessedThisRound, NoticeMessage.NotInWordList].includes(noticeState.newestMessage.message)
+        }
     />
 {/each}
 

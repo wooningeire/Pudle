@@ -67,3 +67,12 @@ export const flipBottom = (node: HTMLElement, {duration, delay, easing, baseRot=
         css: (t: number, u: number) => `transform: rotateX(calc(${u * -0.5}turn + ${baseRot}));`,
     };
 };
+
+export const flipBottomAndFade = (node: HTMLElement, {duration, delay, easing, baseRot="0deg"}: {duration?: number, delay?: number, easing?: (t: number) => number, baseRot?: string}) => {
+    return {
+        duration,
+        delay,
+        easing,
+        css: (t: number, u: number) => `transform: rotateX(calc(${u * -0.5}turn + ${baseRot})); opacity: ${t};`,
+    };
+};

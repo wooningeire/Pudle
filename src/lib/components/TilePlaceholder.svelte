@@ -4,6 +4,8 @@ import {Tile} from "$lib/types/Tile.ts";
     import TileContent from "#/TileContent.svelte";
     import { N_ROWS } from "$lib/constants.ts";
     import { gameState } from "../state/gameState.svelte";
+    import { NoticeMessage, noticeState } from "../state/noticeState.svelte";
+    import { tick } from "svelte";
 
 const {
     tile = null,
@@ -13,6 +15,7 @@ const {
     hidden = false,
     x = null,
     y = null,
+    doGuessRejectShake = false,
 }: {
     tile?: Tile | null,
     isInputRow?: boolean,
@@ -21,13 +24,28 @@ const {
     hidden?: boolean,
     x?: number | null,
     y?: number | null,
+    doGuessRejectShake?: boolean,
 } = $props();
+
+let isDoingGuessRejectShake = $state(false);
+let containerEl = $state<HTMLDivElement | null>(null);
+
+$effect(() => {
+    isDoingGuessRejectShake = false;
+    if (!doGuessRejectShake) return;
+    void containerEl!.offsetHeight; // force reflow
+    isDoingGuessRejectShake = true;
+});
 
 </script>
 
 
-<tile-bg-container style:grid-area={x !== null && y !== null ? `${N_ROWS - y}/${x + 1}` : ""}>
-    <tile-bg
+<tile-placeholder-container
+    style:grid-area={x !== null && y !== null ? `${N_ROWS - y}/${x + 1}` : ""}
+    class:guess-reject-shake={isDoingGuessRejectShake}
+    bind:this={containerEl}
+>
+    <tile-placeholder
         class:filled={isInputRow && (tile?.letter.length ?? 0) > 0}
         class:flipping
         class:hidden
@@ -37,7 +55,7 @@ const {
         {#if tile !== null && isInputRow}
             <span transition:fade={{duration: 50}}>{tile.letter}</span>
         {/if}
-    </tile-bg>
+    </tile-placeholder>
 
 
     {#if tile !== null && isInputRow && flipping}
@@ -50,11 +68,11 @@ const {
             y={y ?? 0}
         />
     {/if}
-</tile-bg-container>
+</tile-placeholder-container>
 
 
 <style lang="scss">
-tile-bg-container {
+tile-placeholder-container {
     width: var(--tile-size);
     height: var(--tile-size);
     font-size: 2rem;
@@ -69,7 +87,7 @@ tile-bg-container {
     transform-style: preserve-3d;
 }
 
-tile-bg {
+tile-placeholder {
     display: grid;
     place-items: center;
 
@@ -124,6 +142,31 @@ tile-bg {
         }
     }
 }
-    
+
+
+.guess-reject-shake {
+    animation: shake 0.5s ease-in-out;
+
+    @keyframes shake {
+        14.28571% {
+            transform: translateX(0.5rem);
+        }
+        28.57143% {
+            transform: translateX(-0.7rem);
+        }
+        42.85714% {
+            transform: translateX(0.8rem);
+        }
+        57.14286% {
+            transform: translateX(-0.8rem);
+        }
+        71.42857% {
+            transform: translateX(0.7rem);
+        }
+        85.71429% {
+            transform: translateX(-0.5rem);
+        }
+    }
+}
 </style>
 

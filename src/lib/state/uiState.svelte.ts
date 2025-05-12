@@ -5,7 +5,7 @@ import { TileTag } from "$lib/types/TileTag.ts";
 import { MatchResult } from "../types/MatchResult.ts";
 import { GUESS_TIME_BY_GUESS_NO_DECAY_FAC, GUESS_TIME_BY_WORD_NO_DECAY_FAC, MAX_TIME_LIMIT_S_BY_WORD_NO, MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO, MIN_TIME_LIMIT_S_BY_WORD_NO, WORD_LENGTH, MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO, EMPTY_TILE_CHAR, N_ROWS } from "../constants.ts";
 import { pauseTimer, resetTimerState, restartTimer, setTimeLimit, startTimer, timerState } from "./timerState.svelte.ts";
-import { NoticeMessage, noticeState, setTemporaryMessage } from "./noticeState.svelte.ts";
+import { NoticeMessage, noticeState, addTemporaryMessage, addMessage } from "./noticeState.svelte.ts";
 
 
 const state = $state({
@@ -194,13 +194,13 @@ const requestBlueTileSelection = async () => {
     const {promise, resolve} = Promise.withResolvers<number>();
     state.selectingBlueTile = true;
     state.currentBlueTileSelectionResolver = resolve;
-    noticeState.currentMessage = NoticeMessage.SelectBlueTile;
+    const removeMessage = await addMessage(NoticeMessage.SelectBlueTile);
 
     const index = await promise;
 
     state.selectingBlueTile = false;
     state.currentBlueTileSelectionResolver = null;
-    noticeState.currentMessage = null;
+    removeMessage();
 
     return index;
 };
@@ -276,7 +276,7 @@ export const consumeGuess = async () => {
         const message = await invalidGuessMessage(state.guess);
         if (message === null) return;
 
-        setTemporaryMessage(message);
+        addTemporaryMessage(message);
         return;
     }
 
