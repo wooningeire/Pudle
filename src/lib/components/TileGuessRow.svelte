@@ -1,9 +1,10 @@
 <script lang="ts">
 import {backspaceGuess, consumeGuess, extendGuess, uiState } from "$lib/state/uiState.svelte.ts";
 import TilePlaceholder from "@/lib/components/TilePlaceholder.svelte";
-import { gameState, isFirstGuess } from "../state/gameState.svelte";
+import { boardState } from "../state/boardState.svelte";
 import { N_ROWS } from "../constants";
 import {NoticeMessage, noticeState} from "$lib/state/noticeState.svelte";
+    import { isFirstGuess } from "../state/statsState.svelte";
 
 
 const keydown = (event: KeyboardEvent) => {
@@ -40,7 +41,7 @@ const keydown = (event: KeyboardEvent) => {
         isInputRow
         flipping={uiState().flipping}
         revealAnimationDelay={x * (isFirstGuess() ? 300 : 100)}
-        hidden={gameState.board[x].length >= N_ROWS}
+        hidden={boardState.board[x].length >= N_ROWS}
         {x}
         y={N_ROWS - 1}
     />

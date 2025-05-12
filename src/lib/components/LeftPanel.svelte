@@ -1,13 +1,11 @@
 <script>
-import { gameState, isFirstGuess } from "$lib/state/gameState.svelte.ts";
-    import { fly } from "svelte/transition";
 import { uiState } from "../state/uiState.svelte";
-import Button from "./Button.svelte";
 import GameOverOptions from "./GameOverOptions.svelte";
 import GameStats from "./GameStats.svelte";
     import { elasticOut, quartOut } from "svelte/easing";
     import { flipLeft, halfFlipLeft, halfFlipRight } from "./transition";
     import AutoDropTimer from "./AutoDropTimer.svelte";
+    import { isFirstGuess } from "../state/statsState.svelte";
 </script>
 
 

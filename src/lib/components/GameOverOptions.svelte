@@ -1,20 +1,21 @@
 <script>
 import { N_ROWS } from "$lib/constants";
-import { gameState } from "$lib/state/gameState.svelte";
+import { boardState } from "@/lib/state/boardState.svelte";
 import { TileColor } from "$lib/types/Tile";
     import { fly } from "svelte/transition";
     import { reset, uiState } from "../state/uiState.svelte";
 import Button from "./Button.svelte";
     import { flipLeft, flipRight, halfFlipLeft, halfFlipRight } from "./transition";
     import { backIn, backOut, cubicIn, cubicInOut, cubicOut, elasticIn, elasticOut } from "svelte/easing";
+    import { statsState } from "../state/statsState.svelte";
 
 const resultsString = () => `**Pudle • https://wooningeire.github.io/pudle**
-word ${gameState.stats.nthWord} • guess ${gameState.stats.nthGuess}
+word ${statsState.nthWord} • guess ${statsState.nthGuess}
 ${
     new Array(N_ROWS).fill(0)
         .map((_, i) => {
             const y = N_ROWS - i - 1;
-            return gameState.board
+            return boardState.board
                 .map(column => {
                     if (y >= column.length) {
                         return "◽";

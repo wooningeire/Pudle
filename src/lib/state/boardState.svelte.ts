@@ -4,7 +4,7 @@ import { ISLAND_SIZE_THRESHOLD, N_ROWS, WORD_LENGTH } from "$lib/constants.ts";
 import { MatchResult } from "$lib/types/MatchResult.ts";
 import type { TileTag } from "../types/TileTag";
 
-export const gameState = $state({
+export const boardState = $state({
     board: new Array(WORD_LENGTH).fill(0).map(() => <Tile[]>[]),
 
     currentColors: {
@@ -15,33 +15,26 @@ export const gameState = $state({
 
     nextTileId: 0n,
     guessTileIds: <bigint[]>[],
-
-    stats: {
-        nthWord: 1,
-        nthGuess: 1,
-    },
-
-    hasRestarted: false,
 });
 
-export const nextTileId = () => gameState.nextTileId++;
+export const nextTileId = () => boardState.nextTileId++;
 
 export const setNextGuessTileIds = () => {
-    gameState.guessTileIds = new Array(WORD_LENGTH).fill(0).map(() => nextTileId());
+    boardState.guessTileIds = new Array(WORD_LENGTH).fill(0).map(() => nextTileId());
 };
 setNextGuessTileIds();
 
 export const removeTags = (tags: TileTag[]) => {
     for (const tag of tags) {
-        const tile = gameState.board[tag.x][tag.y];
-        gameState.board[tag.x][tag.y] = new Tile(tile.id, tile.color, tile.letter, null);
+        const tile = boardState.board[tag.x][tag.y];
+        boardState.board[tag.x][tag.y] = new Tile(tile.id, tile.color, tile.letter, null);
     }
 };
 
 export const applyTags = (tags: TileTag[]) => {
     for (const tag of tags) {
-        const tile = gameState.board[tag.x][tag.y];
-        gameState.board[tag.x][tag.y] = new Tile(tile.id, tile.color, tile.letter, tag.tagColor);
+        const tile = boardState.board[tag.x][tag.y];
+        boardState.board[tag.x][tag.y] = new Tile(tile.id, tile.color, tile.letter, tag.tagColor);
     }
 };
 
@@ -50,7 +43,7 @@ export const placeNewTiles = (tiles: (Tile | null)[]) => {
     for (const [i, tile] of tiles.entries()) {
         if (tile === null) continue;
 
-        gameState.board[i].push(tile);
+        boardState.board[i].push(tile);
     }
 };
 
@@ -58,18 +51,18 @@ export const placeNewTiles = (tiles: (Tile | null)[]) => {
 export const tilesFromMatchResults = (guess: string, results: MatchResult[], existingTiles: (Tile | null)[] | null=null) => {
     const ids = existingTiles !== null
         ? existingTiles.map(tile => tile?.id ?? null)
-        : gameState.guessTileIds;
+        : boardState.guessTileIds;
 
     return results.map((result, i) => {
         switch (result) {
             case MatchResult.Empty:
                 return null;
             case MatchResult.Match:
-                return new Tile(ids[i]!, gameState.currentColors.match, guess[i]);
+                return new Tile(ids[i]!, boardState.currentColors.match, guess[i]);
             case MatchResult.Misplaced:
-                return new Tile(ids[i]!, gameState.currentColors.misplaced, guess[i]);
+                return new Tile(ids[i]!, boardState.currentColors.misplaced, guess[i]);
             case MatchResult.Absent:
-                return new Tile(ids[i]!, gameState.currentColors.absent, guess[i]);
+                return new Tile(ids[i]!, boardState.currentColors.absent, guess[i]);
         }
     });
 }
@@ -90,7 +83,7 @@ export const hashPoint = (point: Point) => {
 
 const pointIsInBoard = (x: number, y: number) => {
     if (x < 0 || x >= WORD_LENGTH) return false;
-    if (y < 0 || y >= gameState.board[x].length) return false;
+    if (y < 0 || y >= boardState.board[x].length) return false;
 
     return true;
 };
@@ -99,13 +92,13 @@ const pointIsInBoard = (x: number, y: number) => {
 export const locateIslands = () => {
     const islands: Point[][] = [];
 
-    const visited = gameState.board.map(col => col.map(() => false));
+    const visited = boardState.board.map(col => col.map(() => false));
 
     const dfsExplore = (x: number, y: number, targetColor: TileColor, currentIsland: Point[]) => {
         if (!pointIsInBoard(x, y)) return;
         if (visited[x][y]) return;
 
-        const tile = gameState.board[x][y];
+        const tile = boardState.board[x][y];
         if (tile.color !== targetColor) return;
 
         visited[x][y] = true;
@@ -120,8 +113,8 @@ export const locateIslands = () => {
     };
 
     for (let x = 0; x < WORD_LENGTH; x++) {
-        for (let y = 0; y < gameState.board[x].length; y++) {
-            const lookingForColor = gameState.board[x][y].color;
+        for (let y = 0; y < boardState.board[x].length; y++) {
+            const lookingForColor = boardState.board[x][y].color;
 
             const currentIsland: Point[] = [];
             dfsExplore(x, y, lookingForColor, currentIsland);
@@ -140,7 +133,7 @@ export const getBlueTileCrossRange = (start: Point) => {
 
     const add = (x: number, y: number) => {
         if (!pointIsInBoard(x, y)) return;
-        if (gameState.board[x][y].color === TileColor.Blue) return;
+        if (boardState.board[x][y].color === TileColor.Blue) return;
         points.push({x, y});
     };
 
@@ -162,13 +155,13 @@ export const getBlueTileCrossRange = (start: Point) => {
 export const getIslandOfColor = (start: Point, color: TileColor) => {
     const island: Point[] = [];
 
-    const visited = gameState.board.map(col => col.map(() => false));
+    const visited = boardState.board.map(col => col.map(() => false));
 
     const dfsExplore = (x: number, y: number) => {
         if (!pointIsInBoard(x, y)) return;
         if (visited[x][y]) return;
 
-        const tile = gameState.board[x][y];
+        const tile = boardState.board[x][y];
         if (hashPoint(start) !== hashPoint({x, y}) && tile.color !== color) return;
 
         visited[x][y] = true;
@@ -189,14 +182,14 @@ export const getIslandOfColor = (start: Point, color: TileColor) => {
 export const getAdjacentGrays = (islands: Point[][]) => {
     const eliminatedGrays: Point[] = [];
 
-    const visited = gameState.board.map(col => col.map(() => false));
+    const visited = boardState.board.map(col => col.map(() => false));
 
     const checkGray = (x: number, y: number) => {
         if (!pointIsInBoard(x, y)) return;
         if (visited[x][y]) return;
 
         visited[x][y] = true;
-        const tile = gameState.board[x][y];
+        const tile = boardState.board[x][y];
         if (tile.color !== TileColor.Gray) return;
 
         eliminatedGrays.push({x, y});
@@ -222,26 +215,24 @@ export const getAdjacentGrays = (islands: Point[][]) => {
 export const destroyTiles = (...tileCoords: Point[]) => {
     const eliminatedPoints = new Set(tileCoords.map(point => hashPoint(point)));
 
-    gameState.board = gameState.board.map(
+    boardState.board = boardState.board.map(
         (col, x) => col.filter((_, y) => !eliminatedPoints.has(hashPoint({x, y})))
     );
 };
 
 const hasBlueTiles = () => {
-    return gameState.board.some(column => column.some(tile => tile.color === TileColor.Blue));
+    return boardState.board.some(column => column.some(tile => tile.color === TileColor.Blue));
 };
 
-export const hasColumnAtTop = () => gameState.board.some(column => column.length >= N_ROWS);
+export const hasColumnAtTop = () => boardState.board.some(column => column.length >= N_ROWS);
 
 export const isGameOver = () => !hasBlueTiles() && hasColumnAtTop();
 
-export const isFirstGuess = () => !gameState.hasRestarted && gameState.stats.nthGuess === 1;
-
 export const allBlueTileCoords = function* () {
-    const maxColumnHeight = Math.max(...gameState.board.map(column => column.length));
+    const maxColumnHeight = Math.max(...boardState.board.map(column => column.length));
 
     for (let y = maxColumnHeight - 1; y >= 0; y--) {
-        for (const [x, column] of gameState.board.entries()) {
+        for (const [x, column] of boardState.board.entries()) {
             if (y >= column.length) continue;
             if (column[y].color !== TileColor.Blue) continue;
 
@@ -252,21 +243,13 @@ export const allBlueTileCoords = function* () {
 
 
 export const resetGameState = () => {
-    gameState.board = new Array(WORD_LENGTH).fill(0).map(() => []);
+    boardState.board = new Array(WORD_LENGTH).fill(0).map(() => []);
 
-    gameState.currentColors = {
+    boardState.currentColors = {
         match: TileColor.Green,
         misplaced: TileColor.Yellow,
         absent: TileColor.Gray,
     };
 
     setNextGuessTileIds();
-    
-
-    gameState.stats = {
-        nthWord: 1,
-        nthGuess: 1,
-    };
-
-    gameState.hasRestarted = true;
 };

@@ -3,12 +3,13 @@ import {Tile, TileColor} from "$lib/types/Tile.ts";
     import { getTileTypeCssColor } from "$lib/types/tileColors.ts";
 import { receive, send } from "#/transition.ts";
     import { backOut, bounceOut, cubicIn, cubicInOut, cubicOut, elasticOut, quadIn } from "svelte/easing";
-    import { gameState, hashPoint, isFirstGuess } from "../state/gameState.svelte";
+    import { boardState, hashPoint } from "../state/boardState.svelte";
     import { roundState } from "../state/roundState.svelte";
     import { N_ROWS } from "../constants";
     import { uiState } from "../state/uiState.svelte";
     import TileContentBg from "./TileContentBg.svelte";
     import { keyboardClick } from "./event";
+    import { isFirstGuess } from "../state/statsState.svelte";
 
 const {
     tile,
@@ -31,7 +32,7 @@ const hasTab = $derived(tile.tagColor !== null && tile.tagColor !== tile.color);
 const bgColor = $derived(getTileTypeCssColor(tile.color));
 const tabColor = $derived(tile.tagColor !== null ? getTileTypeCssColor(tile.tagColor!) : bgColor);
 
-const fallDistance = $derived(N_ROWS - gameState.board[x].length);
+const fallDistance = $derived(N_ROWS - boardState.board[x].length);
 const transitionDuration = $derived((isFirstGuess() ? 1500 : 1250) * Math.sqrt(fallDistance / N_ROWS));
 
 

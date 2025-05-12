@@ -1,4 +1,4 @@
-import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, destroyTiles, setNextGuessTileIds, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess, removeTags, resetGameState, getIslandOfColor, getBlueTileCrossRange, hasColumnAtTop, allBlueTileCoords, hashPoint } from "./gameState.svelte.ts";
+import { placeNewTiles, boardState, locateIslands, type Point, getAdjacentGrays, destroyTiles, setNextGuessTileIds, isGameOver, applyTags, tilesFromMatchResults, removeTags, resetGameState, getIslandOfColor, getBlueTileCrossRange, hasColumnAtTop, allBlueTileCoords, hashPoint } from "./boardState.svelte.ts";
 import { Tile, TileColor } from "$lib/types/Tile.ts";
 import { guessedCorrectly, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, getRoundStateResetter, roundState, invalidGuessMessage } from "./roundState.svelte.ts";
 import { TileTag } from "$lib/types/TileTag.ts";
@@ -6,6 +6,7 @@ import { MatchResult } from "../types/MatchResult.ts";
 import { GUESS_TIME_BY_GUESS_NO_DECAY_FAC, GUESS_TIME_BY_WORD_NO_DECAY_FAC, MAX_TIME_LIMIT_S_BY_WORD_NO, MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO, MIN_TIME_LIMIT_S_BY_WORD_NO, WORD_LENGTH, MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO, EMPTY_TILE_CHAR, N_ROWS } from "../constants.ts";
 import { pauseTimer, resetTimerState, restartTimer, setTimeLimit, resumeTimer, timerState } from "./timerState.svelte.ts";
 import { NoticeMessage, noticeState, addTemporaryMessage, addMessage, emitMessage } from "./noticeState.svelte.ts";
+import { isFirstGuess, resetStatsState, statsState } from "./statsState.svelte.ts";
 
 
 const state = $state({
@@ -45,9 +46,9 @@ const stateDerived = $derived({
 
     nextColumnBlocked: state.guess.length >= WORD_LENGTH
         ? true
-        : gameState.board[state.guess.length].length >= N_ROWS,
+        : boardState.board[state.guess.length].length >= N_ROWS,
     firstBlockedColumnIndex: (() => {
-        const index = gameState.board.findIndex(column => column.length >= N_ROWS);
+        const index = boardState.board.findIndex(column => column.length >= N_ROWS);
         return index === -1 ? null : index;
     })(),
 });
@@ -58,7 +59,7 @@ const resetGuessTiles = (mockGuess=state.guess) => {
     state.guessTiles = mockGuess
         .padEnd(WORD_LENGTH, EMPTY_TILE_CHAR)
         .split("")
-        .map((char, i) => new Tile(gameState.guessTileIds[i], TileColor.Empty, char === EMPTY_TILE_CHAR ? "" : char));
+        .map((char, i) => new Tile(boardState.guessTileIds[i], TileColor.Empty, char === EMPTY_TILE_CHAR ? "" : char));
 };
 
 type ExistingRowEvaluation = {
@@ -69,9 +70,9 @@ type ExistingRowEvaluation = {
 };
 
 const reevaluateExistingRows = function* () {
-    const maxColumnHeight = Math.max(...gameState.board.map(column => column.length));
+    const maxColumnHeight = Math.max(...boardState.board.map(column => column.length));
     for (let y = 0; y < maxColumnHeight; y++) {
-        const existingTiles = gameState.board.map(column => column[y] ?? null);
+        const existingTiles = boardState.board.map(column => column[y] ?? null);
         const mockGuess = existingTiles.map(tile => tile?.letter ?? EMPTY_TILE_CHAR).join("");
 
         const results = matchResults(mockGuess);
@@ -89,7 +90,7 @@ const checkIfTilesNeedTagging = (evaluations: ExistingRowEvaluation[]) => {
         for (const [x, tile] of tiles.entries()) {
             if (tile === null) continue;
 
-            const existingTile = gameState.board[x][y];
+            const existingTile = boardState.board[x][y];
 
             if (tile.color === existingTile.tagColor) continue;
             tags.push(new TileTag(x, y, existingTile, tile.color));
@@ -126,8 +127,8 @@ const locateAndDestroyLargeGroups = async () => {
 
 const nextGuessTimeLimit = () => {
     // https://www.desmos.com/calculator/jledjyjotv
-    const maxTimeLimitByWordNo = MIN_TIME_LIMIT_S_BY_WORD_NO + 2 * (MAX_TIME_LIMIT_S_BY_WORD_NO - MIN_TIME_LIMIT_S_BY_WORD_NO) / (1 + Math.exp((gameState.stats.nthWord - 1) * GUESS_TIME_BY_WORD_NO_DECAY_FAC));
-    const minTimeLimitByWordNo = MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO + 2 * (MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO - MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO) / (1 + Math.exp((gameState.stats.nthWord - 1) * GUESS_TIME_BY_WORD_NO_DECAY_FAC));
+    const maxTimeLimitByWordNo = MIN_TIME_LIMIT_S_BY_WORD_NO + 2 * (MAX_TIME_LIMIT_S_BY_WORD_NO - MIN_TIME_LIMIT_S_BY_WORD_NO) / (1 + Math.exp((statsState.nthWord - 1) * GUESS_TIME_BY_WORD_NO_DECAY_FAC));
+    const minTimeLimitByWordNo = MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO + 2 * (MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO - MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO) / (1 + Math.exp((statsState.nthWord - 1) * GUESS_TIME_BY_WORD_NO_DECAY_FAC));
     const timeLimitByGuessNo = minTimeLimitByWordNo + 2 * (maxTimeLimitByWordNo - minTimeLimitByWordNo) / (1 + Math.exp((roundState.guessedWords.size - 1) * GUESS_TIME_BY_GUESS_NO_DECAY_FAC));
 
     return timeLimitByGuessNo * 1000;
@@ -258,7 +259,7 @@ const execConsumeGuess = async (isGarbage=false) => {
         await wait(500);
 
         await nextWord();
-        gameState.stats.nthWord++;
+        statsState.nthWord++;
     }
 
     await wait(250);
@@ -293,7 +294,7 @@ export const consumeGuess = async () => {
 
     restartTimer(dropGarbage, nextGuessTimeLimit());
 
-    gameState.stats.nthGuess++;
+    statsState.nthGuess++;
     state.guess = "";
     state.canTypeOrAffectBoard = false;
 };
@@ -354,8 +355,8 @@ const executeBlueTileAction = async (x: number, y: number, action: BlueTileActio
             : TileColor.Yellow;
 
         for (const {x, y} of island) {
-            const tile = gameState.board[x][y]
-            gameState.board[x][y] = new Tile(tile.id, color, tile.letter, tile.tagColor);
+            const tile = boardState.board[x][y]
+            boardState.board[x][y] = new Tile(tile.id, color, tile.letter, tile.tagColor);
         }
 
         await wait(500);
@@ -413,6 +414,7 @@ export const reset = async () => {
     resetGameState();
     resetTimerState();
     resetRoundState();
+    resetStatsState();
 
     setTimeLimit(MAX_TIME_LIMIT_S_BY_WORD_NO * 1000);
     

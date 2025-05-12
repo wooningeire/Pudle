@@ -3,10 +3,11 @@ import { fade } from "svelte/transition";
 import {Tile} from "$lib/types/Tile.ts";
     import TileContent from "#/TileContent.svelte";
     import { N_ROWS } from "$lib/constants.ts";
-    import { gameState } from "../state/gameState.svelte";
+    import { boardState } from "../state/boardState.svelte";
     import { noticeEvent, NoticeMessage, noticeState } from "../state/noticeState.svelte";
     import { onDestroy, onMount, tick } from "svelte";
     import { uiState } from "../state/uiState.svelte";
+    import { isFirstGuess, statsState } from "../state/statsState.svelte";
 
 const {
     tile = null,
@@ -67,7 +68,7 @@ let containerEl = $state<HTMLDivElement | null>(null);
         class:hidden
         class:paused={uiState().paused}
         style:--reveal-animation-delay="{revealAnimationDelay}ms"
-        class:is-first-guess={gameState.stats.nthGuess === 1}
+        class:is-first-guess={isFirstGuess()}
     >
         {#if tile !== null && isInputRow && !uiState().paused}
             <span transition:fade={{duration: 50}}>{tile.letter}</span>
