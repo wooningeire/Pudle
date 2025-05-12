@@ -37,8 +37,13 @@ notice-list {
     transform: translateX(-50%) translateZ(3rem);
 
     transition: opacity 0.125s ease-in-out;
-    &:hover {
+    &:hover,
+    &:active {
         opacity: 0.5;
+    }
+
+    &:active {
+        pointer-events: none;
     }
 }
 

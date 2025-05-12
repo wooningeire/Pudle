@@ -11,6 +11,8 @@ import TileContent from "#/TileContent.svelte";
     import BlueTileActionSelector from "./BlueTileActionSelector.svelte";
     import { stopPropagation } from "svelte/legacy";
     import { keyboardClick } from "./event";
+    import { NoticeMessage, noticeState } from "../state/noticeState.svelte";
+    import { N_ROWS } from "../constants";
 
 const {
     tile,
@@ -28,6 +30,7 @@ const explode = (node: HTMLElement, params: TransitionConfig, options: {directio
         css: (t: number, u: number) => `transform: scale(${1.5 - t * 0.5}); opacity: ${t};`,
     };
 };
+
 
 const isBlue = $derived(tile.color === TileColor.Blue);
 const isSelectingAction = $derived(whichBlueTileIsOpen === tile);
@@ -60,6 +63,44 @@ const handleBlueBlur = () => {
     whichBlueTileIsOpen = null;
 };
 
+
+let containerEl = $state<HTMLDivElement | null>(null);
+
+const generateShake = (maxScale: number) => {
+    let x: number;
+    let y: number;
+    while (true) {
+        x = Math.random() * 2 - 1;
+        y = Math.random() * 2 - 1;
+
+        if (x**2 + y**2 < 1) break;
+    }
+
+    return { transform: `translate(${x * maxScale}rem, ${y * maxScale}rem)` };
+};
+
+$effect(() => {
+    if (
+        noticeState.emittedMessage === null
+        || noticeState.emittedMessage.message !== NoticeMessage.ColumnBlocked
+        || y !== N_ROWS - 1
+        || x !== uiState().firstBlockedColumnIndex
+    ) return;
+
+    containerEl!.animate(
+        [
+            {transform: "translate(0, 0)"},
+            ...new Array(15).fill(0).map((_, i) => generateShake(1.5 ** (-i - 1))),
+            {transform: "translate(0, 0)"},
+        ],
+        {
+            duration: 500,
+            iterations: 1,
+            easing: "ease-in-out",
+            
+        },
+    );
+});
 </script>
 
 <svelte:window onclick={() => handleBlueBlur()} />
@@ -72,6 +113,7 @@ const handleBlueBlur = () => {
     class:blue={isBlue}
     class:selecting-color={isSelectingAction}
     class:can-be-clicked={!uiState().inputLocked}
+    bind:this={containerEl}
 >
     <TileContent
         {tile}

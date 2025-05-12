@@ -29,13 +29,15 @@ const {
 } = $props();
 
 let isDoingGuessRejectShake = $state(false);
-let containerEl = $state<HTMLDivElement | null>(null);
 
 $effect(() => {
-    isDoingGuessRejectShake = false;
     if (!doGuessRejectShake) return;
-    void containerEl!.offsetHeight; // force reflow
-    isDoingGuessRejectShake = true;
+
+    (async () => {
+        isDoingGuessRejectShake = false;
+        await tick();
+        isDoingGuessRejectShake = true;
+    })();
 });
 
 </script>
@@ -44,7 +46,6 @@ $effect(() => {
 <tile-placeholder-container
     style:grid-area={x !== null && y !== null ? `${N_ROWS - y}/${x + 1}` : ""}
     class:guess-reject-shake={isDoingGuessRejectShake}
-    bind:this={containerEl}
 >
     <tile-placeholder
         class:filled={isInputRow && (tile?.letter.length ?? 0) > 0}

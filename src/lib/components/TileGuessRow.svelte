@@ -44,8 +44,8 @@ const keydown = (event: KeyboardEvent) => {
         {x}
         y={N_ROWS - 1}
         doGuessRejectShake={
-            noticeState.newestMessage !== null
-                && [NoticeMessage.AlreadyGuessedThisRound, NoticeMessage.NotInWordList].includes(noticeState.newestMessage.message)
+            noticeState.emittedMessage !== null
+                && [NoticeMessage.AlreadyGuessedThisRound, NoticeMessage.NotInWordList].includes(noticeState.emittedMessage.message)
         }
     />
 {/each}

@@ -11,12 +11,12 @@ export enum NoticeMessage {
 
 export const noticeState = $state({
     messages: new SvelteMap<bigint, NoticeMessage>(),
-    newestMessage: <{id: bigint, message: NoticeMessage} | null>null,
+    emittedMessage: <{id: bigint, message: NoticeMessage} | null>null,
 });
 
 let nextId = 0n;
 
-const getNextId = () => nextId++;
+const nextMessageId = () => nextId++;
 
 
 export const addTemporaryMessage = async (message: NoticeMessage) => {
@@ -25,18 +25,25 @@ export const addTemporaryMessage = async (message: NoticeMessage) => {
 };
 
 export const addMessage = async (message: NoticeMessage) => {
-    const id = getNextId();
+    const id = nextMessageId();
 
     noticeState.messages.set(id, message);
-    
 
-    if (noticeState.newestMessage !== null) {
-        noticeState.newestMessage = null;
-        await tick();
-    }
-    noticeState.newestMessage = {id, message};
+    await emitMessage(message, id);
 
     return () => {
         noticeState.messages.delete(id);
+    };
+};
+
+export const emitMessage = async (message: NoticeMessage, id: bigint=nextMessageId()) => {
+    if (noticeState.emittedMessage !== null) {
+        noticeState.emittedMessage = null;
+        await tick();
     }
+    noticeState.emittedMessage = {id, message};
+
+    tick().then(() => {
+        noticeState.emittedMessage = null;
+    })
 };

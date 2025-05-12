@@ -2,7 +2,7 @@
     import { timerState } from "../state/timerState.svelte";
 
 let msRemaining = $state(0);
-let sRemaining = $derived(Math.ceil(msRemaining / 1000));
+let sRemaining = $derived(Math.max(0, Math.ceil(msRemaining / 1000)));
 
 let lastAnimationFrame = <number | null>null;
 

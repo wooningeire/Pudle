@@ -28,6 +28,7 @@ prev-guesses-grid {
     transform-style: flat;
     display: flex;
     flex-direction: column;
+    align-items: start;
     gap: 0.125rem;
     user-select: none;
 

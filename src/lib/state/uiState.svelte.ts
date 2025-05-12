@@ -5,7 +5,7 @@ import { TileTag } from "$lib/types/TileTag.ts";
 import { MatchResult } from "../types/MatchResult.ts";
 import { GUESS_TIME_BY_GUESS_NO_DECAY_FAC, GUESS_TIME_BY_WORD_NO_DECAY_FAC, MAX_TIME_LIMIT_S_BY_WORD_NO, MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO, MIN_TIME_LIMIT_S_BY_WORD_NO, WORD_LENGTH, MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO, EMPTY_TILE_CHAR, N_ROWS } from "../constants.ts";
 import { pauseTimer, resetTimerState, restartTimer, setTimeLimit, resumeTimer, timerState } from "./timerState.svelte.ts";
-import { NoticeMessage, noticeState, addTemporaryMessage, addMessage } from "./noticeState.svelte.ts";
+import { NoticeMessage, noticeState, addTemporaryMessage, addMessage, emitMessage } from "./noticeState.svelte.ts";
 
 
 const state = $state({
@@ -311,7 +311,10 @@ export const backspaceGuess = () => {
 export const extendGuess = (char: string) => {
     if (state.canTypeOrAffectBoard) return;
     if (state.guess.length >= WORD_LENGTH) return;
-    if (stateDerived.nextColumnBlocked) return;
+    if (stateDerived.nextColumnBlocked) {
+        emitMessage(NoticeMessage.ColumnBlocked);
+        return;
+    }
 
     state.guess += char;
     resetGuessTiles();
