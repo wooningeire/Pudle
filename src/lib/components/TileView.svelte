@@ -7,7 +7,7 @@ import {Tile, TileColor} from "$lib/types/Tile.ts";
 import TileContent from "#/TileContent.svelte";
     import { fade, type TransitionConfig } from "svelte/transition";
     import { backOut, cubicOut } from "svelte/easing";
-    import { BlueTileAction, blueTileAction, uiState } from "../state/uiState.svelte";
+    import { BlueTileAction, blueTileAction, previewBlueTileRange, uiState } from "../state/uiState.svelte";
     import BlueTileActionSelector from "./BlueTileActionSelector.svelte";
     import { stopPropagation } from "svelte/legacy";
     import { keyboardClick } from "./event";
@@ -57,6 +57,13 @@ const performBlueSelect = (action: BlueTileAction) => {
     blueTileAction(x, y, action);
 
     whichBlueTileIsOpen = null;
+};
+
+const performBluePreview = (action: BlueTileAction) => {
+    if (uiState().inputLocked) return;
+    if (!isBlue || !isSelectingAction) return;
+
+    previewBlueTileRange(x, y, action);
 };
 
 const handleBlueBlur = () => {
@@ -132,7 +139,10 @@ onDestroy(() => {
     />
 
     {#if isSelectingAction}
-        <BlueTileActionSelector onSelect={performBlueSelect} />
+        <BlueTileActionSelector
+            onSelect={performBlueSelect}
+            onPreview={performBluePreview}
+        />
     {/if}
 </tile-view>
 

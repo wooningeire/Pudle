@@ -1,13 +1,19 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
-    import { BlueTileAction } from "../state/uiState.svelte";
+    import { BlueTileAction, stopPreviewBlueTileRange } from "../state/uiState.svelte";
     import { backOut } from "svelte/easing";
 
 const {
     onSelect,
+    onPreview,
 }: {
     onSelect: (action: BlueTileAction) => void,
+    onPreview: (action: BlueTileAction) => void,
 } = $props();
+
+const stopPreview = () => {
+    stopPreviewBlueTileRange();
+};
 </script>
 
 
@@ -15,14 +21,20 @@ const {
     <blue-tile-action-option
         class="green"
         onclick={() => onSelect(BlueTileAction.DestroyGreen)}
+        onpointerover={() => onPreview(BlueTileAction.DestroyGreen)}
+        onpointerout={() => stopPreview()}
     ></blue-tile-action-option>
     <blue-tile-action-option
         class="yellow"
         onclick={() => onSelect(BlueTileAction.DestroyYellow)}
-    ></blue-tile-action-option>
+        onpointerover={() => onPreview(BlueTileAction.DestroyYellow)}
+        onpointerout={() => stopPreview()}
+        ></blue-tile-action-option>
     <blue-tile-action-option
         class="explode"
         onclick={() => onSelect(BlueTileAction.Explode)}
+        onpointerover={() => onPreview(BlueTileAction.Explode)}
+        onpointerout={() => stopPreview()}
     >
         explode
     </blue-tile-action-option>

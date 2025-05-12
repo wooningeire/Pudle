@@ -3,7 +3,7 @@ import {Tile, TileColor} from "$lib/types/Tile.ts";
     import { getTileTypeCssColor } from "$lib/types/tileColors.ts";
 import { receive, send } from "#/transition.ts";
     import { backOut, bounceOut, cubicIn, cubicInOut, cubicOut, elasticOut, quadIn } from "svelte/easing";
-    import { gameState, isFirstGuess } from "../state/gameState.svelte";
+    import { gameState, hashPoint, isFirstGuess } from "../state/gameState.svelte";
     import { roundState } from "../state/roundState.svelte";
     import { N_ROWS } from "../constants";
     import { uiState } from "../state/uiState.svelte";
@@ -34,6 +34,7 @@ const tabColor = $derived(tile.tagColor !== null ? getTileTypeCssColor(tile.tagC
 const fallDistance = $derived(N_ROWS - gameState.board[x].length);
 const transitionDuration = $derived((isFirstGuess() ? 1500 : 1250) * Math.sqrt(fallDistance / N_ROWS));
 
+
 const isBlue = $derived(tile.color === TileColor.Blue);
 
 const isSelectingBlueTile = $derived(isInputRow && uiState().selectingBlueTile);
@@ -42,6 +43,8 @@ const selectBlueTile = () => {
     if (!isSelectingBlueTile) return;
     uiState().currentBlueTileSelectionResolver!(x);
 };
+
+const inDestroyRange = $derived(uiState().previewRange?.has(hashPoint({x, y})) ?? false);
 </script>
 
 
@@ -60,6 +63,7 @@ const selectBlueTile = () => {
     class:selecting-blue-tile={isSelectingBlueTile}
     tabindex={isSelectingBlueTile ? 0 : -1}
     class:hidden={uiState().paused}
+    class:in-destroy-range={inDestroyRange}
 >
     <TileContentBg {tile} />
 
@@ -73,11 +77,21 @@ tile-content {
     place-items: center;
     color: #fff;
 
+    backface-visibility: hidden;
+    transition:
+        filter .125s ease-in-out,
+        transform .25s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        background .125s ease-in-out,
+        color .125s ease-in-out,
+        box-shadow .25s ease-in-out,
+        border .25s ease-in-out,
+        opacity 0.125s ease-in-out;
+
+    filter: none;
+
     > :global(*) {
         grid-area: 1/1;
     }
-
-    backface-visibility: hidden;
 
     &.flipping {
         transform: rotateX(0.5turn);
@@ -99,12 +113,6 @@ tile-content {
     }
 
     &.blue {
-        transition:
-            background .125s ease-in-out,
-            color .125s ease-in-out,
-            box-shadow .25s ease-in-out,
-            border .25s ease-in-out;
-
         color: var(--tile-blue-dark);
         filter: drop-shadow(0 0.25rem 0.5rem var(--tile-blue));
     }
@@ -112,10 +120,6 @@ tile-content {
     &.selecting-blue-tile {
         cursor: pointer;
         pointer-events: all;
-
-        transition:
-            filter .125s ease-in-out,
-            transform .25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
         &:hover,
         &:focus {
@@ -127,11 +131,12 @@ tile-content {
             filter: brightness(0.85);
         }
     }
-
-
-    transition: opacity 0.125s ease-in-out;
     &.hidden {
         opacity: 0;
+    }
+
+    &.in-destroy-range {
+        filter: brightness(1.5);
     }
 }
 

@@ -80,7 +80,7 @@ export type Point = {
     y: number,
 };
 
-const hash = (point: Point) => {
+export const hashPoint = (point: Point) => {
     const dataView = new DataView(new ArrayBuffer(16));
     dataView.setFloat64(0, point.x);
     dataView.setFloat64(8, point.y);
@@ -169,7 +169,7 @@ export const getIslandOfColor = (start: Point, color: TileColor) => {
         if (visited[x][y]) return;
 
         const tile = gameState.board[x][y];
-        if (hash(start) !== hash({x, y}) && tile.color !== color) return;
+        if (hashPoint(start) !== hashPoint({x, y}) && tile.color !== color) return;
 
         visited[x][y] = true;
 
@@ -219,11 +219,11 @@ export const getAdjacentGrays = (islands: Point[][]) => {
     return eliminatedGrays;
 };
 
-export const eliminateTiles = (...tileCoords: Point[]) => {
-    const eliminatedPoints = new Set(tileCoords.map(point => hash(point)));
+export const destroyTiles = (...tileCoords: Point[]) => {
+    const eliminatedPoints = new Set(tileCoords.map(point => hashPoint(point)));
 
     gameState.board = gameState.board.map(
-        (col, x) => col.filter((_, y) => !eliminatedPoints.has(hash({x, y})))
+        (col, x) => col.filter((_, y) => !eliminatedPoints.has(hashPoint({x, y})))
     );
 };
 
