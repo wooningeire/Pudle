@@ -11,8 +11,9 @@ export enum NoticeMessage {
 
 export const noticeState = $state({
     messages: new SvelteMap<bigint, NoticeMessage>(),
-    emittedMessage: <{id: bigint, message: NoticeMessage} | null>null,
 });
+
+export const noticeEvent = new EventTarget();
 
 let nextId = 0n;
 
@@ -20,30 +21,24 @@ const nextMessageId = () => nextId++;
 
 
 export const addTemporaryMessage = async (message: NoticeMessage) => {
-    const remove = await addMessage(message);
+    const remove = addMessage(message);
     setTimeout(remove, 2000);
 };
 
-export const addMessage = async (message: NoticeMessage) => {
+export const addMessage = (message: NoticeMessage) => {
     const id = nextMessageId();
 
     noticeState.messages.set(id, message);
 
-    await emitMessage(message, id);
+    emitMessage(message, id);
 
     return () => {
         noticeState.messages.delete(id);
     };
 };
 
-export const emitMessage = async (message: NoticeMessage, id: bigint=nextMessageId()) => {
-    if (noticeState.emittedMessage !== null) {
-        noticeState.emittedMessage = null;
-        await tick();
-    }
-    noticeState.emittedMessage = {id, message};
-
-    tick().then(() => {
-        noticeState.emittedMessage = null;
-    })
+export const emitMessage = (message: NoticeMessage, id: bigint=nextMessageId()) => {
+    noticeEvent.dispatchEvent(new CustomEvent("message", {
+        detail: message,
+    }));
 };

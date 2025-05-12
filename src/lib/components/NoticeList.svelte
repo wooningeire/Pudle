@@ -36,15 +36,12 @@ notice-list {
 
     transform: translateX(-50%) translateZ(3rem);
 
-    transition: opacity 0.125s ease-in-out;
-    &:hover,
-    &:active {
-        opacity: 0.5;
-    }
+    pointer-events: none;
 
-    &:active {
-        pointer-events: none;
-    }
+    // transition: opacity 0.125s ease-in-out;
+    // &:hover {
+    //     opacity: 0.25;
+    // }
 }
 
 tile-guess-notice-container {

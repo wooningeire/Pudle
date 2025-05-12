@@ -17,6 +17,7 @@ let shouldFlash = $state(false);
 let buttonEl = $state<HTMLButtonElement | null>(null);
 
 const handleClick = async () => {
+    buttonEl!.blur();
     shouldFlash = false;
     const nextFlash = await Promise.resolve(onClick());
     setTimeout(() => {

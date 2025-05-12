@@ -4,8 +4,8 @@ import {Tile} from "$lib/types/Tile.ts";
     import TileContent from "#/TileContent.svelte";
     import { N_ROWS } from "$lib/constants.ts";
     import { gameState } from "../state/gameState.svelte";
-    import { NoticeMessage, noticeState } from "../state/noticeState.svelte";
-    import { tick } from "svelte";
+    import { noticeEvent, NoticeMessage, noticeState } from "../state/noticeState.svelte";
+    import { onDestroy, onMount, tick } from "svelte";
     import { uiState } from "../state/uiState.svelte";
 
 const {
@@ -16,7 +16,6 @@ const {
     hidden = false,
     x = null,
     y = null,
-    doGuessRejectShake = false,
 }: {
     tile?: Tile | null,
     isInputRow?: boolean,
@@ -25,27 +24,42 @@ const {
     hidden?: boolean,
     x?: number | null,
     y?: number | null,
-    doGuessRejectShake?: boolean,
 } = $props();
 
 let isDoingGuessRejectShake = $state(false);
 
-$effect(() => {
-    if (!doGuessRejectShake) return;
+const handleMessage: EventListener = (event: Event) => {
+    const {detail: message} = <CustomEvent<NoticeMessage>>event;
+
+    if (
+        !isInputRow
+        || ![NoticeMessage.NotInWordList, NoticeMessage.AlreadyGuessedThisRound].includes(message)
+    ) return;
 
     (async () => {
         isDoingGuessRejectShake = false;
         await tick();
         isDoingGuessRejectShake = true;
     })();
+};
+
+onMount(() => {
+    noticeEvent.addEventListener("message", handleMessage);
 });
 
+onDestroy(() => {
+    noticeEvent.removeEventListener("message", handleMessage);
+});
+
+let containerEl = $state<HTMLDivElement | null>(null);
 </script>
 
 
 <tile-placeholder-container
     style:grid-area={x !== null && y !== null ? `${N_ROWS - y}/${x + 1}` : ""}
     class:guess-reject-shake={isDoingGuessRejectShake}
+    bind:this={containerEl}
+    onanimationend={(event: Event) => event.currentTarget === containerEl && (isDoingGuessRejectShake = false)}
 >
     <tile-placeholder
         class:filled={isInputRow && (tile?.letter.length ?? 0) > 0}

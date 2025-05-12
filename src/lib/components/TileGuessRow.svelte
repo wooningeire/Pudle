@@ -43,10 +43,6 @@ const keydown = (event: KeyboardEvent) => {
         hidden={gameState.board[x].length >= N_ROWS}
         {x}
         y={N_ROWS - 1}
-        doGuessRejectShake={
-            noticeState.emittedMessage !== null
-                && [NoticeMessage.AlreadyGuessedThisRound, NoticeMessage.NotInWordList].includes(noticeState.emittedMessage.message)
-        }
     />
 {/each}
 

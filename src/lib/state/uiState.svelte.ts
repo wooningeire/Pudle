@@ -203,7 +203,7 @@ const requestBlueTileSelection = async () => {
     const {promise, resolve} = Promise.withResolvers<number>();
     state.selectingBlueTile = true;
     state.currentBlueTileSelectionResolver = resolve;
-    const removeMessage = await addMessage(NoticeMessage.SelectBlueTile);
+    const removeMessage = addMessage(NoticeMessage.SelectBlueTile);
 
     const index = await promise;
 

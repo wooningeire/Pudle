@@ -11,8 +11,9 @@ import TileContent from "#/TileContent.svelte";
     import BlueTileActionSelector from "./BlueTileActionSelector.svelte";
     import { stopPropagation } from "svelte/legacy";
     import { keyboardClick } from "./event";
-    import { NoticeMessage, noticeState } from "../state/noticeState.svelte";
+    import { noticeEvent, NoticeMessage, noticeState } from "../state/noticeState.svelte";
     import { N_ROWS } from "../constants";
+    import { onDestroy, onMount } from "svelte";
 
 const {
     tile,
@@ -79,10 +80,11 @@ const generateShake = (maxScale: number) => {
     return { transform: `translate(${x * maxScale}rem, ${y * maxScale}rem)` };
 };
 
-$effect(() => {
+const handleMessage: EventListener = (event: Event) => {
+    const {detail: message} = <CustomEvent<NoticeMessage>>event;
+
     if (
-        noticeState.emittedMessage === null
-        || noticeState.emittedMessage.message !== NoticeMessage.ColumnBlocked
+        message !== NoticeMessage.ColumnBlocked
         || y !== N_ROWS - 1
         || x !== uiState().firstBlockedColumnIndex
     ) return;
@@ -100,6 +102,14 @@ $effect(() => {
             
         },
     );
+};
+
+onMount(() => {
+    noticeEvent.addEventListener("message", handleMessage);
+});
+
+onDestroy(() => {
+    noticeEvent.removeEventListener("message", handleMessage);
 });
 </script>
 
