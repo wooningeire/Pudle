@@ -2,6 +2,8 @@ import { tick } from "svelte";
 import { SvelteMap, SvelteSet } from "svelte/reactivity";
 
 export enum NoticeMessage {
+    Loading,
+    LoadingFailed,
     SelectBlueTile,
     NotInWordList,
     AlreadyGuessedThisRound,

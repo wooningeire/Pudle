@@ -1,14 +1,33 @@
-<script>
+<script lang="ts">
 import PudleTitle from "./PudleTitle.svelte";
 import RightPanel from "@/lib/components/panels/RightPanel.svelte";
 import LeftPanel from "@/lib/components/panels/LeftPanel.svelte";
 import Keyboard from "@/lib/components/board/Keyboard.svelte";
 import Letterboard from "@/lib/components/board/Letterboard.svelte";
-    import { fade } from "svelte/transition";
+import { fade } from "svelte/transition";
+import { onDataLoad, uiState } from "../state/uiState.svelte";
+import { setupInitialLoad } from "../state/initialLoadState.svelte";
+import { onMount } from "svelte";
+import { addMessage, NoticeMessage, noticeState } from "../state/noticeState.svelte";
 
+onMount(async () => {
+    const removeMessage = addMessage(NoticeMessage.Loading);
+
+    try {
+        await setupInitialLoad();
+    } catch {
+        removeMessage();
+
+        addMessage(NoticeMessage.LoadingFailed);
+        return;
+    }
+
+    removeMessage();
+    onDataLoad();
+});
 </script>
 
-<game-page in:fade={{duration: 500}}>
+<game-page>
     <PudleTitle fades />
 
     <Keyboard />

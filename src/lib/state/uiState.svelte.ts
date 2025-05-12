@@ -11,7 +11,7 @@ import { isFirstGuess, resetStatsState, statsState } from "./statsState.svelte.t
 
 const state = $state({
     guess: "",
-    canTypeOrAffectBoard: false,
+    boardsLocked: true,
     flipping: false,
     guessTiles: <Tile[]>[],
 
@@ -29,8 +29,7 @@ const state = $state({
 
 const stateDerived = $derived({
     guess: state.guess,
-    canTypeOrAffectBoard: state.canTypeOrAffectBoard,
-    inputLocked: state.canTypeOrAffectBoard || state.paused,
+    inputLocked: state.boardsLocked || state.paused,
     flipping: state.flipping,
     guessTiles: state.guessTiles,
 
@@ -54,6 +53,10 @@ const stateDerived = $derived({
 });
 
 export const uiState = () => stateDerived;
+
+export const onDataLoad = () => {
+    state.boardsLocked = false;
+};
 
 const resetGuessTiles = (mockGuess=state.guess) => {
     state.guessTiles = mockGuess
@@ -135,7 +138,7 @@ const nextGuessTimeLimit = () => {
 };
 
 const dropGarbage = async () => {
-    state.canTypeOrAffectBoard = true;
+    state.boardsLocked = true;
     pauseTimer();
 
     const lastGuess = state.guess;
@@ -161,7 +164,7 @@ const dropGarbage = async () => {
     resetGuessTiles();
 
 
-    state.canTypeOrAffectBoard = false;
+    state.boardsLocked = false;
     restartTimer(dropGarbage, nextGuessTimeLimit());
 };
 
@@ -214,7 +217,7 @@ const execConsumeGuess = async (isGarbage=false) => {
     const results = matchResults(state.guess);
     let tiles = <Tile[]>tilesFromMatchResults(state.guess, results);
 
-    state.canTypeOrAffectBoard = true;
+    state.boardsLocked = true;
     state.flipping = true;
     state.guessTiles = tiles;
 
@@ -278,7 +281,7 @@ const execConsumeGuess = async (isGarbage=false) => {
 }
 
 export const consumeGuess = async () => {
-    if (state.canTypeOrAffectBoard) return;
+    if (state.boardsLocked) return;
     if (!await isValidGuess(state.guess)) {
         const message = await invalidGuessMessage(state.guess);
         if (message === null) return;
@@ -296,18 +299,18 @@ export const consumeGuess = async () => {
 
     statsState.nthGuess++;
     state.guess = "";
-    state.canTypeOrAffectBoard = false;
+    state.boardsLocked = false;
 };
 
 export const backspaceGuess = () => {
-    if (state.canTypeOrAffectBoard) return;
+    if (state.boardsLocked) return;
 
     state.guess = state.guess.slice(0, -1);
     resetGuessTiles();
 };
 
 export const extendGuess = (char: string) => {
-    if (state.canTypeOrAffectBoard) return;
+    if (state.boardsLocked) return;
     if (state.guess.length >= WORD_LENGTH) return;
     if (stateDerived.nextColumnBlocked) {
         emitMessage(NoticeMessage.ColumnBlocked);
@@ -373,9 +376,9 @@ const executeBlueTileAction = async (x: number, y: number, action: BlueTileActio
 };
 
 export const blueTileAction = async (x: number, y: number, action: BlueTileAction) => {
-    if (state.canTypeOrAffectBoard) return;
+    if (state.boardsLocked) return;
 
-    state.canTypeOrAffectBoard = true;
+    state.boardsLocked = true;
 
     pauseTimer();
 
@@ -383,7 +386,7 @@ export const blueTileAction = async (x: number, y: number, action: BlueTileActio
     if (!shouldContinue) return;
 
     resumeTimer(dropGarbage);
-    state.canTypeOrAffectBoard = false;
+    state.boardsLocked = false;
 };
 
 export const previewBlueTileRange = (x: number, y: number, action: BlueTileAction) => {
@@ -425,7 +428,7 @@ export const reset = async () => {
     setTimeLimit(MAX_TIME_LIMIT_S_BY_WORD_NO * 1000);
     
     state.guess = "";
-    state.canTypeOrAffectBoard = false;
+    state.boardsLocked = true;
     state.flipping = false;
     state.previewRange = null;
 

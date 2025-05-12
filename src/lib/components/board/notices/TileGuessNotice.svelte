@@ -9,7 +9,11 @@ const {
 </script>
 
 <tile-guess-notice>
-    {#if message === NoticeMessage.SelectBlueTile}
+    {#if message === NoticeMessage.Loading}
+        Loading!
+    {:else if message === NoticeMessage.LoadingFailed}
+        Loading failed &gt;.=.&lt;" … please reload!
+    {:else if message === NoticeMessage.SelectBlueTile}
         Select a tile from the word to convert into a blue tile!
     {:else if message === NoticeMessage.AlreadyGuessedThisRound}
         Already guessed this word this round!
