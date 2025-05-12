@@ -218,8 +218,6 @@ const execConsumeGuess = async (isGarbage=false) => {
     if (results.every(result => result === MatchResult.Match)) {
         await wait(250);
 
-        state.discoveredBlueTiles = true;
-
         const blueTileIndex = await requestBlueTileSelection();
 
         const originalTile = tiles[blueTileIndex];
@@ -228,6 +226,8 @@ const execConsumeGuess = async (isGarbage=false) => {
         state.guessTiles = tiles;
 
         await wait(250);
+
+        state.discoveredBlueTiles = true;
     }
 
     if (!isGarbage && !isFirstGuess()) {
