@@ -6,6 +6,7 @@ import { gameState } from "$lib/state/gameState.svelte.ts";
     import TileBg from "#/TileBg.svelte";
     import { flip } from "svelte/animate";
     import { bounceOut, cubicInOut } from "svelte/easing";
+    import TileGuessNotice from "./TileGuessNotice.svelte";
 </script>
 
 <letter-board
@@ -42,6 +43,8 @@ import { gameState } from "$lib/state/gameState.svelte.ts";
             {/each}
         </tile-grid>
     </tile-grids>
+    
+    <TileGuessNotice>a</TileGuessNotice>
 </letter-board>
 
 <style lang="scss">
@@ -55,6 +58,7 @@ letter-board {
     flex-direction: column;
     gap: 0.5rem;
     user-select: none;
+    position: relative;
 }
 
 tile-grids {
@@ -71,6 +75,7 @@ tile-grid {
     grid-template-columns: repeat(var(--word-length), 1fr);
     grid-template-rows: repeat(var(--n-rows), 1fr);
     gap: 0.5rem;
+    pointer-events: none;
 }
 
 tile-view-container {

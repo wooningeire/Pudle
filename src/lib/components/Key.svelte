@@ -36,7 +36,7 @@ const must = $derived(
 const mustNot = $derived(
     colorable && currentLetterPositionInfo === PositionType.MustNotBeInPosition
 );
-const disabled = $derived(uiState().inputLocked || forceDisabled || uiState().nextColumnBlocked);
+const disabled = $derived(uiState().inputLocked || forceDisabled);
 
 let transitionDelay = $state(0);
 const rerollTransitionDelay = () => {

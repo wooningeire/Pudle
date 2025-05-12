@@ -4,6 +4,9 @@ import TileContent from "#/TileContent.svelte";
     import { fade, type TransitionConfig } from "svelte/transition";
     import { backOut, cubicOut } from "svelte/easing";
     import { BlueTileAction, blueTileAction, uiState } from "../state/uiState.svelte";
+    import BlueTileActionSelector from "./BlueTileActionSelector.svelte";
+    import { stopPropagation } from "svelte/legacy";
+    import { keyboardClick } from "./event";
 
 const {
     tile,
@@ -32,9 +35,11 @@ $effect(() => {
     isSelectingAction = false;
 });
 
-const handleBlueClick = () => {
+const handleBlueClick = (event: MouseEvent | null=null) => {
     if (uiState().inputLocked) return;
     if (!isBlue) return;
+
+    event?.stopPropagation();
     isSelectingAction = true;
 };
 
@@ -52,21 +57,18 @@ const handleBlueBlur = () => {
     isSelectingAction = false;
 };
 
-const handleBlueKeydown = (event: KeyboardEvent) => {
-    if (!["Enter", "Space"].includes(event.key)) return;
-    handleBlueClick();
-};
 </script>
 
+<svelte:window onclick={() => handleBlueBlur()} />
 
 <tile-view
     out:explode|global={{duration: 500, easing: cubicOut, delay: Math.random() * 125}}
-    onclick={() => handleBlueClick()}
-    onkeydown={handleBlueKeydown}
-    onblur={handleBlueBlur}
+    onclick={handleBlueClick}
+    onkeydown={keyboardClick(handleBlueClick)}
     tabindex={isBlue ? 0 : -1}
     class:blue={isBlue}
     class:selecting-color={isSelectingAction}
+    class:can-be-clicked={!uiState().inputLocked}
 >
     <TileContent
         {tile}
@@ -75,27 +77,13 @@ const handleBlueKeydown = (event: KeyboardEvent) => {
     />
 
     {#if isSelectingAction}
-        <blue-tile-action-selector transition:fade={{duration: 500, easing: backOut}}>
-            <blue-tile-action-option
-                class="green"
-                onclick={() => performBlueSelect(BlueTileAction.SetGreen)}
-            ></blue-tile-action-option>
-            <blue-tile-action-option
-                class="yellow"
-                onclick={() => performBlueSelect(BlueTileAction.SetYellow)}
-            ></blue-tile-action-option>
-            <blue-tile-action-option
-                class="destroy"
-                onclick={() => performBlueSelect(BlueTileAction.DestroyNearby)}
-            >
-                destroy
-            </blue-tile-action-option>
-        </blue-tile-action-selector>
+        <BlueTileActionSelector onSelect={performBlueSelect} />
     {/if}
 </tile-view>
 
 <style lang="scss">
 tile-view {
+    pointer-events: all;
     width: var(--tile-size);
     height: var(--tile-size);
     font-size: 2rem;
@@ -112,65 +100,24 @@ tile-view {
     transition:
         transform .25s cubic-bezier(0.2, 0.6, 0.265, 1.55),
         filter .125s ease-in-out;
-    &.blue:not(.selecting-color) {
-        cursor: pointer;
-        filter: brightness(1.125);
+
+    &.blue {
+        
+        &:not(.selecting-color).can-be-clicked {
+            cursor: pointer;
+            &:hover {
+                filter: brightness(1.125);
+                transform: scale(1.25);
+            }
+        }
     }
 
 
     &.selecting-color {
-        transform: scale(1.125);
+        transform: scale(1.25);
         > :global(tile-content) {
             opacity: 0.3333333;
         }
-    }
-}
-
-blue-tile-action-selector {
-    display: grid;
-    place-items: stretch;
-    grid-template-rows: 1fr 1fr;
-    grid-template-columns: 1fr 1fr;
-    position: relative;
-    gap: 0.25rem;
-}
-
-blue-tile-action-option {
-    box-shadow:
-        0 0.125rem 0.5rem var(--tile-green-dark),
-        0 0 0 2px #fff inset;
-    cursor: pointer;
-    color: #fff;
-    font-size: 0.8rem;
-
-    display: grid;
-    place-items: center;
-
-    &.green {
-        background: var(--light-green);
-        grid-area: 1/1;
-    }
-    &.yellow {
-        background: var(--light-yellow);
-        grid-area: 1/2;
-    }
-    &.destroy {
-        background: var(--tile-blue-dark);
-        grid-area: 2/1 / 3/3;
-    }
-
-    transition:
-        filter 0.125s ease-in-out,
-        transform 0.125s cubic-bezier(0.1, 0.6, 0.265, 1.55);
-
-    &:hover,
-    &:focus {
-        filter: brightness(1.25);
-        transform: scale(1.125);
-    }
-
-    &:active {
-        filter: brightness(0.85);
     }
 }
 </style>

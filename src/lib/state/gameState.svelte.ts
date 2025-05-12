@@ -140,17 +140,21 @@ export const getBlueTileExplodeRange = (start: Point) => {
 
     const add = (x: number, y: number) => {
         if (!pointIsInBoard(x, y)) return;
+        if (gameState.board[x][y].color === TileColor.Blue) return;
         points.push({x, y});
     };
 
+    add(start.x - 3, start.y);
     add(start.x - 2, start.y);
     add(start.x - 1, start.y);
     add(start.x + 1, start.y);
     add(start.x + 2, start.y);
+    add(start.x + 3, start.y);
+    add(start.x, start.y - 3);
     add(start.x, start.y - 2);
     add(start.x, start.y - 1);
     add(start.x, start.y + 1);
-    // add(start.x, start.y + 2);
+    add(start.x, start.y + 2);
 
     return(points);
 };
@@ -165,7 +169,7 @@ export const getIslandOfColor = (start: Point, color: TileColor) => {
         if (visited[x][y]) return;
 
         const tile = gameState.board[x][y];
-        if (hash(start) !== hash({x, y}) && tile.color !== color && tile.color !== TileColor.Blue) return;
+        if (hash(start) !== hash({x, y}) && tile.color !== color) return;
 
         visited[x][y] = true;
 

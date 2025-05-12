@@ -7,17 +7,21 @@ import { receive, send } from "#/transition.ts";
     import { roundState } from "../state/roundState.svelte";
     import { N_ROWS } from "../constants";
     import { uiState } from "../state/uiState.svelte";
+    import TileContentBg from "./TileContentBg.svelte";
+    import { keyboardClick } from "./event";
 
 const {
     tile,
     flipping = false,
     revealAnimationDelay = 0,
+    isInputRow = false,
     x,
     y,
 }: {
     tile: Tile,
     flipping?: boolean,
     revealAnimationDelay?: number,
+    isInputRow?: boolean,
     x: number,
     y: number,
 } = $props();
@@ -31,6 +35,13 @@ const fallDistance = $derived(N_ROWS - gameState.board[x].length);
 const transitionDuration = $derived((isFirstGuess() ? 1500 : 1250) * Math.sqrt(fallDistance / N_ROWS));
 
 const isBlue = $derived(tile.color === TileColor.Blue);
+
+const isSelectingBlueTile = $derived(isInputRow && uiState().selectingBlueTile);
+
+const selectBlueTile = () => {
+    if (!isSelectingBlueTile) return;
+    uiState().currentBlueTileSelectionResolver!(x);
+};
 </script>
 
 
@@ -44,14 +55,12 @@ const isBlue = $derived(tile.color === TileColor.Blue);
     style:--tab-color={tabColor}
     class:is-first-guess={isFirstGuess()}
     class:blue={isBlue}
+    onclick={selectBlueTile}
+    onkeydown={keyboardClick(selectBlueTile)}
+    class:selecting-blue-tile={isSelectingBlueTile}
+    tabindex={isSelectingBlueTile ? 0 : -1}
 >
-    <tile-content-bg-container>
-        <tile-content-bg-mask>
-            <tile-content-bg></tile-content-bg>
-        </tile-content-bg-mask>
-
-        <tile-flag></tile-flag>
-    </tile-content-bg-container>
+    <TileContentBg {tile} />
 
     <tile-text>{tile.letter}</tile-text>
 </tile-content>
@@ -63,7 +72,7 @@ tile-content {
     place-items: center;
     color: #fff;
 
-    > * {
+    > :global(*) {
         grid-area: 1/1;
     }
 
@@ -98,74 +107,27 @@ tile-content {
         color: var(--tile-blue-dark);
         filter: drop-shadow(0 0.25rem 0.5rem var(--tile-blue));
     }
-}
 
-tile-content-bg-container {
-    place-self: stretch;
-    display: grid;
-    width: var(--tile-size);
-    height: var(--tile-size);
-    place-items: stretch;
-    overflow: hidden;
-    > * {
-        width: var(--tile-size);
-        height: var(--tile-size);
-        grid-area: 1/1;
-    }
-}
+    &.selecting-blue-tile {
+        cursor: pointer;
+        pointer-events: all;
 
-.blue tile-content-bg-container {
-    outline: 2px solid var(--tile-blue);
-}
+        transition:
+            filter .125s ease-in-out,
+            transform .25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
-tile-content-bg-mask {
-    mask: linear-gradient(135deg, #000 80%, #0000 80%);
+        &:hover,
+        &:focus {
+            transform: scale(1.125);
+            filter: brightness(1.25);
+        }
 
-    display: grid;
-    place-items: stretch;
-}
-
-tile-content-bg {
-    background: var(--bg-color);
-}
-
-tile-flag {
-    background: var(--tab-color);
-    mask: linear-gradient(135deg, #0000 82.5%, #000 82.5%);
-    position: relative;
-}
-
-tile-content-bg-mask,
-tile-flag {
-    mask-repeat: no-repeat;
-    mask-size: 5rem 5rem;
-}
-
-:not(.has-tab) :is(tile-content-bg-mask, tile-flag) {
-    transition: mask-position 0.25s cubic-bezier(.35,0,0.6,.45);
-
-    mask-position: -0.5rem -0.5rem;
-}
-.has-tab :is(tile-content-bg-mask, tile-flag) {
-    transition: mask-position 0.25s cubic-bezier(.04,.64,.2,1.43);
-
-    mask-position: -1.75rem -1.75rem;
-}
-
-.blue tile-content-bg {
-    width: 5rem;
-    height: 5rem;
-    margin-top: calc((5rem - var(--tile-size)) / -2);
-    margin-left: calc((5rem - var(--tile-size)) / -2);
-    background: var(--tile-blue-bg);
-    animation: background-spin 5s infinite linear;
-
-    @keyframes background-spin {
-        100% {
-            transform: rotate(1turn);
+        &:active {
+            filter: brightness(0.85);
         }
     }
 }
+
 
 tile-text {
     position: relative;

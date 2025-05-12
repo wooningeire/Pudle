@@ -45,6 +45,7 @@ const {
             {tile}
             {flipping}
             {revealAnimationDelay}
+            {isInputRow}
             x={x ?? 0}
             y={y ?? 0}
         />

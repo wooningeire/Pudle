@@ -6,7 +6,7 @@
     import { TileColor } from "../types/Tile";
     import MiniTile from "./MiniTile.svelte";
     import { cubicOut, elasticOut } from "svelte/easing";
-    import { halfFlipLeft, halfFlipRight } from "./transition";
+    import { flipLeft, halfFlipLeft, halfFlipRight } from "./transition";
 
 </script>
 <instructions-text>
@@ -16,8 +16,8 @@
     </p>
 
     {#if uiState().discoveredBlueTiles}
-        <p in:halfFlipLeft={{duration: 4000, easing: elasticOut}}>
-            Click <MiniTile tileColor={TileColor.Blue} smaller /> to set its color or destroy nearby tiles!
+        <p in:halfFlipRight={{duration: 4000, easing: elasticOut}}>
+            Click a <MiniTile tileColor={TileColor.Blue} smaller /> to choose how it will destroy tiles!
         </p>
     {/if}
 
@@ -43,6 +43,6 @@ instructions-text {
 
 p {
     margin: 0;
-    transform-origin: left;
+    backface-visibility: hidden;
 }
 </style>

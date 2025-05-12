@@ -1,10 +1,11 @@
-import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles as destroyTiles, setNextGuessTileIds, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess, removeTags, resetGameState, getIslandOfColor, getBlueTileExplodeRange, hasColumnAtTop, allBlueTileCoords } from "./gameState.svelte.ts";
+import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles as destroyTiles, setNextGuessTileIds, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess, removeTags, resetGameState, getIslandOfColor, getBlueTileExplodeRange, hasColumnAtTop, allBlueTileCoords, eliminateTiles } from "./gameState.svelte.ts";
 import { Tile, TileColor } from "$lib/types/Tile.ts";
-import { guessedCorrectly, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, getRoundStateResetter, roundState } from "./roundState.svelte.ts";
+import { guessedCorrectly, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, getRoundStateResetter, roundState, invalidGuessMessage } from "./roundState.svelte.ts";
 import { TileTag } from "$lib/types/TileTag.ts";
 import { MatchResult } from "../types/MatchResult.ts";
 import { GUESS_TIME_BY_GUESS_NO_DECAY_FAC, GUESS_TIME_BY_WORD_NO_DECAY_FAC, MAX_TIME_LIMIT_S_BY_WORD_NO, MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO, MIN_TIME_LIMIT_S_BY_WORD_NO, WORD_LENGTH, MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO, EMPTY_TILE_CHAR, N_ROWS } from "../constants.ts";
 import { pauseTimer, resetTimerState, restartTimer, setTimeLimit, startTimer, timerState } from "./timerState.svelte.ts";
+import { NoticeMessage, noticeState, setTemporaryMessage } from "./noticeState.svelte.ts";
 
 
 const state = $state({
@@ -16,6 +17,8 @@ const state = $state({
     currentGrays: <Point[]>[],
     gameOver: false,
     discoveredBlueTiles: false,
+    selectingBlueTile: false,
+    currentBlueTileSelectionResolver: <((index: number | PromiseLike<number>) => void) | null>null,
 });
 
 const stateDerived = $derived({
@@ -27,6 +30,8 @@ const stateDerived = $derived({
     currentGrays: state.currentGrays,
     gameOver: state.gameOver,
     discoveredBlueTiles: state.discoveredBlueTiles,
+    selectingBlueTile: state.selectingBlueTile,
+    currentBlueTileSelectionResolver: state.currentBlueTileSelectionResolver,
     nextColumnBlocked: state.guess.length >= WORD_LENGTH
         ? true
         : gameState.board[state.guess.length].length >= N_ROWS,
@@ -131,7 +136,7 @@ const dropGarbage = async () => {
 
         await wait(500);
 
-        await executeBlueTileAction(x, y, BlueTileAction.DestroyNearby);
+        await executeBlueTileAction(x, y, BlueTileAction.Explode);
     }
 
     let {shouldContinue} = await boardChangeChecks();
@@ -183,6 +188,23 @@ const boardChangeChecks = async () => {
     return {shouldContinue: true, evaluationsOfExistingRows};
 };
 
+const requestBlueTileSelection = async () => {
+    if (state.selectingBlueTile) throw new Error();
+
+    const {promise, resolve} = Promise.withResolvers<number>();
+    state.selectingBlueTile = true;
+    state.currentBlueTileSelectionResolver = resolve;
+    noticeState.currentMessage = NoticeMessage.SelectBlueTile;
+
+    const index = await promise;
+
+    state.selectingBlueTile = false;
+    state.currentBlueTileSelectionResolver = null;
+    noticeState.currentMessage = null;
+
+    return index;
+};
+
 const execConsumeGuess = async (isGarbage=false) => {
     const results = matchResults(state.guess);
     let tiles = <Tile[]>tilesFromMatchResults(state.guess, results);
@@ -196,11 +218,16 @@ const execConsumeGuess = async (isGarbage=false) => {
     if (results.every(result => result === MatchResult.Match)) {
         await wait(250);
 
-        tiles = tiles.map(tile => new Tile(tile.id, TileColor.Blue, tile.letter, tile.tagColor));
-        state.guessTiles = tiles;
         state.discoveredBlueTiles = true;
 
-        await wait(750);
+        const blueTileIndex = await requestBlueTileSelection();
+
+        const originalTile = tiles[blueTileIndex];
+        tiles[blueTileIndex] = new Tile(originalTile.id, TileColor.Blue, originalTile.letter, originalTile.tagColor);
+        
+        state.guessTiles = tiles;
+
+        await wait(250);
     }
 
     if (!isGarbage && !isFirstGuess()) {
@@ -245,7 +272,13 @@ const execConsumeGuess = async (isGarbage=false) => {
 
 export const consumeGuess = async () => {
     if (state.inputLocked) return;
-    if (!await isValidGuess(state.guess)) return;
+    if (!await isValidGuess(state.guess)) {
+        const message = await invalidGuessMessage(state.guess);
+        if (message === null) return;
+
+        setTemporaryMessage(message);
+        return;
+    }
 
     pauseTimer();
 
@@ -276,15 +309,14 @@ export const extendGuess = (char: string) => {
 };
 
 export enum BlueTileAction {
-    SetGreen,
-    SetYellow,
-    DestroyNearby,
+    DestroyGreen,
+    DestroyYellow,
+    Explode,
 }
 
 const executeBlueTileAction = async (x: number, y: number, action: BlueTileAction) => {
-    
     switch (action) {
-        case BlueTileAction.DestroyNearby: {
+        case BlueTileAction.Explode: {
             const points = getBlueTileExplodeRange({x, y});
             destroyTiles(...points);
 
@@ -293,18 +325,24 @@ const executeBlueTileAction = async (x: number, y: number, action: BlueTileActio
             break;
         }
 
-        case BlueTileAction.SetGreen:
-        case BlueTileAction.SetYellow: {
-            const color = action === BlueTileAction.SetGreen
+        case BlueTileAction.DestroyGreen:
+        case BlueTileAction.DestroyYellow: {
+            const color = action === BlueTileAction.DestroyGreen
                 ? TileColor.Green
                 : TileColor.Yellow;
 
             const island = getIslandOfColor({x, y}, color);
 
-            for (const point of island) {
-                const tile = gameState.board[point.x][point.y];
-                gameState.board[point.x][point.y] = new Tile(tile.id, color, tile.letter, tile.tagColor);
+            for (const {x, y} of island) {
+                const tile = gameState.board[x][y]
+                gameState.board[x][y] = new Tile(tile.id, color, tile.letter, tile.tagColor);
             }
+
+            const grays = getAdjacentGrays([island]);
+
+            await wait(500);
+
+            eliminateTiles(...island, ...grays);
 
             break;
         }

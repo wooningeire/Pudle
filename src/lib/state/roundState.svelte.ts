@@ -5,6 +5,7 @@ import { initialLoadState } from "./initialLoadState.svelte";
 import { TileTag } from "$lib/types/TileTag";
 import { emplace, update } from "$lib/emplace";
 import { EMPTY_TILE_CHAR, WORD_LENGTH } from "../constants";
+import { NoticeMessage } from "./noticeState.svelte";
 
 const ALPHABET = new Set("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
@@ -174,6 +175,20 @@ export const isValidGuess = async (guess: string) => {
         && !roundState.guessedWords.has(guess)
         && (await initialLoadState.services).words.isValidGuess(guess)
     );
+};
+
+export const invalidGuessMessage = async (guess: string) => {
+    if (guess.length !== WORD_LENGTH) {
+        return null;
+    }
+    if (roundState.guessedWords.has(guess)) {
+        return NoticeMessage.AlreadyGuessedThisRound;
+    }
+    if (!(await initialLoadState.services).words.isValidGuess(guess)) {
+        return NoticeMessage.NotInWordList;
+    }
+
+    return null;
 };
 
 export const recordGuessResults = (guess: string, matchResults: MatchResult[]) => {

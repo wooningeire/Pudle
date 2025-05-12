@@ -49,3 +49,21 @@ export const halfFlipRight = (node: HTMLElement, {duration, delay, easing, baseR
         css: (t: number, u: number) => `transform: rotateY(calc(${u * -0.25}turn + ${baseRot}));`,
     };
 };
+
+export const flipTop = (node: HTMLElement, {duration, delay, easing, baseRot="0deg"}: {duration?: number, delay?: number, easing?: (t: number) => number, baseRot?: string}) => {
+    return {
+        duration,
+        delay,
+        easing,
+        css: (t: number, u: number) => `transform: rotateX(calc(${u * 0.5}turn + ${baseRot}));`,
+    };
+};
+
+export const flipBottom = (node: HTMLElement, {duration, delay, easing, baseRot="0deg"}: {duration?: number, delay?: number, easing?: (t: number) => number, baseRot?: string}) => {
+    return {
+        duration,
+        delay,
+        easing,
+        css: (t: number, u: number) => `transform: rotateX(calc(${u * -0.5}turn + ${baseRot}));`,
+    };
+};
