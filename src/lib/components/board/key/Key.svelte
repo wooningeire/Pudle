@@ -1,9 +1,9 @@
 <script lang="ts">
 import { getMatchResultCssColor, getMatchResultCssColorDark } from "$lib/types/tileColors.ts";
 import { uiState } from "$lib/state/uiState.svelte.ts";
-import { PositionType, roundState } from "../state/roundState.svelte";
-    import { MatchResult } from "../types/MatchResult";
-    import { TileColor } from "../types/Tile";
+import { PositionType, roundState } from "$lib/state/roundState.svelte";
+    import { MatchResult } from "$lib/types/MatchResult";
+    import { TileColor } from "$lib/types/Tile";
 
 const {
     onClick,

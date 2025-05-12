@@ -1,13 +1,13 @@
 <script lang="ts">
 import { fade } from "svelte/transition";
 import {Tile} from "$lib/types/Tile.ts";
-    import TileContent from "#/TileContent.svelte";
+    import TileContent from "./TileContent.svelte";
     import { N_ROWS } from "$lib/constants.ts";
-    import { boardState } from "../state/boardState.svelte";
-    import { noticeEvent, NoticeMessage, noticeState } from "../state/noticeState.svelte";
+    import { boardState } from "$lib/state/boardState.svelte";
+    import { noticeEvent, NoticeMessage, noticeState } from "$lib/state/noticeState.svelte";
     import { onDestroy, onMount, tick } from "svelte";
-    import { uiState } from "../state/uiState.svelte";
-    import { isFirstGuess, statsState } from "../state/statsState.svelte";
+    import { uiState } from "$lib/state/uiState.svelte";
+    import { isFirstGuess, statsState } from "$lib/state/statsState.svelte";
 
 const {
     tile = null,

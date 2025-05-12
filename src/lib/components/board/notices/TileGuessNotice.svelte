@@ -1,9 +1,5 @@
 <script lang="ts">
-    import { onDestroy, onMount } from "svelte";
-    import { NoticeMessage, noticeState } from "../state/noticeState.svelte";
-    import { flipBottomAndFade, flipTop } from "./transition";
-    import { cubicIn, cubicOut } from "svelte/easing";
-    import { fly } from "svelte/transition";
+    import { NoticeMessage } from "$lib/state/noticeState.svelte";
 
 const {
     message,

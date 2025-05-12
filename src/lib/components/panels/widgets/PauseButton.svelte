@@ -1,6 +1,6 @@
 <script>
-    import { pauseGame, uiState, unpauseGame } from "../state/uiState.svelte";
-    import Button from "./Button.svelte";
+    import { pauseGame, uiState, unpauseGame } from "$lib/state/uiState.svelte";
+    import Button from "./parts/Button.svelte";
 
 const togglePaused = () => {
     if (!uiState().paused) {

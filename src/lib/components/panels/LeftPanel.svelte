@@ -1,11 +1,11 @@
 <script>
-import { uiState } from "../state/uiState.svelte";
-import GameOverOptions from "./GameOverOptions.svelte";
-import GameStats from "./GameStats.svelte";
+import { uiState } from "$lib/state/uiState.svelte";
+import GameOverOptions from "./widgets/GameOverOptions.svelte";
+import GameStats from "./widgets/GameStats.svelte";
     import { elasticOut, quartOut } from "svelte/easing";
-    import { flipLeft, halfFlipLeft, halfFlipRight } from "./transition";
-    import AutoDropTimer from "./AutoDropTimer.svelte";
-    import { isFirstGuess } from "../state/statsState.svelte";
+    import { flipLeft, halfFlipLeft, halfFlipRight } from "#/transition";
+    import GarbageDropTimer from "./widgets/GarbageDropTimer.svelte";
+    import { isFirstGuess } from "$lib/state/statsState.svelte";
 </script>
 
 
@@ -13,7 +13,7 @@ import GameStats from "./GameStats.svelte";
     <left-panel in:halfFlipRight={{duration: 5000, easing: elasticOut, baseRot: "35deg"}}>
         <GameStats />
 
-        <AutoDropTimer />
+        <GarbageDropTimer />
 
         {#if uiState().gameOver}
             <GameOverOptions />

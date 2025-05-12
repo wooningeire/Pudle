@@ -1,14 +1,14 @@
 <script lang="ts">
-import TileGuessRow from "#/TileGuessRow.svelte";
+import TileGuessRow from "./tile/TileGuessRow.svelte";
 import { N_ROWS, WORD_LENGTH } from "$lib/constants.ts";
-import TileView from "#/TileView.svelte";
+import TileView from "./tile/TileView.svelte";
 import { boardState } from "@/lib/state/boardState.svelte";
-    import TilePlaceholder from "@/lib/components/TilePlaceholder.svelte";
+    import TilePlaceholder from "./tile/TilePlaceholder.svelte";
     import { flip } from "svelte/animate";
     import { bounceOut, cubicInOut } from "svelte/easing";
-    import TileGuessNotice from "./TileGuessNotice.svelte";
-    import { noticeState } from "../state/noticeState.svelte";
-    import NoticeList from "./NoticeList.svelte";
+    import TileGuessNotice from "./notices/TileGuessNotice.svelte";
+    import { noticeState } from "$lib/state/noticeState.svelte";
+    import NoticeList from "./notices/NoticeList.svelte";
 </script>
 
 <letter-board

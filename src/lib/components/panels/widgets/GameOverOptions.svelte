@@ -3,11 +3,11 @@ import { N_ROWS } from "$lib/constants";
 import { boardState } from "@/lib/state/boardState.svelte";
 import { TileColor } from "$lib/types/Tile";
     import { fly } from "svelte/transition";
-    import { reset, uiState } from "../state/uiState.svelte";
-import Button from "./Button.svelte";
-    import { flipLeft, flipRight, halfFlipLeft, halfFlipRight } from "./transition";
+    import { reset, uiState } from "$lib/state/uiState.svelte";
+import Button from "./parts/Button.svelte";
+    import { flipLeft, flipRight, halfFlipLeft, halfFlipRight } from "#/transition";
     import { backIn, backOut, cubicIn, cubicInOut, cubicOut, elasticIn, elasticOut } from "svelte/easing";
-    import { statsState } from "../state/statsState.svelte";
+    import { statsState } from "$lib/state/statsState.svelte";
 
 const resultsString = () => `**Pudle • https://wooningeire.github.io/pudle**
 word ${statsState.nthWord} • guess ${statsState.nthGuess}

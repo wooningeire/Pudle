@@ -3,13 +3,13 @@ import {Tile, TileColor} from "$lib/types/Tile.ts";
     import { getTileTypeCssColor } from "$lib/types/tileColors.ts";
 import { receive, send } from "#/transition.ts";
     import { backOut, bounceOut, cubicIn, cubicInOut, cubicOut, elasticOut, quadIn } from "svelte/easing";
-    import { boardState, hashPoint } from "../state/boardState.svelte";
-    import { roundState } from "../state/roundState.svelte";
-    import { N_ROWS } from "../constants";
-    import { uiState } from "../state/uiState.svelte";
+    import { boardState, hashPoint } from "$lib/state/boardState.svelte";
+    import { roundState } from "$lib/state/roundState.svelte";
+    import { N_ROWS } from "$lib/constants";
+    import { uiState } from "$lib/state/uiState.svelte";
     import TileContentBg from "./TileContentBg.svelte";
-    import { keyboardClick } from "./event";
-    import { isFirstGuess } from "../state/statsState.svelte";
+    import { keyboardClick } from "#/event";
+    import { isFirstGuess } from "$lib/state/statsState.svelte";
 
 const {
     tile,

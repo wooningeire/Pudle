@@ -4,15 +4,14 @@ let whichBlueTileIsOpen = $state<Tile | null>(null);
 
 <script lang="ts">
 import {Tile, TileColor} from "$lib/types/Tile.ts";
-import TileContent from "#/TileContent.svelte";
+import TileContent from "./TileContent.svelte";
     import { fade, type TransitionConfig } from "svelte/transition";
     import { backOut, cubicOut } from "svelte/easing";
-    import { BlueTileAction, blueTileAction, previewBlueTileRange, uiState } from "../state/uiState.svelte";
+    import { BlueTileAction, blueTileAction, previewBlueTileRange, uiState } from "$lib/state/uiState.svelte";
     import BlueTileActionSelector from "./BlueTileActionSelector.svelte";
-    import { stopPropagation } from "svelte/legacy";
-    import { keyboardClick } from "./event";
-    import { noticeEvent, NoticeMessage, noticeState } from "../state/noticeState.svelte";
-    import { N_ROWS } from "../constants";
+    import { keyboardClick } from "#/event";
+    import { noticeEvent, NoticeMessage, noticeState } from "$lib/state/noticeState.svelte";
+    import { N_ROWS } from "$lib/constants";
     import { onDestroy, onMount } from "svelte";
 
 const {

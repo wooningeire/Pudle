@@ -1,12 +1,12 @@
 <script>
     import { elasticOut, quartOut } from "svelte/easing";
-    import PrevGuessesDisplay from "./PrevGuessesDisplay.svelte";
+    import PrevGuessesDisplay from "./widgets/prev-guesses-display/PrevGuessesDisplay.svelte";
     import { fly } from "svelte/transition";
-    import { flipRight, halfFlipLeft, halfFlipRight } from "./transition";
-    import Instructions from "./Instructions.svelte";
+    import { flipRight, halfFlipLeft, halfFlipRight } from "#/transition";
+    import Instructions from "./widgets/Instructions.svelte";
     import { flip } from "svelte/animate";
-    import PauseButton from "./PauseButton.svelte";
-    import { isFirstGuess } from "../state/statsState.svelte";
+    import PauseButton from "./widgets/PauseButton.svelte";
+    import { isFirstGuess } from "$lib/state/statsState.svelte";
 
 </script>
 

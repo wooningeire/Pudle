@@ -1,8 +1,8 @@
 <script>
-    import { WORD_LENGTH } from "../constants";
-    import { roundState } from "../state/roundState.svelte";
-    import { uiState } from "../state/uiState.svelte";
-    import { MatchResult } from "../types/MatchResult";
+    import { WORD_LENGTH } from "$lib/constants";
+    import { roundState } from "$lib/state/roundState.svelte";
+    import { uiState } from "$lib/state/uiState.svelte";
+    import { MatchResult } from "$lib/types/MatchResult";
     import MiniWordRow from "./MiniWordRow.svelte";
 
 </script>

@@ -1,10 +1,10 @@
 <script lang="ts">
 import {backspaceGuess, consumeGuess, extendGuess, uiState } from "$lib/state/uiState.svelte.ts";
-import TilePlaceholder from "@/lib/components/TilePlaceholder.svelte";
-import { boardState } from "../state/boardState.svelte";
-import { N_ROWS } from "../constants";
+import TilePlaceholder from "./TilePlaceholder.svelte";
+import { boardState } from "$lib/state/boardState.svelte";
+import { N_ROWS } from "$lib/constants";
 import {NoticeMessage, noticeState} from "$lib/state/noticeState.svelte";
-    import { isFirstGuess } from "../state/statsState.svelte";
+    import { isFirstGuess } from "$lib/state/statsState.svelte";
 
 
 const keydown = (event: KeyboardEvent) => {

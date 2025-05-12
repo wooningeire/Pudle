@@ -2,7 +2,7 @@ import { emplace, update } from "$lib/emplace.ts";
 import { TileColor, Tile } from "$lib/types/Tile.ts";
 import { ISLAND_SIZE_THRESHOLD, N_ROWS, WORD_LENGTH } from "$lib/constants.ts";
 import { MatchResult } from "$lib/types/MatchResult.ts";
-import type { TileTag } from "../types/TileTag";
+import type { TileTag } from "$lib/types/TileTag";
 
 export const boardState = $state({
     board: new Array(WORD_LENGTH).fill(0).map(() => <Tile[]>[]),

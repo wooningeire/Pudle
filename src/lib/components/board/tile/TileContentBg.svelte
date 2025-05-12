@@ -1,5 +1,5 @@
 <script lang="ts">
-import { TileColor, type Tile } from "../types/Tile";
+import { TileColor, type Tile } from "$lib/types/Tile";
 
 const {
     tile,

@@ -1,9 +1,9 @@
 <script>
 import PudleTitle from "./PudleTitle.svelte";
-import RightPanel from "#/RightPanel.svelte";
-import LeftPanel from "#/LeftPanel.svelte";
-import Keyboard from "#/Keyboard.svelte";
-import Letterboard from "#/Letterboard.svelte";
+import RightPanel from "@/lib/components/panels/RightPanel.svelte";
+import LeftPanel from "@/lib/components/panels/LeftPanel.svelte";
+import Keyboard from "@/lib/components/board/Keyboard.svelte";
+import Letterboard from "@/lib/components/board/Letterboard.svelte";
     import { fade } from "svelte/transition";
 
 </script>

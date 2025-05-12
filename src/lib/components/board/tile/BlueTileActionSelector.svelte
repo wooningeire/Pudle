@@ -1,6 +1,6 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
-    import { BlueTileAction, stopPreviewBlueTileRange } from "../state/uiState.svelte";
+    import { BlueTileAction, stopPreviewBlueTileRange } from "$lib/state/uiState.svelte";
     import { backOut } from "svelte/easing";
 
 const {

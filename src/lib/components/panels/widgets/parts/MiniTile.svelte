@@ -1,10 +1,10 @@
 <script lang="ts">
     import { cubicInOut } from "svelte/easing";
-    import { MatchResult } from "../types/MatchResult";
-    import { getMatchResultCssColor, getTileTypeCssColor } from "../types/tileColors";
-    import { flipLeft, flipRight, halfFlipLeft, halfFlipRight } from "./transition";
-    import { EMPTY_TILE_CHAR } from "../constants";
-    import { TileColor } from "../types/Tile";
+    import { MatchResult } from "$lib/types/MatchResult";
+    import { getMatchResultCssColor, getTileTypeCssColor } from "$lib/types/tileColors";
+    import { flipLeft, flipRight, halfFlipLeft, halfFlipRight } from "#/transition";
+    import { EMPTY_TILE_CHAR } from "$lib/constants";
+    import { TileColor } from "$lib/types/Tile";
 
 const {
     letter = EMPTY_TILE_CHAR,

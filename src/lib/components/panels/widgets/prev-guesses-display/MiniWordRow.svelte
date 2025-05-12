@@ -1,10 +1,10 @@
 <script lang="ts">
     import { onDestroy, onMount, tick } from "svelte";
-import { MatchResult } from "../types/MatchResult";
-    import { TileColor } from "../types/Tile";
-import MiniTile from "./MiniTile.svelte";
-    import { uiState } from "../state/uiState.svelte";
-    import { noticeEvent, NoticeMessage, noticeState } from "../state/noticeState.svelte";
+import { MatchResult } from "$lib/types/MatchResult";
+    import { TileColor } from "$lib/types/Tile";
+import MiniTile from "../parts/MiniTile.svelte";
+    import { uiState } from "$lib/state/uiState.svelte";
+    import { noticeEvent, NoticeMessage, noticeState } from "$lib/state/noticeState.svelte";
 
 const {
     word,

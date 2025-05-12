@@ -1,6 +1,6 @@
 <script>
-    import { boardState } from "../state/boardState.svelte";
-    import { statsState } from "../state/statsState.svelte";
+    import { boardState } from "$lib/state/boardState.svelte";
+    import { statsState } from "$lib/state/statsState.svelte";
 
 </script>
 

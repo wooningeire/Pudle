@@ -3,7 +3,7 @@
 import {noticeState} from "$lib/state/noticeState.svelte";
     import { flip } from "svelte/animate";
     import { cubicIn, cubicInOut, cubicOut } from "svelte/easing";
-    import { flipBottom, flipBottomAndFade, flipTop } from "./transition";
+    import { flipBottom, flipBottomAndFade, flipTop } from "#/transition";
     import { fade, fly } from "svelte/transition";
 </script>
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { backspaceGuess, consumeGuess, extendGuess, uiState } from "$lib/state/uiState.svelte.ts";
-import Key from "#/Key.svelte";
+import Key from "@/lib/components/board/key/Key.svelte";
 import {WORD_LENGTH} from "$lib/constants.ts";
 
 const keyRows = [

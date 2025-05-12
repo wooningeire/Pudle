@@ -1,12 +1,12 @@
 <script>
     import { fade } from "svelte/transition";
-    import { ISLAND_SIZE_THRESHOLD } from "../constants";
-    import { uiState } from "../state/uiState.svelte";
-    import { MatchResult } from "../types/MatchResult";
-    import { TileColor } from "../types/Tile";
-    import MiniTile from "./MiniTile.svelte";
+    import { ISLAND_SIZE_THRESHOLD } from "$lib/constants";
+    import { uiState } from "$lib/state/uiState.svelte";
+    import { MatchResult } from "$lib/types/MatchResult";
+    import { TileColor } from "$lib/types/Tile";
+    import MiniTile from "./parts/MiniTile.svelte";
     import { cubicOut, elasticOut } from "svelte/easing";
-    import { flipLeft, halfFlipLeft, halfFlipRight } from "./transition";
+    import { flipLeft, halfFlipLeft, halfFlipRight } from "#/transition";
 
 </script>
 <instructions-text>

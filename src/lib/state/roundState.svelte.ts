@@ -4,7 +4,7 @@ import { Tile, TileColor } from "$lib/types/Tile";
 import { initialLoadState } from "./initialLoadState.svelte";
 import { TileTag } from "$lib/types/TileTag";
 import { emplace, update } from "$lib/emplace";
-import { EMPTY_TILE_CHAR, WORD_LENGTH } from "../constants";
+import { EMPTY_TILE_CHAR, WORD_LENGTH } from "$lib/constants";
 import { NoticeMessage } from "./noticeState.svelte";
 
 const ALPHABET = new Set("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
