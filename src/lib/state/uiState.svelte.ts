@@ -197,8 +197,6 @@ const boardChangeChecks = async () => {
 };
 
 const requestBlueTileSelection = async () => {
-    if (state.selectingBlueTile) throw new Error();
-
     const {promise, resolve} = Promise.withResolvers<number>();
     state.currentBlueTileSelectionResolver = resolve;
     const removeMessage = addMessage(NoticeMessage.SelectBlueTile);
