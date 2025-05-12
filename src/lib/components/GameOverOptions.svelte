@@ -8,7 +8,7 @@ import Button from "./Button.svelte";
     import { flipLeft, flipRight, halfFlipLeft, halfFlipRight } from "./transition";
     import { backIn, backOut, cubicIn, cubicInOut, cubicOut, elasticIn, elasticOut } from "svelte/easing";
 
-const resultsString = () => `**Pudle • https://wooningeire.github.io/Pudle**
+const resultsString = () => `**Pudle • https://wooningeire.github.io/pudle**
 word ${gameState.stats.nthWord} • guess ${gameState.stats.nthGuess}
 ${
     new Array(N_ROWS).fill(0)
