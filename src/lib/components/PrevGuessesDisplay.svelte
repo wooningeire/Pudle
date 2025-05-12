@@ -8,7 +8,7 @@
 </script>
 
 
-<prev-guesses-grid>
+<prev-guesses-grid class:paused={uiState().paused}>
     {#each roundState.guessedWords as [word, matchResults], y}
         <MiniWordRow {word} {matchResults} {y} />
     {/each}
@@ -29,5 +29,11 @@ prev-guesses-grid {
     flex-direction: column;
     gap: 0.125rem;
     user-select: none;
+
+
+    transition: opacity 0.125s ease-in-out;
+    &.paused {
+        opacity: 0;
+    }
 }
 </style>

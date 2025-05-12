@@ -21,7 +21,7 @@ const {
 
 const inputingWhichLetter = $derived(uiState().guess.length);
 
-const hasInfo = $derived(colorable && Object.hasOwn(roundState.knownLetterInfo, label));
+const hasInfo = $derived(colorable && !uiState().paused && Object.hasOwn(roundState.knownLetterInfo, label));
 const info = $derived(hasInfo ? roundState.knownLetterInfo[label] : null);
 const currentLetterPositionInfo = $derived(info?.positionInfo[inputingWhichLetter] ?? null);
 

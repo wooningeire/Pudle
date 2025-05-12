@@ -6,15 +6,16 @@ export const timerState = $state({
     lastStartedAt: 0,
     msRemainingAtLastStart: 0,
     timeLimit: 0,
+    msRemainingAtLastPause: 0,
 });
 
-export const startTimer = (onFinish: () => void) => {
+export const resumeTimer = (onFinish: () => void) => {
     if (!timerState.paused) return;
 
     timerState.lastStartedAt = Date.now();
     timerState.paused = false;
 
-    timerState.msRemainingAtLastStart = timerState.timeLimit - offsetWhenNextStart;
+    timerState.msRemainingAtLastStart = timerState.msRemainingAtLastPause;
     lastTimeout = setTimeout(() => {
         pauseTimer();
         onFinish();
@@ -24,7 +25,7 @@ export const startTimer = (onFinish: () => void) => {
 export const pauseTimer = () => {
     if (timerState.paused) return;
 
-    offsetWhenNextStart = Date.now() - timerState.lastStartedAt;
+    timerState.msRemainingAtLastPause = timerState.msRemainingAtLastStart - (Date.now() - timerState.lastStartedAt);
     timerState.paused = true;
     clearTimeout(lastTimeout);
 };
@@ -35,14 +36,15 @@ export const restartTimer = (onFinish: () => void, newTimeLimit: number | null=n
     offsetWhenNextStart = 0;
 
     if (newTimeLimit !== null) {
-        timerState.timeLimit = newTimeLimit;
+        setTimeLimit(newTimeLimit);
     }
 
-    startTimer(onFinish);
+    resumeTimer(onFinish);
 };
 
 export const setTimeLimit = (limit: number) => {
     timerState.timeLimit = limit;
+    timerState.msRemainingAtLastPause = limit;
 };
 
 export const resetTimerState = () => {
@@ -51,4 +53,6 @@ export const resetTimerState = () => {
     timerState.paused = true;
     lastTimeout = 0;
     timerState.timeLimit = 0;
+    timerState.msRemainingAtLastPause = 0;
+    timerState.msRemainingAtLastStart = 0;
 };

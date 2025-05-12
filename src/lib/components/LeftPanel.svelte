@@ -45,9 +45,9 @@ left-panel {
     @media screen and (max-width: $small-width) {
         --scale-fac: 0.75;
     }
-    @media screen and (max-width: $xsmall-width) {
-        display: none;
-    }
+    // @media screen and (max-width: $xsmall-width) {
+    //     display: none;
+    // }
 
     text-align: right;
     line-height: 0.8;

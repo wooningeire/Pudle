@@ -21,6 +21,10 @@ import Letterboard from "#/Letterboard.svelte";
 </game-page>
 
 <style lang="scss">
+* {
+    transform-style: preserve-3d;
+}
+
 game-page {
     display: grid;
     align-items: center;
@@ -28,9 +32,8 @@ game-page {
 
     grid-template-columns: 15rem auto 15rem;
     grid-template-rows: auto auto auto 5rem;
-    padding: 0 5rem;
+    margin: 0 5rem;
 
     gap: 2rem;
-    perspective: 50rem;
 }
 </style>

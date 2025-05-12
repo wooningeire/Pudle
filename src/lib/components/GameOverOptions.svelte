@@ -3,7 +3,7 @@ import { N_ROWS } from "$lib/constants";
 import { gameState } from "$lib/state/gameState.svelte";
 import { TileColor } from "$lib/types/Tile";
     import { fly } from "svelte/transition";
-    import { reset } from "../state/uiState.svelte";
+    import { reset, uiState } from "../state/uiState.svelte";
 import Button from "./Button.svelte";
     import { flipLeft, flipRight, halfFlipLeft, halfFlipRight } from "./transition";
     import { backIn, backOut, cubicIn, cubicInOut, cubicOut, elasticIn, elasticOut } from "svelte/easing";
@@ -59,11 +59,17 @@ const replay = () => {
 >
     <game-over-label>game over</game-over-label>
 
-    <Button onClick={copyResults}>
+    <Button
+        onClick={copyResults}
+        disabled={!uiState().gameOver}
+    >
         copy results
     </Button>
 
-    <Button onClick={replay}>replay</Button>
+    <Button
+        onClick={replay}
+        disabled={!uiState().gameOver}
+    >replay</Button>
 </game-over-options>
 
 <style lang="scss">

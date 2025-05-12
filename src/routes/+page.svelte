@@ -32,6 +32,7 @@ main {
     width: 100vw;
     height: 100vh;
 
+    perspective: 50rem;
     // overflow: hidden;
 }
 </style>

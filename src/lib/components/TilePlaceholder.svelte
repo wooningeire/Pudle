@@ -6,6 +6,7 @@ import {Tile} from "$lib/types/Tile.ts";
     import { gameState } from "../state/gameState.svelte";
     import { NoticeMessage, noticeState } from "../state/noticeState.svelte";
     import { tick } from "svelte";
+    import { uiState } from "../state/uiState.svelte";
 
 const {
     tile = null,
@@ -49,10 +50,11 @@ $effect(() => {
         class:filled={isInputRow && (tile?.letter.length ?? 0) > 0}
         class:flipping
         class:hidden
+        class:paused={uiState().paused}
         style:--reveal-animation-delay="{revealAnimationDelay}ms"
         class:is-first-guess={gameState.stats.nthGuess === 1}
     >
-        {#if tile !== null && isInputRow}
+        {#if tile !== null && isInputRow && !uiState().paused}
             <span transition:fade={{duration: 50}}>{tile.letter}</span>
         {/if}
     </tile-placeholder>
@@ -100,7 +102,7 @@ tile-placeholder {
 
     backface-visibility: hidden;
 
-    &.filled {
+    &.filled:not(.paused) {
         outline: 2px solid var(--off-black);
         outline-offset: 0;
         animation: pulse .175s ease-in-out;
@@ -111,14 +113,18 @@ tile-placeholder {
         }
     }
 
-    &.hidden {
+    &.hidden:not(.paused) {
         opacity: 0.5;
         &.is-first-guess {
             transition-delay: 3s;
         }
     }
 
-    &.flipping {
+    &.paused {
+        opacity: 0.25;
+    }
+
+    &.flipping:not(.paused) {
         animation: flip-bg 0.5s ease-in-out forwards;
         animation-delay: var(--reveal-animation-delay);
 

@@ -59,6 +59,7 @@ const selectBlueTile = () => {
     onkeydown={keyboardClick(selectBlueTile)}
     class:selecting-blue-tile={isSelectingBlueTile}
     tabindex={isSelectingBlueTile ? 0 : -1}
+    class:hidden={uiState().paused}
 >
     <TileContentBg {tile} />
 
@@ -125,6 +126,12 @@ tile-content {
         &:active {
             filter: brightness(0.85);
         }
+    }
+
+
+    transition: opacity 0.125s ease-in-out;
+    &.hidden {
+        opacity: 0;
     }
 }
 

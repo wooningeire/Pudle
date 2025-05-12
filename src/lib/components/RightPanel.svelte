@@ -6,14 +6,21 @@
     import { flipRight, halfFlipLeft, halfFlipRight } from "./transition";
     import Instructions from "./Instructions.svelte";
     import { flip } from "svelte/animate";
+    import PauseButton from "./PauseButton.svelte";
 
 </script>
 
 {#if !isFirstGuess()}
     <right-panel in:halfFlipLeft={{duration: 5000, easing: elasticOut, baseRot: "-35deg"}}>
-        <Instructions />
+        <right-panel-top>
+            <Instructions />
 
-        <PrevGuessesDisplay />
+            <PrevGuessesDisplay />
+        </right-panel-top>
+
+        <right-panel-bottom>
+            <PauseButton />
+        </right-panel-bottom>
     </right-panel>
 {/if}
 
@@ -33,6 +40,7 @@ right-panel {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    justify-content: space-between;
 
     transform: rotateY(-35deg) scale(var(--scale-fac));
     transform-origin: left;
@@ -43,8 +51,18 @@ right-panel {
     @media screen and (max-width: $small-width) {
         --scale-fac: 0.75;
     }
-    @media screen and (max-width: $xsmall-width) {
-        display: none;
-    }
+    // @media screen and (max-width: $xsmall-width) {
+    //     display: none;
+    // }
+}
+
+right-panel-top {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+right-panel-bottom {
+    align-self: center;
 }
 </style>
