@@ -38,7 +38,7 @@ game-stat {
 stat-label {
     font-size: 2rem;
 
-    animation: push-forward-label 0.75s ease-out;
+    animation: push-forward-label 0.5s ease-out;
 
     @keyframes push-forward-label {
         20% {
@@ -51,12 +51,12 @@ stat-number {
     font-size: 4rem;
     font-weight: 700;
 
-    animation: push-forward-number 0.75s ease-out;
+    animation: push-forward-number 0.5s ease-out;
     animation-delay: 0.125s;
 
     @keyframes push-forward-number {
         20% {
-            transform: translateZ(4rem);
+            transform: translateZ(3rem);
         }
     }
 }

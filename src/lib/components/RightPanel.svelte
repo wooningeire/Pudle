@@ -3,15 +3,16 @@
     import { isFirstGuess } from "../state/gameState.svelte";
     import PrevGuessesDisplay from "./PrevGuessesDisplay.svelte";
     import { fly } from "svelte/transition";
-    import { flipRight, halfFlipRight } from "./transition";
+    import { flipRight, halfFlipLeft, halfFlipRight } from "./transition";
     import Instructions from "./Instructions.svelte";
+    import { flip } from "svelte/animate";
 
 </script>
 
 {#if !isFirstGuess()}
-    <right-panel in:halfFlipRight={{duration: 3000, easing: elasticOut, baseRot: "-35deg"}}>
+    <right-panel in:halfFlipLeft={{duration: 5000, easing: elasticOut, baseRot: "-35deg"}}>
         <Instructions />
-
+        
         <PrevGuessesDisplay />
     </right-panel>
 {/if}

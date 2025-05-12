@@ -6,13 +6,13 @@ import Button from "./Button.svelte";
 import GameOverOptions from "./GameOverOptions.svelte";
 import GameStats from "./GameStats.svelte";
     import { elasticOut, quartOut } from "svelte/easing";
-    import { flipLeft, halfFlipLeft } from "./transition";
+    import { flipLeft, halfFlipLeft, halfFlipRight } from "./transition";
     import AutoDropTimer from "./AutoDropTimer.svelte";
 </script>
 
 
 {#if !isFirstGuess()}
-    <left-panel in:halfFlipLeft={{duration: 3000, easing: elasticOut, baseRot: "35deg"}}>
+    <left-panel in:halfFlipRight={{duration: 5000, easing: elasticOut, baseRot: "35deg"}}>
         <GameStats />
 
         <AutoDropTimer />

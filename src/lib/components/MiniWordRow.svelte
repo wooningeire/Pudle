@@ -1,5 +1,6 @@
 <script lang="ts">
-import type { MatchResult } from "../types/MatchResult";
+import { MatchResult } from "../types/MatchResult";
+    import { TileColor } from "../types/Tile";
 import MiniTile from "./MiniTile.svelte";
 
 const {
@@ -11,13 +12,20 @@ const {
     matchResults: MatchResult[],
     y: number,
 } = $props();
+
+const resultsToColors = new Map([
+    [MatchResult.Empty, TileColor.Empty],
+    [MatchResult.Absent, TileColor.Gray],
+    [MatchResult.Misplaced, TileColor.Yellow],
+    [MatchResult.Match, TileColor.Green],
+]);
 </script>
 
 <mini-word-row>
     {#each word as letter, x}
         <MiniTile
             {letter}
-            matchResult={matchResults[x]}
+            tileColor={resultsToColors.get(matchResults[x])!}
             {x}
             {y}
         />

@@ -2,11 +2,11 @@ export const N_ROWS = 10;
 export const ISLAND_SIZE_THRESHOLD = 4;
 export const WORD_LENGTH = 5;
 
-export const MAX_TIME_LIMIT_S_BY_WORD_NO = 30;
-export const MIN_TIME_LIMIT_S_BY_WORD_NO = 8;
+export const MAX_TIME_LIMIT_S_BY_WORD_NO = 35;
+export const MIN_TIME_LIMIT_S_BY_WORD_NO = 10;
 export const MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO = 15;
 export const MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO = 6;
-export const GUESS_TIME_BY_WORD_NO_DECAY_FAC = 1/12;
-export const GUESS_TIME_BY_GUESS_NO_DECAY_FAC = 1/8;
+export const GUESS_TIME_BY_WORD_NO_DECAY_FAC = 1/10;
+export const GUESS_TIME_BY_GUESS_NO_DECAY_FAC = 1/7;
 
 export const EMPTY_TILE_CHAR = " ";

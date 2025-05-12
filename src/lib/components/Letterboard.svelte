@@ -35,7 +35,7 @@ import { gameState } from "$lib/state/gameState.svelte.ts";
                         style:grid-area="{N_ROWS - y}/{x + 1}"
                     >
                         {#if y < N_ROWS}
-                            <TileView {tile} {x} />
+                            <TileView {tile} {x} {y} />
                         {/if}
                     </tile-view-container>
                 {/each}

@@ -3,6 +3,7 @@ export enum TileColor {
     Yellow,
     Gray,
     Green,
+    Blue,
 }
 
 export class Tile {

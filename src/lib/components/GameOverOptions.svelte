@@ -23,12 +23,14 @@ ${
                     switch (column[y].color) {
                         case TileColor.Empty:
                             return "◻️";
-                        case TileColor.Yellow:
-                            return "🟨";
                         case TileColor.Gray:
                             return "⬛";
+                        case TileColor.Yellow:
+                            return "🟨";
                         case TileColor.Green:
                             return "🟩";
+                        case TileColor.Blue:
+                            return "🟦";
                     }
                 })
                 .join("");

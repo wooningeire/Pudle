@@ -46,16 +46,17 @@ const {
             {flipping}
             {revealAnimationDelay}
             x={x ?? 0}
+            y={y ?? 0}
         />
     {/if}
 </tile-bg-container>
 
 
 <style lang="scss">
-@import "#/mixins.scss";
-
 tile-bg-container {
-    @include tile;
+    width: var(--tile-size);
+    height: var(--tile-size);
+    font-size: 2rem;
 
     display: grid;
     place-items: stretch;

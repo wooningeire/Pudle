@@ -53,9 +53,9 @@ export const nextWord = async () => {
     resetKnownLetterInfo();
 };
 
-export const guessMatches = (guess: string) => {
+export const guessedCorrectly = (guess: string) => {
     return guess === roundState.word;
-}
+};
 
 
 const updateInfoFromResult = (index: number, char: string, result: MatchResult) => {
@@ -227,13 +227,16 @@ const init = async () => {
     })();
 };
 
-export const resetRoundState = async () => {
-    roundState.word = "";
-    roundState.guessedWords.clear();
-    roundState.knownLetterInfo = {};
-    roundState.ready = false;
-
-    await init();
+export const getRoundStateResetter = async () => {
+    const services = await initialLoadState.services;
+    return () => {
+        roundState.word = "";
+        roundState.guessedWords.clear();
+        roundState.knownLetterInfo = {};
+        roundState.word = services.words.getRandomTargetWord();
+        roundState.ready = true;
+        resetKnownLetterInfo();
+    };
 };
 
 init();

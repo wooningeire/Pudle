@@ -1,10 +1,10 @@
-import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles, setNextGuessTileIds, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess, removeTags, resetGameState } from "./gameState.svelte.ts";
+import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, eliminateTiles as destroyTiles, setNextGuessTileIds, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess, removeTags, resetGameState, getIslandOfColor } from "./gameState.svelte.ts";
 import { Tile, TileColor } from "$lib/types/Tile.ts";
-import { guessMatches, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, resetRoundState, roundState } from "./roundState.svelte.ts";
+import { guessedCorrectly, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, getRoundStateResetter, roundState } from "./roundState.svelte.ts";
 import { TileTag } from "$lib/types/TileTag.ts";
-import type { MatchResult } from "../types/MatchResult.ts";
-import { GUESS_TIME_BY_GUESS_NO_DECAY_FAC, GUESS_TIME_BY_WORD_NO_DECAY_FAC, MAX_TIME_LIMIT_S_BY_WORD_NO, MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO, MIN_TIME_LIMIT_S_BY_WORD_NO, WORD_LENGTH, MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO, EMPTY_TILE_CHAR } from "../constants.ts";
-import { pauseTimer, resetTimerState, restartTimer, setTimeLimit, timerState } from "./timerState.svelte.ts";
+import { MatchResult } from "../types/MatchResult.ts";
+import { GUESS_TIME_BY_GUESS_NO_DECAY_FAC, GUESS_TIME_BY_WORD_NO_DECAY_FAC, MAX_TIME_LIMIT_S_BY_WORD_NO, MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO, MIN_TIME_LIMIT_S_BY_WORD_NO, WORD_LENGTH, MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO, EMPTY_TILE_CHAR, N_ROWS } from "../constants.ts";
+import { pauseTimer, resetTimerState, restartTimer, setTimeLimit, startTimer, timerState } from "./timerState.svelte.ts";
 
 export const uiState = $state({
     guess: "",
@@ -14,6 +14,7 @@ export const uiState = $state({
     currentIslands: <Point[][]>[],
     currentGrays: <Point[]>[],
     gameOver: false,
+    discoveredBlueTiles: false,
 });
 
 const resetGuessTiles = (guess=uiState.guess) => {
@@ -73,7 +74,7 @@ const wait = (ms: number=0) => new Promise(resolve => {
     setTimeout(resolve, ms);
 });
 
-const destroyCellsIfApplicable = async () => {
+const locateAndDestroyLargeGroups = async () => {
     while (true) {
         const islands = locateIslands();
         if (islands.length === 0) break;
@@ -85,7 +86,7 @@ const destroyCellsIfApplicable = async () => {
         uiState.currentIslands = islands;
         uiState.currentGrays = grays;
 
-        eliminateTiles(islands, grays);
+        destroyTiles(...islands.flat(), ...grays);
     }
 };
 
@@ -98,7 +99,7 @@ const nextGuessTimeLimit = () => {
     return timeLimitByGuessNo * 1000;
 };
 
-const autoDrop = async () => {
+const dropGarbage = async () => {
     const lastGuess = uiState.guess;
 
     uiState.guess = "×".repeat(WORD_LENGTH);
@@ -106,51 +107,15 @@ const autoDrop = async () => {
 
     if (!isGameOver()) {
         uiState.guess = lastGuess;
+        resetGuessTiles();
     }
 };
 
-export const consumeGuess = async (isGarbage=false) => {
-    if (uiState.inputLocked) return;
-    if (!isGarbage && !await isValidGuess(uiState.guess)) return;
-
-    pauseTimer();
-
-    const results = matchResults(uiState.guess);
-    const tiles = tilesFromMatchResults(uiState.guess, results);
-
-    uiState.inputLocked = true;
-    uiState.flipping = true;
-    uiState.guessTiles = <Tile[]>tiles;
-
-    await wait(isFirstGuess() ? 2250 : 875); // wait for the flipping animation
-
-    if (!isGarbage && !isFirstGuess()) {
-        updateKnownLetterInfo(uiState.guess, results); // delay this until later for the first guess
-    }
-    placeNewTiles(tiles);
-    if (!isGarbage) {
-        recordGuessResults(uiState.guess, results);
-    }
-
-    uiState.flipping = false;
-    resetGuessTiles(""); // make sure the letters don't render in their original spots
-
-    await wait(isFirstGuess() ? 1500 : 500); // falling animation
-
-    setNextGuessTileIds();
-    resetGuessTiles(""); // switch to the new ids of the guess tiles
-
-    await destroyCellsIfApplicable();
-
-    if (guessMatches(uiState.guess)) {
-        await wait(500);
-
-        await nextWord();
-        gameState.stats.nthWord++;
-    }
-
-    await wait(250);
-
+/**
+ * To be called whenever the board gets rearranged after eliminating tiles
+ * @returns 
+ */
+const boardChangeChecks = async () => {
     const evaluationsOfExistingRows = [...reevaluateExistingRows()];
 
     const tags = checkIfTilesNeedTagging(evaluationsOfExistingRows);
@@ -172,15 +137,73 @@ export const consumeGuess = async (isGarbage=false) => {
         await wait(1000);
 
         uiState.gameOver = true;
-        return;
+        return {shouldContinue: false, evaluationsOfExistingRows};
     }
+
+    return {shouldContinue: true, evaluationsOfExistingRows};
+};
+
+export const consumeGuess = async (isGarbage=false) => {
+    if (uiState.inputLocked) return;
+    if (!isGarbage && !await isValidGuess(uiState.guess)) return;
+
+    pauseTimer();
+
+    const results = matchResults(uiState.guess);
+    let tiles = <Tile[]>tilesFromMatchResults(uiState.guess, results);
+
+    uiState.inputLocked = true;
+    uiState.flipping = true;
+    uiState.guessTiles = tiles;
+
+    await wait(isFirstGuess() ? 2250 : 875); // wait for the flipping animation
+
+    if (results.every(result => result === MatchResult.Match)) {
+        await wait(250);
+
+        tiles = tiles.map(tile => new Tile(tile.id, TileColor.Blue, tile.letter, tile.tagColor));
+        uiState.guessTiles = tiles;
+        uiState.discoveredBlueTiles = true;
+
+        await wait(750);
+    }
+
+    if (!isGarbage && !isFirstGuess()) {
+        updateKnownLetterInfo(uiState.guess, results); // delay this until later for the first guess
+    }
+    placeNewTiles(tiles);
+    if (!isGarbage) {
+        recordGuessResults(uiState.guess, results);
+    }
+
+    uiState.flipping = false;
+    resetGuessTiles(""); // make sure the letters don't render in their original spots
+
+    await wait(isFirstGuess() ? 1500 : 500); // falling animation
+
+    setNextGuessTileIds();
+    resetGuessTiles(""); // switch to the new ids of the guess tiles
+
+    await locateAndDestroyLargeGroups();
+
+    if (guessedCorrectly(uiState.guess)) {
+        await wait(500);
+
+        await nextWord();
+        gameState.stats.nthWord++;
+    }
+
+    await wait(250);
+
+    const {shouldContinue, evaluationsOfExistingRows} = await boardChangeChecks();
+    if (!shouldContinue) return;
 
     if (isFirstGuess()) {
         updateKnownLetterInfo(uiState.guess, results);
         updateInfoFromReevaluation(evaluationsOfExistingRows);
     }
 
-    restartTimer(autoDrop, nextGuessTimeLimit());
+    restartTimer(dropGarbage, nextGuessTimeLimit());
 
     if (!isGarbage) {
         gameState.stats.nthGuess++;
@@ -199,15 +222,39 @@ export const backspaceGuess = () => {
 export const extendGuess = (char: string) => {
     if (uiState.inputLocked) return;
     if (uiState.guess.length >= WORD_LENGTH) return;
+    if (gameState.board[uiState.guess.length].length >= N_ROWS) return;
 
     uiState.guess += char;
     resetGuessTiles();
 };
 
+export const selectColorOfBlueTile = async (x: number, y: number, color: TileColor) => {
+    if (uiState.inputLocked) return;
+
+    uiState.inputLocked = true;
+
+    pauseTimer();
+
+    const island = getIslandOfColor({x, y}, color);
+    const grays = getAdjacentGrays([island]);
+    destroyTiles(...island.flat(), ...grays);
+
+    await wait(500);
+
+    await locateAndDestroyLargeGroups();
+
+    const {shouldContinue} = await boardChangeChecks();
+    if (!shouldContinue) return;
+
+    startTimer(dropGarbage);
+    uiState.inputLocked = false;
+};
+
 export const reset = async () => {
-    await resetRoundState();
+    const resetRoundState = await getRoundStateResetter();
     resetGameState();
     resetTimerState();
+    resetRoundState();
 
     setTimeLimit(MAX_TIME_LIMIT_S_BY_WORD_NO * 1000);
     

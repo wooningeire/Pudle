@@ -1,25 +1,26 @@
 <script lang="ts">
     import { cubicInOut } from "svelte/easing";
     import { MatchResult } from "../types/MatchResult";
-    import { getMatchResultCssColor } from "../types/tileColors";
+    import { getMatchResultCssColor, getTileTypeCssColor } from "../types/tileColors";
     import { flipLeft, flipRight, halfFlipLeft, halfFlipRight } from "./transition";
     import { EMPTY_TILE_CHAR } from "../constants";
+    import { TileColor } from "../types/Tile";
 
 const {
     letter = EMPTY_TILE_CHAR,
-    matchResult,
+    tileColor,
     x = 0,
     y = 0,
     smaller = false,
 }: {
     letter?: string,
-    matchResult: MatchResult,
+    tileColor: TileColor,
     x?: number,
     y?: number,
     smaller?: boolean,
 } = $props();
 
-const bgColor = $derived(getMatchResultCssColor(matchResult));
+const bgColor = $derived(getTileTypeCssColor(tileColor));
 </script>
 
 
@@ -28,7 +29,8 @@ const bgColor = $derived(getMatchResultCssColor(matchResult));
     in:halfFlipLeft|global={{duration: 500, delay: x * 50, easing: cubicInOut}}
     out:halfFlipRight|global={{duration: 500, delay: x * 50 + y * 50, easing: cubicInOut}}
     class:smaller
-    class:empty={matchResult === MatchResult.Empty}
+    class:empty={tileColor === TileColor.Empty}
+    class:blue={tileColor === TileColor.Blue}
 >{letter}</mini-tile>
 
 
@@ -52,6 +54,13 @@ mini-tile {
 
     &.empty {
         border: 1px solid #aaa;
+    }
+
+    &.blue {
+        background: var(--tile-blue-bg);
+        border: 1px solid var(--tile-blue);
+        box-shadow: 0 0.125rem 0.25rem var(--tile-blue);
+        color: var(--tile-blue-dark);
     }
 }
 </style>

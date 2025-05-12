@@ -109,7 +109,7 @@ export const locateIslands = () => {
         if (tile.color !== targetColor) return;
 
         visited[x][y] = true;
-        if (targetColor === TileColor.Gray) return;
+        if ([TileColor.Gray, TileColor.Blue].includes(tile.color)) return;
 
         currentIsland.push({x, y});
         
@@ -135,6 +135,33 @@ export const locateIslands = () => {
     return islands;
 };
 
+export const getIslandOfColor = (start: Point, color: TileColor) => {
+    const island: Point[] = [];
+
+    const visited = gameState.board.map(col => col.map(() => false));
+
+    const dfsExplore = (x: number, y: number) => {
+        if (!pointIsInBoard(x, y)) return;
+        if (visited[x][y]) return;
+
+        const tile = gameState.board[x][y];
+        if (hash(start) !== hash({x, y}) && tile.color !== color && tile.color !== TileColor.Blue) return;
+
+        visited[x][y] = true;
+
+        island.push({x, y});
+        
+        dfsExplore(x - 1, y);
+        dfsExplore(x + 1, y);
+        dfsExplore(x, y - 1);
+        dfsExplore(x, y + 1);
+    };
+
+    dfsExplore(start.x, start.y);
+
+    return island;
+};
+
 export const getAdjacentGrays = (islands: Point[][]) => {
     const eliminatedGrays: Point[] = [];
 
@@ -142,10 +169,11 @@ export const getAdjacentGrays = (islands: Point[][]) => {
 
     const checkGray = (x: number, y: number) => {
         if (!pointIsInBoard(x, y)) return;
+        if (visited[x][y]) return;
 
         visited[x][y] = true;
         const tile = gameState.board[x][y];
-        if (visited[x][y] && tile.color !== TileColor.Gray) return;
+        if (tile.color !== TileColor.Gray) return;
 
         eliminatedGrays.push({x, y});
     };
@@ -153,33 +181,35 @@ export const getAdjacentGrays = (islands: Point[][]) => {
     for (const island of islands) {
         for (const point of island) {
             const {x, y} = point;
-            checkGray(x - 1, y - 1);
+            // checkGray(x - 1, y - 1);
             checkGray(x - 1, y);
-            checkGray(x - 1, y + 1);
+            // checkGray(x - 1, y + 1);
             checkGray(x, y - 1);
             checkGray(x, y + 1);
-            checkGray(x + 1, y - 1);
-            checkGray(x + 1, y + 1);
+            // checkGray(x + 1, y - 1);
+            checkGray(x + 1, y);
+            // checkGray(x + 1, y + 1);
         }
     }
 
     return eliminatedGrays;
 };
 
-export const eliminateTiles = (islands: Point[][], grays: Point[]) => {
-    const eliminatedPoints = new Set([
-        ...islands.flat(),
-        ...grays,
-    ].map(point => hash(point)));
+export const eliminateTiles = (...tileCoords: Point[]) => {
+    const eliminatedPoints = new Set(tileCoords.map(point => hash(point)));
 
     gameState.board = gameState.board.map(
         (col, x) => col.filter((_, y) => !eliminatedPoints.has(hash({x, y})))
     );
 };
 
-export const isGameOver = () => {
-    return gameState.board.some(column => column.length >= N_ROWS);
-};
+const hasBlueTiles = () => {
+    return gameState.board.some(column => column.some(tile => tile.color === TileColor.Blue));
+}
+
+export const hasColumnAtTop = () => gameState.board.some(column => column.length >= N_ROWS);
+
+export const isGameOver = () => !hasBlueTiles() && hasColumnAtTop();
 
 export const isFirstGuess = () => !gameState.hasRestarted && gameState.stats.nthGuess === 1;
 

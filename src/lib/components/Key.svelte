@@ -37,6 +37,12 @@ const mustNot = $derived(
     colorable && currentLetterPositionInfo === PositionType.MustNotBeInPosition
 );
 const disabled = $derived(uiState.inputLocked || forceDisabled);
+
+let transitionDelay = $state(0);
+const rerollTransitionDelay = () => {
+    transitionDelay = Math.random() * 50;
+};
+
 </script>
 
 <button
@@ -47,6 +53,8 @@ const disabled = $derived(uiState.inputLocked || forceDisabled);
     class:must-not={mustNot}
     style:background={bgColor}
     style:--box-shadow-color={bgColorDark}
+    style:transition-delay="{transitionDelay}ms"
+    ontransitionend={rerollTransitionDelay}
     {disabled}
 >
     {label}

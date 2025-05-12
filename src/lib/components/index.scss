@@ -6,12 +6,15 @@
     --off-black: #42444b;
         
     --light-green: #8dc28d;
+    --light-yellow: #ddd98a;
     
+    --tile-blue-bg: conic-gradient(#d3f5e7 50%, #e9f1ca 50%);
+    --tile-blue: #78bcc5;
     --tile-green: #66a166;
     --tile-yellow: #bbb660;
     --tile-gray: #7c7c81;
-    --tile-empty: #0000;
 
+    --tile-blue-dark: #335583;
     --tile-green-dark: #457462;
     --tile-yellow-dark: #75704c;
     --tile-gray-dark: #4a4a55;
@@ -20,6 +23,8 @@
     --button-bg-dark: #bdc7bf;
 
     --tile-flip-duration-first-guess: 0.5s;
+
+    --tile-size: 3rem;
 }
 
 body {
