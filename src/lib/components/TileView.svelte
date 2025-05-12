@@ -99,13 +99,12 @@ const handleMessage: EventListener = (event: Event) => {
     containerEl!.animate(
         [
             {transform: "translate(0, 0)"},
-            ...new Array(15).fill(0).map((_, i) => generateShake(1.5 ** (-i - 1))),
+            ...new Array(8).fill(0).map((_, i) => generateShake(1.25 ** (-i - 1))),
             {transform: "translate(0, 0)"},
         ],
         {
-            duration: 500,
+            duration: 250,
             iterations: 1,
-            easing: "ease-in-out",
             
         },
     );

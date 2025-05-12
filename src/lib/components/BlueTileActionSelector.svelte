@@ -31,12 +31,12 @@ const stopPreview = () => {
         onpointerout={() => stopPreview()}
         ></blue-tile-action-option>
     <blue-tile-action-option
-        class="explode"
-        onclick={() => onSelect(BlueTileAction.Explode)}
-        onpointerover={() => onPreview(BlueTileAction.Explode)}
+        class="cross"
+        onclick={() => onSelect(BlueTileAction.Cross)}
+        onpointerover={() => onPreview(BlueTileAction.Cross)}
         onpointerout={() => stopPreview()}
     >
-        explode
+        cross
     </blue-tile-action-option>
 </blue-tile-action-selector>
 
@@ -70,7 +70,7 @@ blue-tile-action-option {
         background: var(--light-yellow);
         grid-area: 1/2;
     }
-    &.explode {
+    &.cross {
         background: var(--tile-blue-dark);
         grid-area: 2/1 / 3/3;
     }

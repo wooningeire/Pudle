@@ -135,7 +135,7 @@ export const locateIslands = () => {
     return islands;
 };
 
-export const getBlueTileExplodeRange = (start: Point) => {
+export const getBlueTileCrossRange = (start: Point) => {
     const points: Point[] = [start];
 
     const add = (x: number, y: number) => {

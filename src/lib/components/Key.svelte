@@ -43,10 +43,20 @@ const rerollTransitionDelay = () => {
     transitionDelay = Math.random() * 50;
 };
 
+
+let buttonEl = $state<HTMLButtonElement | null>(null);
+
+const handleClick = () => {
+    if (disabled) return;
+    buttonEl!.blur();
+    onClick();
+};
+
+
 </script>
 
 <button
-    onclick={() => !disabled && onClick()}
+    onclick={handleClick}
     class:small
     class:has-color={hasInfo && info!.type !== MatchResult.Empty}
     class:must
@@ -55,6 +65,7 @@ const rerollTransitionDelay = () => {
     style:--box-shadow-color={bgColorDark}
     style:transition-delay="{transitionDelay}ms"
     ontransitionend={rerollTransitionDelay}
+    bind:this={buttonEl}
     {disabled}
 >
     {label}
@@ -93,7 +104,7 @@ button {
     }
 
     &.small {
-        font-size: 1rem;
+        font-size: 0.85rem;
     }
 
     &.must {

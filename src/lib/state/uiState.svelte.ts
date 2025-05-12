@@ -1,4 +1,4 @@
-import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, destroyTiles, setNextGuessTileIds, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess, removeTags, resetGameState, getIslandOfColor, getBlueTileExplodeRange, hasColumnAtTop, allBlueTileCoords, hashPoint } from "./gameState.svelte.ts";
+import { placeNewTiles, gameState, locateIslands, type Point, getAdjacentGrays, destroyTiles, setNextGuessTileIds, isGameOver, applyTags, tilesFromMatchResults, isFirstGuess, removeTags, resetGameState, getIslandOfColor, getBlueTileCrossRange, hasColumnAtTop, allBlueTileCoords, hashPoint } from "./gameState.svelte.ts";
 import { Tile, TileColor } from "$lib/types/Tile.ts";
 import { guessedCorrectly, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, getRoundStateResetter, roundState, invalidGuessMessage } from "./roundState.svelte.ts";
 import { TileTag } from "$lib/types/TileTag.ts";
@@ -144,7 +144,7 @@ const dropGarbage = async () => {
 
         await wait(500);
 
-        await executeBlueTileAction(x, y, BlueTileAction.Explode);
+        await executeBlueTileAction(x, y, BlueTileAction.Cross);
     }
 
     let {shouldContinue} = await boardChangeChecks();
@@ -320,14 +320,14 @@ export const extendGuess = (char: string) => {
 export enum BlueTileAction {
     DestroyGreen,
     DestroyYellow,
-    Explode,
+    Cross,
 }
 
 const getBlueTileRange = (x: number, y: number, action: BlueTileAction) => {
     switch (action) {
-        case BlueTileAction.Explode:
+        case BlueTileAction.Cross:
             return {
-                island: getBlueTileExplodeRange({x, y}),
+                island: getBlueTileCrossRange({x, y}),
                 grays: [],
             };
 
