@@ -9,6 +9,7 @@ import { boardState } from "@/lib/state/boardState.svelte";
     import TileGuessNotice from "./notices/TileGuessNotice.svelte";
     import { noticeState } from "$lib/state/noticeState.svelte";
     import NoticeList from "./notices/NoticeList.svelte";
+    import { TileColor } from "@/lib/types/Tile";
 </script>
 
 <letter-board
@@ -36,6 +37,7 @@ import { boardState } from "@/lib/state/boardState.svelte";
                     <tile-view-container
                         animate:flip={{duration: 750, easing: bounceOut}}
                         style:grid-area="{N_ROWS - y}/{x + 1}"
+                        style:z-index={tile.color === TileColor.Blue ? "1" : ""}
                     >
                         {#if y < N_ROWS}
                             <TileView {tile} {x} {y} />

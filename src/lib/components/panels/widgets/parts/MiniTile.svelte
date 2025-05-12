@@ -58,8 +58,9 @@ mini-tile {
 
     &.blue {
         background: var(--tile-blue-bg);
-        border: 1px solid var(--tile-blue);
-        box-shadow: 0 0.125rem 0.25rem var(--tile-blue);
+        box-shadow:
+            0 0 0 2px var(--tile-blue) inset,
+            0 0.125rem 0.25rem var(--tile-blue);
         color: var(--tile-blue-dark);
     }
 }

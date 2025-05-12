@@ -165,7 +165,6 @@ tile-view {
         filter .125s ease-in-out;
 
     &.blue {
-        
         &:not(.selecting-color).can-be-clicked {
             cursor: pointer;
             &:hover {

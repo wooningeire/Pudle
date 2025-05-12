@@ -18,6 +18,10 @@ const hasTab = $derived(tile.tagColor !== null && tile.tagColor !== tile.color);
 >
     <tile-content-bg-mask>
         <tile-content-bg class:blue></tile-content-bg>
+
+        {#if blue}
+            <tile-content-border></tile-content-border>
+        {/if}
     </tile-content-bg-mask>
 
     <tile-flag></tile-flag>
@@ -36,10 +40,6 @@ tile-content-bg-container {
         height: var(--tile-size);
         grid-area: 1/1;
     }
-
-    &.blue {
-        outline: 2px solid var(--tile-blue);
-    }
 }
 
 tile-content-bg-mask {
@@ -47,6 +47,10 @@ tile-content-bg-mask {
 
     display: grid;
     place-items: stretch;
+
+    > * {
+        grid-area: 1/1;
+    }
 }
 
 tile-content-bg {
@@ -66,6 +70,14 @@ tile-content-bg {
             }
         }
     }
+}
+
+tile-content-border {
+    display: block;
+    width: var(--tile-size);
+    height: var(--tile-size);
+    box-shadow: 0 0 0 0.25rem var(--tile-blue) inset;
+    position: relative;
 }
 
 tile-flag {

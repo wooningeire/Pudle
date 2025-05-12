@@ -2,6 +2,7 @@
     import { fade } from "svelte/transition";
     import { BlueTileAction, stopPreviewBlueTileRange } from "$lib/state/uiState.svelte";
     import { backOut } from "svelte/easing";
+    import { keyboardClick } from "../../event";
 
 const {
     onSelect,
@@ -21,18 +22,24 @@ const stopPreview = () => {
     <blue-tile-action-option
         class="green"
         onclick={() => onSelect(BlueTileAction.DestroyGreen)}
+        onkeydown={keyboardClick(() => onSelect(BlueTileAction.DestroyGreen))}
+        tabindex="0"
         onpointerover={() => onPreview(BlueTileAction.DestroyGreen)}
         onpointerout={() => stopPreview()}
     ></blue-tile-action-option>
     <blue-tile-action-option
         class="yellow"
         onclick={() => onSelect(BlueTileAction.DestroyYellow)}
+        onkeydown={keyboardClick(() => onSelect(BlueTileAction.DestroyYellow))}
+        tabindex="0"
         onpointerover={() => onPreview(BlueTileAction.DestroyYellow)}
         onpointerout={() => stopPreview()}
         ></blue-tile-action-option>
     <blue-tile-action-option
         class="cross"
         onclick={() => onSelect(BlueTileAction.Cross)}
+        onkeydown={keyboardClick(() => onSelect(BlueTileAction.Cross))}
+        tabindex="0"
         onpointerover={() => onPreview(BlueTileAction.Cross)}
         onpointerout={() => stopPreview()}
     >
