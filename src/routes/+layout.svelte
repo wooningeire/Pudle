@@ -26,7 +26,7 @@ const {
         rel="stylesheet"
     />
 
-    <title>Pudle Pudle</title>
+    <title>Pudle</title>
 </svelte:head>
 
 <style lang="scss">
