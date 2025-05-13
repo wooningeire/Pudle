@@ -6,7 +6,7 @@ import { MatchResult } from "$lib/types/MatchResult.ts";
 import { GUESS_TIME_BY_GUESS_NO_DECAY_FAC, GUESS_TIME_BY_WORD_NO_DECAY_FAC, MAX_TIME_LIMIT_S_BY_WORD_NO, MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO, MIN_TIME_LIMIT_S_BY_WORD_NO, WORD_LENGTH, MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO, EMPTY_TILE_CHAR, N_ROWS, PAR_GUESSES_PER_WORD } from "$lib/constants.ts";
 import { pauseTimer, resetTimerState, restartTimer, setTimeLimit, resumeTimer, timerState } from "./timerState.svelte.ts";
 import { NoticeMessage, noticeState, addTemporaryMessage, addMessage, emitMessage } from "./noticeState.svelte.ts";
-import { resetStatsState, statsState, statsStateMain } from "./statsState.svelte.ts";
+import { incrementNthGuess, incrementNthWord, resetStatsState, statsState } from "./statsState.svelte.ts";
 
 
 const state = $state({
@@ -133,7 +133,7 @@ const nextGuessTimeLimit = () => {
     // 3d: https://www.desmos.com/3d/byglo99q4n
     // 2d: https://www.desmos.com/calculator/jledjyjotv
 
-    const usedWordCount = ((statsStateMain.nthWord - 1) + (statsStateMain.nthGuess - roundState.guessedWords.size - 1) / PAR_GUESSES_PER_WORD) / 2;
+    const usedWordCount = ((statsState().nthWord - 1) + (statsState().nthGuess - roundState.guessedWords.size - 1) / PAR_GUESSES_PER_WORD) / 2;
 
     const maxTimeLimitByWordNo = MIN_TIME_LIMIT_S_BY_WORD_NO + 2 * (MAX_TIME_LIMIT_S_BY_WORD_NO - MIN_TIME_LIMIT_S_BY_WORD_NO) / (1 + Math.exp(usedWordCount * GUESS_TIME_BY_WORD_NO_DECAY_FAC));
     const minTimeLimitByWordNo = MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO + 2 * (MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO - MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO) / (1 + Math.exp(usedWordCount * GUESS_TIME_BY_WORD_NO_DECAY_FAC));
@@ -267,7 +267,7 @@ const execConsumeGuess = async (isGarbage=false) => {
         await wait(500);
 
         await nextWord();
-        statsStateMain.nthWord++;
+        incrementNthWord();
     }
 
     await wait(250);
@@ -302,7 +302,7 @@ export const consumeGuess = async () => {
 
     restartTimer(dropGarbage, nextGuessTimeLimit());
 
-    statsStateMain.nthGuess++;
+    incrementNthGuess();
     state.guess = "";
     state.boardsLocked = false;
 };

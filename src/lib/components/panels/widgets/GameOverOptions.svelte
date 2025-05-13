@@ -7,10 +7,10 @@ import { TileColor } from "$lib/types/Tile";
 import Button from "./parts/Button.svelte";
     import { flipLeft, flipRight, halfFlipLeft, halfFlipRight } from "#/transition";
     import { backIn, backOut, cubicIn, cubicInOut, cubicOut, elasticIn, elasticOut } from "svelte/easing";
-    import { statsStateMain } from "$lib/state/statsState.svelte";
+    import { statsState } from "$lib/state/statsState.svelte";
 
 const resultsString = () => `**Pudle • https://wooningeire.github.io/pudle**
-word ${statsStateMain.nthWord} • guess ${statsStateMain.nthGuess}
+word ${statsState().nthWord} • guess ${statsState().nthGuess}
 ${
     new Array(N_ROWS).fill(0)
         .map((_, i) => {

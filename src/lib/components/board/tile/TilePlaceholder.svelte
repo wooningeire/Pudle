@@ -7,7 +7,7 @@ import {Tile} from "$lib/types/Tile.ts";
     import { noticeEvent, NoticeMessage, noticeState } from "$lib/state/noticeState.svelte";
     import { onDestroy, onMount, tick } from "svelte";
     import { uiState } from "$lib/state/uiState.svelte";
-    import { statsState, statsStateMain } from "$lib/state/statsState.svelte";
+    import { statsState } from "$lib/state/statsState.svelte";
     import { backOut } from "svelte/easing";
 
 const {

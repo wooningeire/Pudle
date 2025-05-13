@@ -1,21 +1,21 @@
 <script>
     import { boardState } from "$lib/state/boardState.svelte";
-    import { statsStateMain } from "$lib/state/statsState.svelte";
+    import { statsState } from "$lib/state/statsState.svelte";
 
 </script>
 
 <game-stats>
-    {#key statsStateMain.nthWord}
+    {#key statsState().nthWord}
         <game-stat class="nth-word">
             <stat-label>word</stat-label>
-            <stat-number>{statsStateMain.nthWord}</stat-number>
+            <stat-number>{statsState().nthWord}</stat-number>
         </game-stat>
     {/key}
 
-    {#key statsStateMain.nthGuess}
+    {#key statsState().nthGuess}
         <game-stat class="nth-guess">
             <stat-label>guess</stat-label>
-            <stat-number>{statsStateMain.nthGuess}</stat-number>
+            <stat-number>{statsState().nthGuess}</stat-number>
         </game-stat>
     {/key}
 </game-stats>

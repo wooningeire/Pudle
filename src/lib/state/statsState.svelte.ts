@@ -1,18 +1,28 @@
-export const statsStateMain = $state({
+const state = $state({
     nthWord: 1,
     nthGuess: 1,
     hasRestarted: false,
 });
 
 const stateDerived = $derived({
-    isFirstGuess: !statsStateMain.hasRestarted && statsStateMain.nthGuess === 1,
+    nthWord: state.nthWord,
+    nthGuess: state.nthGuess,
+    hasRestarted: state.hasRestarted,
+    isFirstGuess: !state.hasRestarted && state.nthGuess === 1,
 });
 
 export const statsState = () => stateDerived;
 
-export const resetStatsState = () => {
-    statsStateMain.nthGuess = 1;
-    statsStateMain.nthWord = 1;
+export const incrementNthWord = () => {
+    state.nthWord++;
+};
+export const incrementNthGuess = () => {
+    state.nthGuess++;
+};
 
-    statsStateMain.hasRestarted = true;
+export const resetStatsState = () => {
+    state.nthGuess = 1;
+    state.nthWord = 1;
+
+    state.hasRestarted = true;
 };

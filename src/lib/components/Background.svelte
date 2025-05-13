@@ -314,7 +314,7 @@ canvas-container {
 
 canvas {
     mask: radial-gradient(circle, #0000000f, #0000007f 80%, #000);
-    animation: shrink-in 4s cubic-bezier(0.075, 0.82, 0.165, 1);
+    animation: shrink-in 7s cubic-bezier(0.075, 0.82, 0.165, 1);
     pointer-events: none;
 
     transition: opacity 0.25s ease-in-out;
