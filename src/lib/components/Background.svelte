@@ -108,7 +108,7 @@ vec3 frontColor(vec2 uvTile, bool isEven, vec2 uvCtr) {
     isFront = (uvTile.x < threshold && uvTile.y >= threshold)
         || (uvTile.x >= threshold && uvTile.y < threshold);
 
-    if (isFront) {
+    if (!isFront) {
         return isEven
             ? mix(vec3(0.85, 0.9, 0.82), vec3(0.93, 0.93, 0.82), sin(length(uvCtr) + time))
             : vec3(0.9375, 0.9375, 0.9375);
