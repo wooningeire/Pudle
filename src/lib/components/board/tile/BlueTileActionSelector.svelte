@@ -79,7 +79,7 @@ blue-tile-action-option {
     }
     &.cross {
         background: var(--tile-blue-dark);
-        grid-area: 2/1 / 3/3;
+        grid-area: 2/1 / 3/-1;
     }
 
     transition:

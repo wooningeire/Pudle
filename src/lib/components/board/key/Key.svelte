@@ -126,7 +126,7 @@ button {
     }
 
     &.must-not {
-        filter: brightness(0.75);
+        filter: brightness(0.8);
     }
 
     &.has-color {

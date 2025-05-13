@@ -18,7 +18,7 @@ const togglePaused = () => {
     <Button
         onClick={togglePaused}
         moveLeft
-        disabled={uiState().gameOver || uiState().canTypeOrAffectBoard}
+        disabled={uiState().gameOver || uiState().boardsLocked}
     >
         {#if !uiState().paused}
             pause

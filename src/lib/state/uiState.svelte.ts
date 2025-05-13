@@ -3,7 +3,7 @@ import { Tile, TileColor } from "$lib/types/Tile.ts";
 import { guessedCorrectly, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, getRoundStateResetter, roundState, invalidGuessMessage } from "./roundState.svelte.ts";
 import { TileTag } from "$lib/types/TileTag.ts";
 import { MatchResult } from "$lib/types/MatchResult.ts";
-import { GUESS_TIME_BY_GUESS_NO_DECAY_FAC, GUESS_TIME_BY_WORD_NO_DECAY_FAC, MAX_TIME_LIMIT_S_BY_WORD_NO, MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO, MIN_TIME_LIMIT_S_BY_WORD_NO, WORD_LENGTH, MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO, EMPTY_TILE_CHAR, N_ROWS } from "$lib/constants.ts";
+import { GUESS_TIME_BY_GUESS_NO_DECAY_FAC, GUESS_TIME_BY_WORD_NO_DECAY_FAC, MAX_TIME_LIMIT_S_BY_WORD_NO, MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO, MIN_TIME_LIMIT_S_BY_WORD_NO, WORD_LENGTH, MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO, EMPTY_TILE_CHAR, N_ROWS, PAR_GUESSES_PER_WORD } from "$lib/constants.ts";
 import { pauseTimer, resetTimerState, restartTimer, setTimeLimit, resumeTimer, timerState } from "./timerState.svelte.ts";
 import { NoticeMessage, noticeState, addTemporaryMessage, addMessage, emitMessage } from "./noticeState.svelte.ts";
 import { isFirstGuess, resetStatsState, statsState } from "./statsState.svelte.ts";
@@ -29,6 +29,7 @@ const state = $state({
 
 const stateDerived = $derived({
     guess: state.guess,
+    boardsLocked: state.boardsLocked,
     inputLocked: state.boardsLocked || state.paused,
     flipping: state.flipping,
     guessTiles: state.guessTiles,
@@ -129,9 +130,13 @@ const locateAndDestroyLargeGroups = async () => {
 };
 
 const nextGuessTimeLimit = () => {
-    // https://www.desmos.com/calculator/jledjyjotv
-    const maxTimeLimitByWordNo = MIN_TIME_LIMIT_S_BY_WORD_NO + 2 * (MAX_TIME_LIMIT_S_BY_WORD_NO - MIN_TIME_LIMIT_S_BY_WORD_NO) / (1 + Math.exp((statsState.nthWord - 1) * GUESS_TIME_BY_WORD_NO_DECAY_FAC));
-    const minTimeLimitByWordNo = MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO + 2 * (MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO - MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO) / (1 + Math.exp((statsState.nthWord - 1) * GUESS_TIME_BY_WORD_NO_DECAY_FAC));
+    // 3d: https://www.desmos.com/3d/byglo99q4n
+    // 2d: https://www.desmos.com/calculator/jledjyjotv
+
+    const usedWordCount = ((statsState.nthWord - 1) + (statsState.nthGuess - roundState.guessedWords.size - 1) / PAR_GUESSES_PER_WORD) / 2;
+
+    const maxTimeLimitByWordNo = MIN_TIME_LIMIT_S_BY_WORD_NO + 2 * (MAX_TIME_LIMIT_S_BY_WORD_NO - MIN_TIME_LIMIT_S_BY_WORD_NO) / (1 + Math.exp(usedWordCount * GUESS_TIME_BY_WORD_NO_DECAY_FAC));
+    const minTimeLimitByWordNo = MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO + 2 * (MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO - MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO) / (1 + Math.exp(usedWordCount * GUESS_TIME_BY_WORD_NO_DECAY_FAC));
     const timeLimitByGuessNo = minTimeLimitByWordNo + 2 * (maxTimeLimitByWordNo - minTimeLimitByWordNo) / (1 + Math.exp((roundState.guessedWords.size - 1) * GUESS_TIME_BY_GUESS_NO_DECAY_FAC));
 
     return timeLimitByGuessNo * 1000;
