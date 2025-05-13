@@ -25,6 +25,8 @@ const {
         href="https://fonts.googleapis.com/css2?family=Belanosima:wght@400;700&display=swap"
         rel="stylesheet"
     />
+
+    <title>Pudle Pudle</title>
 </svelte:head>
 
 <style lang="scss">

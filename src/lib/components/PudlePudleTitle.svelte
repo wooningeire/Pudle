@@ -1,10 +1,8 @@
-<script lang="ts" module>
+<!-- <script lang="ts" module>
 const titleKey = Symbol("pudle title key");
-</script>
+</script> -->
 
 <script lang="ts">
-import { receive, send } from "./transition";
-
 const {
     fades = false,
 }: {
@@ -13,31 +11,30 @@ const {
 
 </script>
 
-{#key titleKey}
-    <title-container
-        in:receive|global={{key: titleKey, duration: 250}}
-        out:send|global={{key: titleKey, duration: 250}}
-    >
-        <bg-graphic class:fades>
-            <square-1></square-1>
-            <square-2></square-2>
-            <square-3></square-3>
-        </bg-graphic>
+<!-- {#key titleKey}
+in:receive|global={{key: titleKey, duration: 250}}
+out:send|global={{key: titleKey, duration: 250}} -->
+<title-container>
+    <bg-graphic class:fades>
+        <square-1></square-1>
+        <square-2></square-2>
+        <square-3></square-3>
+    </bg-graphic>
 
-        <title-text>
-            <pudle-title>Pudle</pudle-title>
-            <pudle-credit>
-                by
-                <a
-                    href="https://vaie.art"
-                    target="_blank"
-                >
-                    vaiezzell
-                </a>
-            </pudle-credit>
-        </title-text>
-    </title-container>
-{/key}
+    <title-text>
+        <pudle-pudle-title>Pudle Pudle</pudle-pudle-title>
+        <pudle-pudle-credit>
+            by
+            <a
+                href="https://vaie.art"
+                target="_blank"
+            >
+                vaiezzell
+            </a>
+        </pudle-pudle-credit>
+    </title-text>
+</title-container>
+<!-- {/key} -->
 
 <style lang="scss">
 title-container {
@@ -135,11 +132,11 @@ title-text {
     position: relative;
 }
 
-pudle-title {
+pudle-pudle-title {
     font-size: 3rem;
     font-weight: 700;
 }
-pudle-credit {
+pudle-pudle-credit {
     font-size: 1.5rem;
 }
 

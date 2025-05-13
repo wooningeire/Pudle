@@ -1,5 +1,5 @@
 <script lang="ts">
-import PudleTitle from "./PudleTitle.svelte";
+import PudleTitle from "./PudlePudleTitle.svelte";
 import RightPanel from "@/lib/components/panels/RightPanel.svelte";
 import LeftPanel from "@/lib/components/panels/LeftPanel.svelte";
 import Keyboard from "@/lib/components/board/Keyboard.svelte";
@@ -51,7 +51,6 @@ game-page {
 
     grid-template-columns: 15rem auto 15rem;
     grid-template-rows: auto auto auto 5rem;
-    margin: 0 5rem;
 
     gap: 2rem;
 }
