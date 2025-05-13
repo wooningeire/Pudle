@@ -22,7 +22,7 @@ out:send|global={{key: titleKey, duration: 250}} -->
     </bg-graphic>
 
     <title-text>
-        <pudle-pudle-title>Pudle Pudle</pudle-pudle-title>
+        <pudle-pudle-title>Pudle</pudle-pudle-title>
         <pudle-pudle-credit>
             by
             <a

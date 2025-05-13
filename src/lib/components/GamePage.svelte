@@ -1,5 +1,5 @@
 <script lang="ts">
-import PudleTitle from "./PudlePudleTitle.svelte";
+import PudleTitle from "./PudleTitle.svelte";
 import RightPanel from "@/lib/components/panels/RightPanel.svelte";
 import LeftPanel from "@/lib/components/panels/LeftPanel.svelte";
 import Keyboard from "@/lib/components/board/Keyboard.svelte";
