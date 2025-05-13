@@ -1,6 +1,7 @@
 <script lang="ts">
     import Background from "@/lib/components/Background.svelte";
 import GamePage from "@/lib/components/GamePage.svelte";
+    import { statsState } from "@/lib/state/statsState.svelte";
     import { onMount } from "svelte";
 
 
@@ -23,10 +24,13 @@ onMount(resize);
 <svelte:window onresize={resize} />
 
 <main bind:this={mainEl}>
-    <Background
-        width={bgWidth}
-        height={bgHeight}
-    />
+    {#if !statsState().isFirstGuess}
+        <Background
+            width={bgWidth}
+            height={bgHeight}
+        />
+    {/if}
+    
     <GamePage />
 </main>
 

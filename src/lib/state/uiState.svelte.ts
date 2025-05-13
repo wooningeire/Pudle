@@ -6,7 +6,7 @@ import { MatchResult } from "$lib/types/MatchResult.ts";
 import { GUESS_TIME_BY_GUESS_NO_DECAY_FAC, GUESS_TIME_BY_WORD_NO_DECAY_FAC, MAX_TIME_LIMIT_S_BY_WORD_NO, MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO, MIN_TIME_LIMIT_S_BY_WORD_NO, WORD_LENGTH, MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO, EMPTY_TILE_CHAR, N_ROWS, PAR_GUESSES_PER_WORD } from "$lib/constants.ts";
 import { pauseTimer, resetTimerState, restartTimer, setTimeLimit, resumeTimer, timerState } from "./timerState.svelte.ts";
 import { NoticeMessage, noticeState, addTemporaryMessage, addMessage, emitMessage } from "./noticeState.svelte.ts";
-import { isFirstGuess, resetStatsState, statsState } from "./statsState.svelte.ts";
+import { resetStatsState, statsState, statsStateMain } from "./statsState.svelte.ts";
 
 
 const state = $state({
@@ -133,7 +133,7 @@ const nextGuessTimeLimit = () => {
     // 3d: https://www.desmos.com/3d/byglo99q4n
     // 2d: https://www.desmos.com/calculator/jledjyjotv
 
-    const usedWordCount = ((statsState.nthWord - 1) + (statsState.nthGuess - roundState.guessedWords.size - 1) / PAR_GUESSES_PER_WORD) / 2;
+    const usedWordCount = ((statsStateMain.nthWord - 1) + (statsStateMain.nthGuess - roundState.guessedWords.size - 1) / PAR_GUESSES_PER_WORD) / 2;
 
     const maxTimeLimitByWordNo = MIN_TIME_LIMIT_S_BY_WORD_NO + 2 * (MAX_TIME_LIMIT_S_BY_WORD_NO - MIN_TIME_LIMIT_S_BY_WORD_NO) / (1 + Math.exp(usedWordCount * GUESS_TIME_BY_WORD_NO_DECAY_FAC));
     const minTimeLimitByWordNo = MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO + 2 * (MAX_TIME_DECAY_LIMIT_S_BY_GUESS_NO - MIN_TIME_DECAY_LIMIT_S_BY_GUESS_NO) / (1 + Math.exp(usedWordCount * GUESS_TIME_BY_WORD_NO_DECAY_FAC));
@@ -181,7 +181,7 @@ const boardChangeChecks = async () => {
     const evaluationsOfExistingRows = [...reevaluateExistingRows()];
 
     const tags = checkIfTilesNeedTagging(evaluationsOfExistingRows);
-    if (!isFirstGuess()) {
+    if (!statsState().isFirstGuess) {
         updateInfoFromReevaluation(evaluationsOfExistingRows);
     }
 
@@ -226,7 +226,7 @@ const execConsumeGuess = async (isGarbage=false) => {
     state.flipping = true;
     state.guessTiles = tiles;
 
-    await wait(isFirstGuess() ? 2250 : 875); // wait for the flipping animation
+    await wait(statsState().isFirstGuess ? 2250 : 875); // wait for the flipping animation
 
     if (results.every(result => result === MatchResult.Match)) {
         await wait(250);
@@ -244,7 +244,7 @@ const execConsumeGuess = async (isGarbage=false) => {
         state.discoveredBlueTiles = true;
     }
 
-    if (!isGarbage && !isFirstGuess()) {
+    if (!isGarbage && !statsState().isFirstGuess) {
         updateKnownLetterInfo(state.guess, results); // delay this until later for the first guess
     }
     placeNewTiles(tiles);
@@ -256,7 +256,7 @@ const execConsumeGuess = async (isGarbage=false) => {
     state.flipping = false;
     resetGuessTiles(""); // make sure the letters don't render in their original spots
 
-    await wait(isFirstGuess() ? 1500 : 500); // falling animation
+    await wait(statsState().isFirstGuess ? 1500 : 500); // falling animation
 
     setNextGuessTileIds();
     resetGuessTiles(""); // switch to the new ids of the guess tiles
@@ -267,7 +267,7 @@ const execConsumeGuess = async (isGarbage=false) => {
         await wait(500);
 
         await nextWord();
-        statsState.nthWord++;
+        statsStateMain.nthWord++;
     }
 
     await wait(250);
@@ -275,7 +275,7 @@ const execConsumeGuess = async (isGarbage=false) => {
     const {shouldContinue, evaluationsOfExistingRows} = await boardChangeChecks();
     if (!shouldContinue) return {shouldContinue};
 
-    if (isFirstGuess()) {
+    if (statsState().isFirstGuess) {
         updateKnownLetterInfo(state.guess, results);
         updateInfoFromReevaluation(evaluationsOfExistingRows);
     }
@@ -302,7 +302,7 @@ export const consumeGuess = async () => {
 
     restartTimer(dropGarbage, nextGuessTimeLimit());
 
-    statsState.nthGuess++;
+    statsStateMain.nthGuess++;
     state.guess = "";
     state.boardsLocked = false;
 };

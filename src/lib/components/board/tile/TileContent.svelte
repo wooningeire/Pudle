@@ -9,7 +9,7 @@ import { receive, send } from "#/transition.ts";
     import { uiState } from "$lib/state/uiState.svelte";
     import TileContentBg from "./TileContentBg.svelte";
     import { keyboardClick } from "#/event";
-    import { isFirstGuess } from "$lib/state/statsState.svelte";
+    import { statsState } from "$lib/state/statsState.svelte";
 
 const {
     tile,
@@ -33,7 +33,7 @@ const bgColor = $derived(getTileTypeCssColor(tile.color));
 const tabColor = $derived(tile.tagColor !== null ? getTileTypeCssColor(tile.tagColor!) : bgColor);
 
 const fallDistance = $derived(N_ROWS - boardState.board[x].length);
-const transitionDuration = $derived((isFirstGuess() ? 1500 : 1250) * Math.sqrt(fallDistance / N_ROWS));
+const transitionDuration = $derived((statsState().isFirstGuess ? 1500 : 1250) * Math.sqrt(fallDistance / N_ROWS));
 
 
 const isBlue = $derived(tile.color === TileColor.Blue);
@@ -57,7 +57,7 @@ const inDestroyRange = $derived(uiState().previewRange?.has(hashPoint({x, y})) ?
     class:has-tab={hasTab}
     style:--reveal-animation-delay="{revealAnimationDelay}ms"
     style:--tab-color={tabColor}
-    class:is-first-guess={isFirstGuess()}
+    class:is-first-guess={statsState().isFirstGuess}
     class:blue={isBlue}
     onclick={selectBlueTile}
     onkeydown={keyboardClick(selectBlueTile)}

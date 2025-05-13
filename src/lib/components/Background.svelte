@@ -1,5 +1,6 @@
 <script lang="ts">
 import { onDestroy, onMount } from "svelte";
+    import { uiState } from "../state/uiState.svelte";
 
 const {
     width,
@@ -15,7 +16,7 @@ let animationFrame = <number | null>null;
 let resolutionUnif = <WebGLUniformLocation | null>null;
 
 onMount(() => {
-    const TIMESCALE = 0.5;
+    const TIMESCALE = 0.25;
 
     const vertexShaderSource = `#version 300 es
 in vec4 a_pos;
@@ -296,10 +297,37 @@ onDestroy(() => {
 </script>
 
 
-<canvas bind:this={canvasEl}></canvas>
+<canvas-container>
+    <canvas
+        bind:this={canvasEl}
+        class:paused={uiState().paused}
+    ></canvas>
+</canvas-container>
+
 
 <style lang="scss">
+canvas-container {
+    display: grid;
+    place-items: stretch;
+    overflow: hidden;
+}
+
 canvas {
     mask: radial-gradient(circle, #0000000f, #0000007f 80%, #000);
+    animation: shrink-in 4s cubic-bezier(0.075, 0.82, 0.165, 1);
+    pointer-events: none;
+
+    transition: opacity 0.25s ease-in-out;
+
+    @keyframes shrink-in {
+        0% {
+            transform: scale(1.5);
+            opacity: 0;
+        }
+    }
+
+    &.paused {
+        opacity: 0.5;
+    }
 }
 </style>

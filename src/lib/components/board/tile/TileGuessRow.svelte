@@ -4,7 +4,7 @@ import TilePlaceholder from "./TilePlaceholder.svelte";
 import { boardState } from "$lib/state/boardState.svelte";
 import { N_ROWS } from "$lib/constants";
 import {NoticeMessage, noticeState} from "$lib/state/noticeState.svelte";
-    import { isFirstGuess } from "$lib/state/statsState.svelte";
+    import { statsState } from "@/lib/state/statsState.svelte";
 
 
 const keydown = (event: KeyboardEvent) => {
@@ -40,7 +40,7 @@ const keydown = (event: KeyboardEvent) => {
         {tile}
         isInputRow
         flipping={uiState().flipping}
-        revealAnimationDelay={x * (isFirstGuess() ? 300 : 100)}
+        revealAnimationDelay={x * (statsState().isFirstGuess ? 300 : 100)}
         hidden={boardState.board[x].length >= N_ROWS}
         {x}
         y={N_ROWS - 1}

@@ -5,21 +5,19 @@ import GameStats from "./widgets/GameStats.svelte";
     import { elasticOut, quartOut } from "svelte/easing";
     import { flipLeft, halfFlipLeft, halfFlipRight } from "#/transition";
     import GarbageDropTimer from "./widgets/GarbageDropTimer.svelte";
-    import { isFirstGuess } from "$lib/state/statsState.svelte";
+    import { statsState } from "$lib/state/statsState.svelte";
 </script>
 
 
-{#if !isFirstGuess()}
-    <left-panel in:halfFlipRight={{duration: 5000, easing: elasticOut, baseRot: "35deg"}}>
-        <GameStats />
+<left-panel in:halfFlipRight={{duration: 5000, easing: elasticOut, baseRot: "35deg"}}>
+    <GameStats />
 
-        <GarbageDropTimer />
+    <GarbageDropTimer />
 
-        {#if uiState().gameOver}
-            <GameOverOptions />
-        {/if}
-    </left-panel>
-{/if}
+    {#if uiState().gameOver}
+        <GameOverOptions />
+    {/if}
+</left-panel>
 
 
 <style lang="scss">

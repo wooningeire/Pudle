@@ -9,6 +9,7 @@ import { onDataLoad, uiState } from "../state/uiState.svelte";
 import { setupInitialLoad } from "../state/initialLoadState.svelte";
 import { onMount } from "svelte";
 import { addMessage, NoticeMessage, noticeState } from "../state/noticeState.svelte";
+    import { statsState } from "../state/statsState.svelte";
 
 const removeLoadingMessage = addMessage(NoticeMessage.Loading);
 
@@ -33,10 +34,12 @@ onMount(async () => {
     <Keyboard />
 
     <Letterboard />
+    
+    {#if !statsState().isFirstGuess}
+        <LeftPanel />
 
-    <LeftPanel />
-
-    <RightPanel />
+        <RightPanel />
+    {/if}
 </game-page>
 
 <style lang="scss">

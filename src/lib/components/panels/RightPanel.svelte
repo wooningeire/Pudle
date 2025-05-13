@@ -6,23 +6,21 @@
     import Instructions from "./widgets/Instructions.svelte";
     import { flip } from "svelte/animate";
     import PauseButton from "./widgets/PauseButton.svelte";
-    import { isFirstGuess } from "$lib/state/statsState.svelte";
+    import { statsState } from "$lib/state/statsState.svelte";
 
 </script>
 
-{#if !isFirstGuess()}
-    <right-panel in:halfFlipLeft={{duration: 5000, easing: elasticOut, baseRot: "-35deg"}}>
-        <right-panel-top>
-            <Instructions />
+<right-panel in:halfFlipLeft={{duration: 5000, easing: elasticOut, baseRot: "-35deg"}}>
+    <right-panel-top>
+        <Instructions />
 
-            <PrevGuessesDisplay />
-        </right-panel-top>
+        <PrevGuessesDisplay />
+    </right-panel-top>
 
-        <right-panel-bottom>
-            <PauseButton />
-        </right-panel-bottom>
-    </right-panel>
-{/if}
+    <right-panel-bottom>
+        <PauseButton />
+    </right-panel-bottom>
+</right-panel>
 
 
 
