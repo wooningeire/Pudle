@@ -16,7 +16,7 @@ const {
     {:else if message === NoticeMessage.SelectBlueTile}
         Pick a tile from the word to turn it blue!
     {:else if message === NoticeMessage.AlreadyGuessedThisRound}
-        Already guessed this word this round!
+        Already guessed this round!
     {:else if message === NoticeMessage.NotInWordList}
         Not in word list!
     {/if}
