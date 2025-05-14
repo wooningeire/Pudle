@@ -41,7 +41,7 @@ const emojiByLetter = new Map([
     ["Z", "🇿"],
 ]);
 
-const resultsString = () => `**Pudle • https://wooningeire.github.io/pudle **
+const resultsString = () => `**Pudle • https://vaie.art/pudle/ **
 word ${statsState().nthWord} • guess ${statsState().nthGuess}
 `;
 
