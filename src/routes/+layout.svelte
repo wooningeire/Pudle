@@ -52,6 +52,8 @@ const description = "The timed Wordle × Puyo Puyo word stacking game I made in 
     <meta property="og:image" content={posterUrl} />
 
     <meta name="description" content={description} />
+
+    <meta name="theme-color" content="#789a61" />
 </svelte:head>
 
 <style lang="scss">
