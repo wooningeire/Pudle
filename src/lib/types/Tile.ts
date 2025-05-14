@@ -4,6 +4,7 @@ export enum TileColor {
     Gray,
     Green,
     Blue,
+    BlueFlash
 }
 
 export class Tile {

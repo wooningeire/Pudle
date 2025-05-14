@@ -3,6 +3,7 @@ import { MatchResult } from "./MatchResult";
 
 
 const tilecolorsMap = new Map<TileColor, string>([
+    [TileColor.BlueFlash, "--tile-blue-flash"],
     [TileColor.Green, "--tile-green"],
     [TileColor.Yellow, "--tile-yellow"],
     [TileColor.Gray, "--tile-gray"],

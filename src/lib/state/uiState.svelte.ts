@@ -1,4 +1,4 @@
-import { placeNewTiles, boardState, locateIslands, type Point, getAdjacentGrays, destroyTiles, setNextGuessTileIds, isGameOver, applyTags, tilesFromMatchResults, removeTags, resetGameState, getIslandOfColor, getBlueTileCrossRange, hasColumnAtTop, allBlueTileCoords, hashPoint } from "./boardState.svelte.ts";
+import { placeNewTiles, boardState, locateIslands, type Point, getAdjacentTiles, destroyTiles, setNextGuessTileIds, isGameOver, applyTags, tilesFromMatchResults, removeTags, resetGameState, getIslandOfColor, getBlueTileCrossRange, hasColumnAtTop, allBlueTileCoords, hashPoint } from "./boardState.svelte.ts";
 import { Tile, TileColor } from "$lib/types/Tile.ts";
 import { guessedCorrectly, matchResults, isValidGuess, nextWord, recordGuessResults, updateKnownLetterInfo, getRoundStateResetter, roundState, invalidGuessMessage } from "./roundState.svelte.ts";
 import { TileTag } from "$lib/types/TileTag.ts";
@@ -123,7 +123,7 @@ const locateAndDestroyLargeGroups = async () => {
         const islands = locateIslands();
         if (islands.length === 0) break;
 
-        const grays = getAdjacentGrays(islands);
+        const grays = getAdjacentTiles(islands, true);
         
         await wait(750);
         
@@ -150,28 +150,24 @@ const nextGuessTimeLimit = () => {
 };
 
 const garbageWords = [
-    "^.=.^",
     ">.=.<",
     "<.=.<",
     ">.=.>",
     "@.=.@",
     "x.=.x",
     "o.=.o",
-    "u.=.u",
-    "^..^\"",
     ">..<\"",
     "<..<\"",
     ">..>\"",
-    "o..o\"",
+    "@..@\"",
     "x..x\"",
-    "o'w'o",
-    "u'w'u",
-    "x'w'x",
-    ">'w'<",
-    "<'w'<",
-    ">'w'>",
-    "^owo^",
-    "^uwu^",
+    "o..o\"",
+    "o'm'o",
+    "x'm'x",
+    ">'m'<",
+    "<'m'<",
+    ">'m'>",
+    "@'m'@",
 ];
 
 const chooseGarbageWord = () => {
@@ -180,6 +176,7 @@ const chooseGarbageWord = () => {
 
 const dropGarbage = async () => {
     state.boardsLocked = true;
+    stopPreviewBlueTileRange();
     pauseTimer();
 
     const lastGuess = state.guess;
@@ -259,6 +256,7 @@ const execConsumeGuess = async (isGarbage=false) => {
     let tiles = <Tile[]>tilesFromMatchResults(state.guess, results);
 
     state.boardsLocked = true;
+    stopPreviewBlueTileRange();
     state.flipping = true;
     state.guessTiles = tiles;
 
@@ -373,7 +371,7 @@ const getBlueTileRange = (x: number, y: number, action: BlueTileAction) => {
         case BlueTileAction.Cross:
             return {
                 island: getBlueTileCrossRange({x, y}),
-                grays: [],
+                adjacents: [],
             };
 
         case BlueTileAction.DestroyGreen:
@@ -383,30 +381,26 @@ const getBlueTileRange = (x: number, y: number, action: BlueTileAction) => {
                 : TileColor.Yellow;
 
             const island = getIslandOfColor({x, y}, color);
-            const grays = getAdjacentGrays([island]);
+            const adjacents = getAdjacentTiles([island], false);
 
-            return {island, grays};
+            return {island, adjacents};
         }
     }
 };
 
 const executeBlueTileAction = async (x: number, y: number, action: BlueTileAction) => {
-    const {island, grays} = getBlueTileRange(x, y, action);
+    const {island, adjacents} = getBlueTileRange(x, y, action);
 
     if ([BlueTileAction.DestroyGreen, BlueTileAction.DestroyYellow].includes(action)) {
-        const color = action === BlueTileAction.DestroyGreen
-            ? TileColor.Green
-            : TileColor.Yellow;
-
         for (const {x, y} of island) {
             const tile = boardState.board[x][y]
-            boardState.board[x][y] = new Tile(tile.id, color, tile.letter, tile.tagColor);
+            boardState.board[x][y] = new Tile(tile.id, TileColor.BlueFlash, tile.letter, null);
         }
 
         await wait(500);
     }
 
-    destroyTiles(...island, ...grays);
+    destroyTiles(...island, ...adjacents);
 
     await wait(500);
 
@@ -420,6 +414,7 @@ export const blueTileAction = async (x: number, y: number, action: BlueTileActio
     if (state.boardsLocked) return;
 
     state.boardsLocked = true;
+    stopPreviewBlueTileRange();
 
     pauseTimer();
 
@@ -431,8 +426,8 @@ export const blueTileAction = async (x: number, y: number, action: BlueTileActio
 };
 
 export const previewBlueTileRange = (x: number, y: number, action: BlueTileAction) => {
-    const {island, grays} = getBlueTileRange(x, y, action);
-    state.previewRange = new Set([...island, ...grays].map(hashPoint));
+    const {island, adjacents} = getBlueTileRange(x, y, action);
+    state.previewRange = new Set([...island, ...adjacents].map(hashPoint));
 };
 
 export const stopPreviewBlueTileRange = () => {

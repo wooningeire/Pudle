@@ -179,7 +179,7 @@ export const getIslandOfColor = (start: Point, color: TileColor) => {
     return island;
 };
 
-export const getAdjacentGrays = (islands: Point[][]) => {
+export const getAdjacentTiles = (islands: Point[][], onlyGray: boolean=false) => {
     const eliminatedGrays: Point[] = [];
 
     const visited = boardState.board.map(col => col.map(() => false));
@@ -190,7 +190,8 @@ export const getAdjacentGrays = (islands: Point[][]) => {
 
         visited[x][y] = true;
         const tile = boardState.board[x][y];
-        if (tile.color !== TileColor.Gray) return;
+        if (onlyGray && tile.color !== TileColor.Gray) return;
+        if (tile.color === TileColor.Blue) return;
 
         eliminatedGrays.push({x, y});
     };
