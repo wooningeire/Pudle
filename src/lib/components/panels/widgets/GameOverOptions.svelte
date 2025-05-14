@@ -75,23 +75,23 @@ const guessesString = () => roundState.pastWords
                     }
 
                     const nMatches = matchResults.filter(result => result === MatchResult.Match).length;
-                    if (nMatches >= 4) {
+                    if (nMatches >= 2) {
                         return "🟩";
                     }
-                    if (nMatches >= 2) {
-                        return "🟢";
-                    }
+                    // if (nMatches >= 2) {
+                    //     return "🟢";
+                    // }
                     // if (nMatches >= 2) {
                     //     return "💚";
                     // }
 
                     const nLetters = matchResults.filter(result => result === MatchResult.Misplaced || result === MatchResult.Match).length;
-                    if (nLetters >= 4) {
+                    if (nLetters >= 2) {
                         return "🟨";
                     }
-                    if (nLetters >= 2) {
-                        return "🟡";
-                    }
+                    // if (nLetters >= 2) {
+                    //     return "🟡";
+                    // }
                     // if (nLetters >= 2) {
                     //     return "💛";
                     // }
