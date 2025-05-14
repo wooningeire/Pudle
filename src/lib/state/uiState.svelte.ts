@@ -117,6 +117,8 @@ const wait = (ms: number=0) => new Promise(resolve => {
 });
 
 const locateAndDestroyLargeGroups = async () => {
+    let destroyed = false;
+
     while (true) {
         const islands = locateIslands();
         if (islands.length === 0) break;
@@ -124,8 +126,13 @@ const locateAndDestroyLargeGroups = async () => {
         const grays = getAdjacentGrays(islands);
         
         await wait(750);
-
+        
         destroyTiles(...islands.flat(), ...grays);
+        destroyed = true;
+    }
+
+    if (destroyed) {
+        await wait(250);
     }
 };
 

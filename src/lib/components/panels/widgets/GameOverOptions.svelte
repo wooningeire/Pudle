@@ -9,6 +9,36 @@ import Button from "./parts/Button.svelte";
     import { backIn, backOut, cubicIn, cubicInOut, cubicOut, elasticIn, elasticOut } from "svelte/easing";
     import { statsState } from "$lib/state/statsState.svelte";
 
+
+const emojiByLetter = new Map([
+    ["A", "🇦"],
+    ["B", "🇧"],
+    ["C", "🇨"],
+    ["D", "🇩"],
+    ["E", "🇪"],
+    ["F", "🇫"],
+    ["G", "🇬"],
+    ["H", "🇭"],
+    ["I", "🇮"],
+    ["J", "🇯"],
+    ["K", "🇰"],
+    ["L", "🇱"],
+    ["M", "🇲"],
+    ["N", "🇳"],
+    ["O", "🇴"],
+    ["P", "🇵"],
+    ["Q", "🇶"],
+    ["R", "🇷"],
+    ["S", "🇸"],
+    ["T", "🇹"],
+    ["U", "🇺"],
+    ["V", "🇻"],
+    ["W", "🇼"],
+    ["X", "🇽"],
+    ["Y", "🇾"],
+    ["Z", "🇿"],
+]);
+
 const resultsString = () => `**Pudle • https://wooningeire.github.io/pudle**
 word ${statsState().nthWord} • guess ${statsState().nthGuess}
 ${
@@ -21,20 +51,9 @@ ${
                         return "◽";
                     }
 
-                    switch (column[y].color) {
-                        case TileColor.Empty:
-                            return "◻️";
-                        case TileColor.Gray:
-                            return "⬛";
-                        case TileColor.Yellow:
-                            return "🟨";
-                        case TileColor.Green:
-                            return "🟩";
-                        case TileColor.Blue:
-                            return "🟦";
-                    }
+                    return emojiByLetter.get(column[y].letter) ?? "🟦";
                 })
-                .join("");
+                .join("\u200b");
         })
         .join("\n")
 }`;

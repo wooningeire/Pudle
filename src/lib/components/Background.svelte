@@ -139,7 +139,7 @@ void main(void)
     vec2 uvWarped = uv;
 
     // radial scale
-    uvWarped += uvCtr / (pow(length(uvCtr), 1.25) + 0.5);
+    uvWarped += uvCtr / (pow(length(uvCtr), 1.25) + 0.5) * (cos(atan(uvCtr.y, uvCtr.x) * 6. + time * 0.125) * 0.125 + 1.);
 
     // rotation
     uvWarped = rot(uvWarped, time * 0.0625);

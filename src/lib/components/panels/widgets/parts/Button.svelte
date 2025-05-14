@@ -40,9 +40,9 @@ const handleClick = async () => {
         {@render children()}
     </button>
 
-    <button-shadow style:--shadow-offset="-0.5rem"></button-shadow>
-    <button-shadow style:--shadow-offset="-1rem"></button-shadow>
-    <button-shadow style:--shadow-offset="-1.5rem" class="has-drop-shadow"></button-shadow>
+    <button-shadow style:--base-shadow-offset="-0.5rem"></button-shadow>
+    <button-shadow style:--base-shadow-offset="-1rem"></button-shadow>
+    <button-shadow style:--base-shadow-offset="-1.5rem" class="has-drop-shadow"></button-shadow>
 </button-container>
 
 <style lang="scss">
@@ -69,16 +69,6 @@ button-container {
 
     &.move-left {
         --hover-movement: -0.5rem;
-    }
-
-    &.disabled {
-        opacity: 0.3333333;
-        pointer-events: none;
-
-        button-shadow {
-            --shadow-offset: 0.0625rem;
-            opacity: 0;
-        }
     }
         
     &:has(button:hover, button:focus-within) {
@@ -113,7 +103,8 @@ button {
 }
 
 button-shadow {
-    transform: translateZ(var(--shadow-offset));
+    // --shadow-offset: -0.625rem;
+    transform: translateZ(var(--shadow-offset, var(--base-shadow-offset)));
     background: var(--box-shadow-color);
     backface-visibility: hidden;
 
@@ -153,6 +144,20 @@ button-shadow {
                 background: var(--tile-green-dark);
             }
         }
+    }
+}
+
+button-container.disabled {
+    pointer-events: none;
+
+    button {
+        opacity: 0.3333333;
+    }
+    
+    button-shadow {
+        --shadow-offset: -0.0625rem;
+        opacity: 0;
+        box-shadow: 0 0 0 #0000;
     }
 }
 </style>
