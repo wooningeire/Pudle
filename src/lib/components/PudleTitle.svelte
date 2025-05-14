@@ -24,8 +24,8 @@ out:send|global={{key: titleKey, duration: 250}} -->
     </bg-graphic>
 
     <title-text>
-        <pudle-pudle-title>Pudle</pudle-pudle-title>
-        <pudle-pudle-credit>
+        <pudle-title>Pudle</pudle-title>
+        <pudle-credit>
             by
             <a
                 href="https://vaie.art"
@@ -33,7 +33,8 @@ out:send|global={{key: titleKey, duration: 250}} -->
             >
                 <VaiezzellLogo />
             </a>
-        </pudle-pudle-credit>
+        </pudle-credit>
+        <pudle-inspo>thanks <a href="https://spax.zone">spax</a> and <a href="https://oat.zone">oatmealine</a> for inspiration</pudle-inspo>
     </title-text>
 </title-container>
 <!-- {/key} -->
@@ -46,7 +47,8 @@ title-container {
     > * {
         grid-area: 1/1;
     }
-    padding-top: 2rem;
+
+    margin-bottom: 0.75rem;
 }
 
 bg-graphic {
@@ -60,7 +62,7 @@ bg-graphic {
     }
 
     &.fades {
-        mask: linear-gradient(#000 45%, #0000 65%);
+        mask: linear-gradient(#000 40%, #0000 60%);
     }
 
 
@@ -131,19 +133,19 @@ title-text {
     display: flex;
     flex-direction: column;
     align-items: center;
-    line-height: 0.9;
+    line-height: 0.8;
     position: relative;
 }
 
-pudle-pudle-title {
-    font-size: 3rem;
+pudle-title {
+    font-size: 3.5rem;
     font-weight: 700;
 }
-pudle-pudle-credit {
+pudle-credit {
     font-size: 1.5rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.25rem;
 
     a {
         border: none;
@@ -157,6 +159,11 @@ pudle-pudle-credit {
             fill: currentColor;
         }
     }
+}
+
+pudle-inspo {
+    margin-top: -0.125rem;
+    font-size: 1rem;
 }
 
 </style>

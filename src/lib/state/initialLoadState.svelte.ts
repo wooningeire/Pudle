@@ -1,7 +1,7 @@
 
 import { createWordGetter } from "$lib/words.ts";
 
-type InitialLoadServices = {
+export type InitialLoadServices = {
     words: Awaited<ReturnType<typeof createWordGetter>>,
 };
 

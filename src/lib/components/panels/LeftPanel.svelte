@@ -10,18 +10,26 @@ import GameStats from "./widgets/GameStats.svelte";
 
 
 <left-panel in:halfFlipRight={{duration: 5000, easing: elasticOut, baseRot: "35deg"}}>
-    <GameStats />
+    <left-panel-top>
+        <GameStats />
 
-    <GarbageDropTimer />
+        <GarbageDropTimer />
+    </left-panel-top>
 
-    {#if uiState().gameOver}
-        <GameOverOptions />
-    {/if}
+    <left-panel-bottom>
+        {#if uiState().gameOver}
+            <GameOverOptions />
+        {/if}
+    </left-panel-bottom>
 </left-panel>
 
 
 <style lang="scss">
 @import "#/constants.scss";
+
+* {
+    transform-style: preserve-3d;
+}
 
 left-panel {
     grid-area: 2/1 / 4/2;
@@ -47,5 +55,15 @@ left-panel {
 
     text-align: right;
     line-height: 0.8;
+
+    > * {
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
+    }
+}
+
+left-panel-top {
+    flex-grow: 1;
 }
 </style>

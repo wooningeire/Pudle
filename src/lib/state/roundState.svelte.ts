@@ -1,7 +1,7 @@
 import { SvelteMap } from "svelte/reactivity";
 import { MatchResult } from "$lib/types/MatchResult";
 import { Tile, TileColor } from "$lib/types/Tile";
-import { initialLoadState } from "./initialLoadState.svelte";
+import { initialLoadState, type InitialLoadServices } from "./initialLoadState.svelte";
 import { TileTag } from "$lib/types/TileTag";
 import { emplace, update } from "$lib/emplace";
 import { EMPTY_TILE_CHAR, WORD_LENGTH } from "$lib/constants";
@@ -22,10 +22,19 @@ export type KnownLetterInfo = {
     nKnownAppearances: number,
 };
 
+export type RoundWordData = {
+    word: string,
+    guesses: {
+        guess: string,
+        matchResults: MatchResult[],
+    }[],
+};
+
 export const roundState = $state({
     word: "",
     guessedWords: new SvelteMap<string, MatchResult[]>(),
     knownLetterInfo: <Record<string, KnownLetterInfo>>{},
+    pastWords: <RoundWordData[]>[],
     ready: false,
 });
 
@@ -51,8 +60,12 @@ const resetKnownLetterInfo = () => {
 
 
 export const nextWord = async () => {
-    roundState.word = (await initialLoadState.services).words.getRandomTargetWord();
+    nextWordWithServiceGiven(await initialLoadState.services);
+};
+const nextWordWithServiceGiven = (services: Awaited<InitialLoadServices>) => {
+    roundState.word = services.words.getRandomTargetWord();
     roundState.guessedWords.clear();
+    roundState.pastWords.push({word: roundState.word, guesses: []});
     resetKnownLetterInfo();
 };
 
@@ -199,6 +212,7 @@ export const invalidGuessMessage = async (guess: string) => {
 
 export const recordGuessResults = (guess: string, matchResults: MatchResult[]) => {
     roundState.guessedWords.set(guess, matchResults);
+    roundState.pastWords.at(-1)!.guesses.push({guess, matchResults})
 };
 
 export const matchResults = (guess: string) => {
@@ -243,7 +257,7 @@ export const matchResults = (guess: string) => {
 const init = async () => {
     resetKnownLetterInfo();
     await (async () => {
-        roundState.word = (await initialLoadState.services).words.getRandomTargetWord();
+        nextWordWithServiceGiven(await initialLoadState.services);
         roundState.ready = true;
     })();
 };
@@ -251,12 +265,10 @@ const init = async () => {
 export const getRoundStateResetter = async () => {
     const services = await initialLoadState.services;
     return () => {
-        roundState.word = "";
         roundState.guessedWords.clear();
-        roundState.knownLetterInfo = {};
-        roundState.word = services.words.getRandomTargetWord();
         roundState.ready = true;
-        resetKnownLetterInfo();
+        roundState.pastWords = [];
+        nextWordWithServiceGiven(services);
     };
 };
 

@@ -162,12 +162,12 @@ const garbageWords = [
     "@..@\"",
     "x..x\"",
     "o..o\"",
-    "o'm'o",
-    "x'm'x",
-    ">'m'<",
-    "<'m'<",
-    ">'m'>",
-    "@'m'@",
+    "o'w'o",
+    "x'w'x",
+    ">'w'<",
+    "<'w'<",
+    ">'w'>",
+    "@'w'@",
 ];
 
 const chooseGarbageWord = () => {

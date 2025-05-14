@@ -1,19 +1,26 @@
-<script>
+<script lang="ts">
     import { WORD_LENGTH } from "$lib/constants";
     import { roundState } from "$lib/state/roundState.svelte";
     import { uiState } from "$lib/state/uiState.svelte";
     import { MatchResult } from "$lib/types/MatchResult";
     import MiniWordRow from "./MiniWordRow.svelte";
 
+const {
+    guessResults,
+    showFinalWord=false,
+}: {
+    guessResults: Iterable<{guess: string, matchResults: MatchResult[]}>,
+    showFinalWord?: boolean,
+} = $props();
 </script>
 
 
 <prev-guesses-grid class:paused={uiState().paused}>
-    {#each roundState.guessedWords as [word, matchResults], y}
-        <MiniWordRow {word} {matchResults} {y} />
+    {#each guessResults as {guess, matchResults}, y}
+        <MiniWordRow word={guess} {matchResults} {y} />
     {/each}
     
-    {#if uiState().gameOver}
+    {#if showFinalWord && uiState().gameOver}
         <MiniWordRow
             word={roundState.word}
             matchResults={new Array(WORD_LENGTH).fill(0).map(_ => MatchResult.Empty)}
