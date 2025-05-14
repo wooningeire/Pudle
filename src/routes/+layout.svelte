@@ -40,14 +40,14 @@ const description = "The timed Wordle × Puyo Puyo word stacking game I made in 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <!-- <meta name="twitter:image" content={posterUrl} /> -->
+    <meta name="twitter:image" content="https://wooningeire.github.io/pudle/poster.png" />
 
     <meta property="og:title" content={title} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:url" content={page.url.toString()} />
     <meta property="og:description" content={description} />
-    <!-- <meta property="og:image" content={posterUrl} /> -->
+    <meta property="og:image" content="https://wooningeire.github.io/pudle/poster.png" />
 
     <meta name="description" content={description} />
 
