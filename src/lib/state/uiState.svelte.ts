@@ -137,7 +137,7 @@ const locateAndDestroyLargeGroups = async () => {
 };
 
 const nextGuessTimeLimit = () => {
-    // 3d: https://www.desmos.com/3d/byglo99q4n
+    // 3d: https://www.desmos.com/3d/md08iio16o
     // 2d: https://www.desmos.com/calculator/jledjyjotv
 
     const usedWordCount = ((statsState().nthWord - 1) + (statsState().nthGuess - roundState.guessedWords.size - 1) / PAR_GUESSES_PER_WORD) / 2;
