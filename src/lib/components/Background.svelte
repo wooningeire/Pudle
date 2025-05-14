@@ -46,7 +46,7 @@ in vec2 v_texcoordCtr;
 
 out vec4 fragColor;
 
-const float N_GRID_REPEATS_LG = 8.;
+const float N_GRID_REPEATS_LG = 6.;
 // const float N_GRID_REPEATS_SM = 64.;
 
 const float HSQRT2 = sqrt(2.) / 2.;
@@ -313,6 +313,8 @@ canvas-container {
 }
 
 canvas {
+    width: 100%;
+    height: 100%;
     mask: radial-gradient(circle, #0000000f, #0000007f 80%, #000);
     animation: shrink-in 7s cubic-bezier(0.075, 0.82, 0.165, 1);
     pointer-events: none;

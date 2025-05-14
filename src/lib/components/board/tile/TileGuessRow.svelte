@@ -5,6 +5,7 @@ import { boardState } from "$lib/state/boardState.svelte";
 import { N_ROWS } from "$lib/constants";
 import {NoticeMessage, noticeState} from "$lib/state/noticeState.svelte";
     import { statsState } from "@/lib/state/statsState.svelte";
+    import { alphabet } from "@/lib/state/roundState.svelte";
 
 
 const keydown = (event: KeyboardEvent) => {
@@ -25,7 +26,7 @@ const keydown = (event: KeyboardEvent) => {
     if (key.length !== 1) return;
 
     key = key.toUpperCase();
-    if (!"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").includes(key)) return;
+    if (!alphabet.has(key)) return;
 
     extendGuess(key);
 };

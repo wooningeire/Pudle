@@ -1,12 +1,20 @@
 <script lang="ts">
 import type { Snippet } from "svelte";
 import "#/index.scss";
+import iconUrl from "$lib/assets/icon.svg";
+    import { page } from "$app/state";
+
 
 const {
     children,
 }: {
     children: Snippet,
 } = $props();
+
+
+const title = "Pudle";
+const siteName = "vaiezzell’s web toys";
+const description = "The timed Wordle × Puyo Puyo word stacking game";
 </script>
 
 {@render children()}
@@ -26,7 +34,23 @@ const {
         rel="stylesheet"
     />
 
-    <title>Pudle</title>
+    <title>{title}</title>
+	
+    <link rel="icon" href={iconUrl} />
+    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content="" />
+    <meta name="twitter:image" content="poster url" />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:url" content={page.url.toString()} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="poster url" />
+
+    <meta name="description" content={description} />
 </svelte:head>
 
 <style lang="scss">

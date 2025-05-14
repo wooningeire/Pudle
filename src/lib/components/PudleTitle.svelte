@@ -44,6 +44,7 @@ title-container {
     > * {
         grid-area: 1/1;
     }
+    padding-top: 2rem;
 }
 
 bg-graphic {

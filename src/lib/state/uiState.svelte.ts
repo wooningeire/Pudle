@@ -149,6 +149,35 @@ const nextGuessTimeLimit = () => {
     return timeLimitByGuessNo * 1000;
 };
 
+const garbageWords = [
+    "^.=.^",
+    ">.=.<",
+    "<.=.<",
+    ">.=.>",
+    "@.=.@",
+    "x.=.x",
+    "o.=.o",
+    "u.=.u",
+    "^..^\"",
+    ">..<\"",
+    "<..<\"",
+    ">..>\"",
+    "o..o\"",
+    "x..x\"",
+    "o'w'o",
+    "u'w'u",
+    "x'w'x",
+    ">'w'<",
+    "<'w'<",
+    ">'w'>",
+    "^owo^",
+    "^uwu^",
+];
+
+const chooseGarbageWord = () => {
+    return garbageWords[Math.floor(Math.random() * garbageWords.length)];
+};
+
 const dropGarbage = async () => {
     state.boardsLocked = true;
     pauseTimer();
@@ -166,7 +195,7 @@ const dropGarbage = async () => {
     let {shouldContinue} = await boardChangeChecks();
     if (!shouldContinue) return;
 
-    state.guess = "_".repeat(WORD_LENGTH);
+    state.guess = chooseGarbageWord().padEnd(WORD_LENGTH, "_").slice(0, WORD_LENGTH);
     await execConsumeGuess(true);
 
     ({shouldContinue} = await boardChangeChecks());

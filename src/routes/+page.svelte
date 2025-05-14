@@ -39,7 +39,6 @@ main {
     display: grid;
     place-items: center;
     
-    width: min-content;
     min-width: 100vw;
     height: 100vh;
 

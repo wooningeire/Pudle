@@ -7,7 +7,7 @@ import { emplace, update } from "$lib/emplace";
 import { EMPTY_TILE_CHAR, WORD_LENGTH } from "$lib/constants";
 import { NoticeMessage } from "./noticeState.svelte";
 
-const ALPHABET = new Set("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+export const alphabet = new Set("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
 
 export enum PositionType {
@@ -155,7 +155,7 @@ export const updateKnownLetterInfo = (guess: string, matchResults: MatchResult[]
     let mismatchIndices: number[] = [];
     for (const [i, result] of matchResults.entries()) {
         const char = guess[i];
-        if (!ALPHABET.has(char) || result === MatchResult.Empty) continue;
+        if (!alphabet.has(char) || result === MatchResult.Empty) continue;
 
         updateInfoFromResult(i, char, result);
         roundState.knownLetterInfo[char].nKnownAppearances = findNKnownAppearances(char, guess, matchResults);
@@ -207,7 +207,7 @@ export const matchResults = (guess: string) => {
 
     const letterCounts = new Map<string, number>();
     for (const char of roundState.word) {
-        if (!ALPHABET.has(char)) continue;
+        if (!alphabet.has(char)) continue;
 
         emplace(letterCounts, char, {
             insert: () => 1,
@@ -220,7 +220,7 @@ export const matchResults = (guess: string) => {
             results[i] = MatchResult.Empty;
             continue;
         }
-        if (!ALPHABET.has(char)) continue;
+        if (!alphabet.has(char)) continue;
         if (char !== roundState.word[i]) continue;
 
         update(letterCounts, char, existing => existing - 1);
@@ -228,7 +228,7 @@ export const matchResults = (guess: string) => {
     }
 
     for (const [i, char] of chars.entries()) {
-        if (!ALPHABET.has(char)) continue;
+        if (!alphabet.has(char)) continue;
         if ([MatchResult.Match, MatchResult.Empty].includes(results[i])) continue;
         if ((letterCounts.get(char) ?? 0) === 0) continue;
 
