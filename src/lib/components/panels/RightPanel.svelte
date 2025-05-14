@@ -9,6 +9,7 @@
     import { statsState } from "$lib/state/statsState.svelte";
     import { uiState } from "@/lib/state/uiState.svelte";
     import { roundState } from "@/lib/state/roundState.svelte";
+    import { WORD_LENGTH } from "@/lib/constants";
 
 const shownGuesses = $derived(
     uiState().gameOver
@@ -16,7 +17,7 @@ const shownGuesses = $derived(
         : [{result: roundState.pastWords.at(-1)!, index: roundState.pastWords.length - 1}]
 );
 
-const flyAbsolute = (
+const flyAbsoluteEarly = (
     node: HTMLElement,
 	{
         delay=0,
@@ -28,16 +29,16 @@ const flyAbsolute = (
 ) => {
 	const style = getComputedStyle(node);
 	const transform = style.transform === 'none' ? '' : style.transform;
+
 	return {
 		delay,
 		duration,
 		easing,
 		css: (t: number, u: number) => `
 transform: ${transform} translate(${u * x}px, ${u * y}px);
-opacity: ${t};
-position: absolute;`
+opacity: ${t};`
 	};
-}
+};
 </script>
 
 <right-panel in:halfFlipLeft={{duration: 5000, easing: elasticOut, baseRot: "-35deg"}}>
@@ -46,11 +47,24 @@ position: absolute;`
 
         <prev-guesses-grid-list>
             {#each shownGuesses as {result: {guesses}, index} (index)}
+                {@const delay = (guesses.length + WORD_LENGTH - 1) * 100}
                 <prev-guesses-item
-                    in:flyAbsolute={{duration: 500, x: 50, easing: cubicOut, delay: uiState().gameOver ? (roundState.pastWords.length - index) * 500 : 500}}
-                    out:fly={{duration: 500, y: 50, easing: cubicIn}}
+                    in:flyAbsoluteEarly={{
+                        duration: 500,
+                        x: 50,
+                        easing: cubicOut,
+                        delay: uiState().gameOver
+                            ? (roundState.pastWords.length - index) * 500
+                            : 750 + delay,
+                    }}
+                    out:fly={{
+                        duration: 500,
+                        y: 50,
+                        easing: cubicIn,
+                        delay,
+                    }}
                 >
-                    <prev-guesses-label>guesses for word {index + 1}</prev-guesses-label>
+                    <prev-guesses-label out:fade|global={{duration: 250, easing: cubicIn, delay: 125}}>guesses for word {index + 1}</prev-guesses-label>
                     <prev-guesses-grid-container>
                         <PrevGuessesDisplay
                             guessResults={guesses}
@@ -125,6 +139,7 @@ prev-guesses-grid-list {
 
     overflow-y: auto;
     overflow-x: hidden;
+    position: relative;
 }
 
 prev-guesses-item {
