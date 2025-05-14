@@ -46,7 +46,7 @@ in vec2 v_texcoordCtr;
 
 out vec4 fragColor;
 
-const float N_GRID_REPEATS_LG = 6.;
+const float N_GRID_REPEATS_LG = 8.;
 // const float N_GRID_REPEATS_SM = 64.;
 
 const float HSQRT2 = sqrt(2.) / 2.;

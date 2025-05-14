@@ -2,6 +2,7 @@
 import type { Snippet } from "svelte";
 import "#/index.scss";
 import iconUrl from "$lib/assets/icon.svg";
+import posterUrl from "$lib/assets/poster.png";
     import { page } from "$app/state";
 
 
@@ -14,7 +15,7 @@ const {
 
 const title = "Pudle";
 const siteName = "vaiezzell’s web toys";
-const description = "The timed Wordle × Puyo Puyo word stacking game";
+const description = "The timed Wordle × Puyo Puyo word stacking game I made in a weekend";
 </script>
 
 {@render children()}
@@ -40,15 +41,15 @@ const description = "The timed Wordle × Puyo Puyo word stacking game";
     
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content="" />
-    <meta name="twitter:image" content="poster url" />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={posterUrl} />
 
     <meta property="og:title" content={title} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:url" content={page.url.toString()} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content="poster url" />
+    <meta property="og:image" content={posterUrl} />
 
     <meta name="description" content={description} />
 </svelte:head>
