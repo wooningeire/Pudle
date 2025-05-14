@@ -54,8 +54,8 @@ game-page {
 
     grid-template-columns: 15rem auto 15rem;
     grid-template-rows: auto auto auto 5rem;
-    margin: 0 -8rem;
+    margin: 0 -6rem;
 
-    gap: 2rem;
+    gap: 0 2rem;
 }
 </style>

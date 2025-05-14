@@ -53,6 +53,7 @@ key-board {
     align-items: center;
     font-size: 1.5rem;
     user-select: none;
+    margin-bottom: 2rem;
 }
 
 key-row {

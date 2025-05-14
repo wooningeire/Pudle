@@ -3,6 +3,8 @@ const titleKey = Symbol("pudle title key");
 </script> -->
 
 <script lang="ts">
+import VaiezzellLogo from "./VaiezzellLogo.svelte";
+
 const {
     fades = false,
 }: {
@@ -29,7 +31,7 @@ out:send|global={{key: titleKey, duration: 250}} -->
                 href="https://vaie.art"
                 target="_blank"
             >
-                vaiezzell
+                <VaiezzellLogo />
             </a>
         </pudle-pudle-credit>
     </title-text>
@@ -139,6 +141,22 @@ pudle-pudle-title {
 }
 pudle-pudle-credit {
     font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    a {
+        border: none;
+    }
+    
+    :global(svg) {
+        height: 3rem;
+        width: auto;
+
+        :global(*) {
+            fill: currentColor;
+        }
+    }
 }
 
 </style>
