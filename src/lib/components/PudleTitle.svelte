@@ -34,7 +34,7 @@ out:send|global={{key: titleKey, duration: 250}} -->
                 <VaiezzellLogo />
             </a>
         </pudle-credit>
-        <pudle-inspo>thanks <a href="https://spax.zone">spax</a> and <a href="https://oat.zone">oatmealine</a> for inspiration</pudle-inspo>
+        <pudle-inspo>thanks <a href="https://spax.zone" target="_blank">spax</a> and <a href="https://oat.zone" target="_blank">oatmealine</a> for inspiration</pudle-inspo>
     </title-text>
 </title-container>
 <!-- {/key} -->
