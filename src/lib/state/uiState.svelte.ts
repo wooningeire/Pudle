@@ -320,7 +320,7 @@ const execConsumeGuess = async (isGarbage=false) => {
 }
 
 export const consumeGuess = async () => {
-    if (state.boardsLocked) return;
+    if (stateDerived.inputLocked) return;
     if (!await isValidGuess(state.guess)) {
         const message = await invalidGuessMessage(state.guess);
         if (message === null) return;
@@ -342,14 +342,14 @@ export const consumeGuess = async () => {
 };
 
 export const backspaceGuess = () => {
-    if (state.boardsLocked) return;
+    if (stateDerived.inputLocked) return;
 
     state.guess = state.guess.slice(0, -1);
     resetGuessTiles();
 };
 
 export const extendGuess = (char: string) => {
-    if (state.boardsLocked) return;
+    if (stateDerived.inputLocked) return;
     if (state.guess.length >= WORD_LENGTH) return;
     if (stateDerived.nextColumnBlocked) {
         emitMessage(NoticeMessage.ColumnBlocked);
