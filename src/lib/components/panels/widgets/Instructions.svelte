@@ -12,7 +12,7 @@
 <instructions-text>
     <p>
         Create groups of {ISLAND_SIZE_THRESHOLD} <MiniTile tileColor={TileColor.Green} smaller />
-        or {ISLAND_SIZE_THRESHOLD} <MiniTile tileColor={TileColor.Yellow} smaller />!
+        or {ISLAND_SIZE_THRESHOLD} <MiniTile tileColor={TileColor.Yellow} smaller /> to destroy them!
     </p>
 
     <p>
