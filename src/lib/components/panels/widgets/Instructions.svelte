@@ -15,6 +15,10 @@
         or {ISLAND_SIZE_THRESHOLD} <MiniTile tileColor={TileColor.Yellow} smaller />!
     </p>
 
+    <p>
+        Destroy <MiniTile tileColor={TileColor.Gray} smaller /> by making groups next to them!
+    </p>
+
     {#if uiState().discoveredBlueTiles}
         <p in:halfFlipRight={{duration: 4000, easing: elasticOut}}>
             Click a <MiniTile tileColor={TileColor.Blue} smaller /> to choose how it destroys tiles!
