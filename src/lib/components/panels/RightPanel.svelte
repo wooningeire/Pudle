@@ -50,11 +50,11 @@ opacity: ${t};`
                 {@const delay = (guesses.length + WORD_LENGTH - 1) * 100}
                 <prev-guesses-item
                     in:flyAbsoluteEarly={{
-                        duration: 500,
+                        duration: 250,
                         x: 50,
                         easing: cubicOut,
                         delay: uiState().gameOver
-                            ? (roundState.pastWords.length - index) * 500
+                            ? (roundState.pastWords.length - index) * 250
                             : 750 + delay,
                     }}
                     out:fly={{
