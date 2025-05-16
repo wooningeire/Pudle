@@ -21,7 +21,7 @@ const resize = () => {
 
 onMount(resize);
 
-setupPersistentSettings();
+onMount(setupPersistentSettings);
 </script>
 
 <svelte:window onresize={resize} />
