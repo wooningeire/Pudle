@@ -121,7 +121,7 @@ onDestroy(() => {
 <svelte:window onclick={() => handleBlueBlur()} />
 
 <tile-view
-    out:explode|global={{duration: 500, easing: cubicOut, delay: Math.random() * 125}}
+    out:explode|global={{duration: 500, easing: cubicOut, delay: Math.random() * 200}}
     onclick={handleBlueClick}
     onkeydown={keyboardClick(handleBlueClick)}
     tabindex={isBlue ? 0 : -1}

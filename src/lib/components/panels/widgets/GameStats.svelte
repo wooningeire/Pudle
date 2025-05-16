@@ -67,7 +67,7 @@ stat-number {
 
     @keyframes flash-green {
         0% {
-            color: var(--tile-green);
+            color: var(--tile-match);
         }
     }
 }
@@ -77,7 +77,7 @@ stat-number {
 
     @keyframes flash-yellow {
         0% {
-            color: var(--tile-yellow);
+            color: var(--tile-misplaced);
         }
     }
 }

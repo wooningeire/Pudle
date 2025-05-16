@@ -1,6 +1,9 @@
 <script lang="ts">
 import { onDestroy, onMount } from "svelte";
-    import { uiState } from "../state/uiState.svelte";
+    import { nextGuessTimeLimit, uiState } from "../state/uiState.svelte";
+    import { settingsState } from "../state/settingsState.svelte";
+    import { base } from "$app/paths";
+    import { MAX_TIME_LIMIT_S_BY_WORD_NO } from "../constants";
 
 const {
     width,
@@ -15,9 +18,17 @@ let gl = <WebGL2RenderingContext | null>null;
 let animationFrame = <number | null>null;
 let resolutionUnif = <WebGLUniformLocation | null>null;
 
-onMount(() => {
-    const TIMESCALE = 0.25;
+const baseTimescale = $derived(settingsState.bgFrozen ? 0 : 0.25);
+const timescale = $derived(
+    baseTimescale
+        * (
+            uiState().paused || uiState().gameOver
+                ? 1
+                : Math.max(1, (MAX_TIME_LIMIT_S_BY_WORD_NO * 1000 + 15000) / (nextGuessTimeLimit() + 15000))
+        )
+);
 
+onMount(() => {
     const vertexShaderSource = `#version 300 es
 in vec4 a_pos;
 
@@ -39,6 +50,7 @@ precision mediump float;
 #define PI 3.1415926535
 
 uniform float time;
+uniform float warpedTime;
 uniform vec2 resolution;
 
 in vec2 v_texcoord;
@@ -74,7 +86,7 @@ vec3 frontColor(vec2 uvTile, bool isEven, vec2 uvCtr) {
     int direction;
     bool isFront;
 
-    float adjustedTime = time - pow(dot(uvCtr, uvCtr), 1.25) * 0.5;
+    float adjustedTime = warpedTime - pow(dot(uvCtr, uvCtr), 1.25) * 0.5;
     int phase = getPhase(adjustedTime);
 
 
@@ -237,6 +249,9 @@ void main(void)
     const timeUnif = gl.getUniformLocation(glProgram, "time");
     gl.uniform1f(timeUnif, 0);
 
+    const warpedTimeUnif = gl.getUniformLocation(glProgram, "warpedTime");
+    gl.uniform1f(warpedTimeUnif, 0);
+
 
     const texture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
@@ -263,9 +278,24 @@ void main(void)
 
     resizeCanvasAndViewport();
 
+    let lastRealTime = <number | null>null;
+    let cumulativeTime = 0;
+    let cumulativeWarpedTime = 0;
 
     const draw = (now: number) => {
-        gl!.uniform1f(timeUnif, now / 1000 * TIMESCALE);
+        const deltaRealTime = (now - (lastRealTime ?? now));
+
+        const deltaTime = deltaRealTime * baseTimescale;
+        const deltaWarpedTime = deltaRealTime * timescale;
+
+        cumulativeTime += deltaTime;
+        cumulativeWarpedTime += deltaWarpedTime;
+
+        lastRealTime = now;
+
+
+        gl!.uniform1f(timeUnif, cumulativeTime / 1000);
+        gl!.uniform1f(warpedTimeUnif, cumulativeWarpedTime / 1000);
 
         gl!.drawArrays(gl!.TRIANGLES, 0, nVerts);
         animationFrame = requestAnimationFrame(draw);

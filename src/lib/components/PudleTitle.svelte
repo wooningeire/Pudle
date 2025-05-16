@@ -108,19 +108,19 @@ bg-graphic {
         display: block;
         width: 5em;
         height: 5rem;
-        background: var(--tile-green);
+        background: var(--tile-match);
         animation: spin-ccw-crossfade 40s infinite linear;
 
         @keyframes spin-ccw-crossfade {
             0% {
                 transform: rotate(0turn);
-                background: var(--tile-green);
+                background: var(--tile-match);
             }
             33.33333% {
-                background: var(--tile-yellow);
+                background: var(--tile-misplaced);
             }
             66.66667% {
-                background: var(--tile-gray);
+                background: var(--tile-absent);
             }
             100% {
                 transform: rotate(-4turn);

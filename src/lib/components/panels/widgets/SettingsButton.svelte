@@ -17,11 +17,11 @@ const togglePaused = () => {
 <pause-button-container>
     <Button
         onClick={togglePaused}
-        moveLeft
-        disabled={uiState().gameOver || uiState().boardsLocked}
+        moveDirection="left"
+        disabled={uiState().boardsLocked}
     >
         {#if !uiState().paused}
-            pause
+            settings
         {:else}
             resume
         {/if}

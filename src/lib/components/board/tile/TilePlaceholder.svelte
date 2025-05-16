@@ -130,7 +130,7 @@ tile-placeholder {
 
 
     &.paused {
-        opacity: 0.25;
+        opacity: 0.125;
     }
 
     &:not(.paused) {

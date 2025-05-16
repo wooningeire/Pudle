@@ -1,6 +1,7 @@
 <script lang="ts">
     import Background from "@/lib/components/Background.svelte";
 import GamePage from "@/lib/components/GamePage.svelte";
+    import { settingsState, setupPersistentSettings } from "@/lib/state/settingsState.svelte";
     import { statsState } from "@/lib/state/statsState.svelte";
     import { onMount } from "svelte";
 
@@ -19,11 +20,18 @@ const resize = () => {
 };
 
 onMount(resize);
+
+setupPersistentSettings();
 </script>
 
 <svelte:window onresize={resize} />
 
-<main bind:this={mainEl}>
+<main
+    bind:this={mainEl}
+    style:--tile-match={settingsState.matchTileColor}
+    style:--tile-misplaced={settingsState.misplacedTileColor}
+    style:--tile-absent={settingsState.absentTileColor}
+>
     {#if !statsState().isFirstGuess}
         <Background
             width={bgWidth}

@@ -26,6 +26,14 @@
     --tile-flip-duration-first-guess: 0.5s;
 
     --tile-size: 3rem;
+
+
+    --tile-match: var(--tile-green);
+    --tile-misplaced: var(--tile-yellow);
+    --tile-absent: var(--tile-gray);
+    --tile-match-dark: var(--tile-green-dark);
+    --tile-misplaced-dark: var(--tile-yellow-dark);
+    --tile-absent-dark: var(--tile-gray-dark);
 }
 
 body {

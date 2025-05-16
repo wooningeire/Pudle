@@ -4,12 +4,12 @@ import type { Snippet } from "svelte";
 const {
     children,
     onClick,
-    moveLeft = false,
+    moveDirection = "right",
     disabled = false,
 }: {
     children: Snippet,
-    onClick: () => (Promise<boolean> | boolean),
-    moveLeft?: boolean,
+    onClick: () => (Promise<boolean> | boolean | void),
+    moveDirection?: "left" | "right" | "up",
     disabled?: boolean,
 } = $props();
 
@@ -19,7 +19,7 @@ let buttonEl = $state<HTMLButtonElement | null>(null);
 const handleClick = async () => {
     buttonEl!.blur();
     shouldFlash = false;
-    const nextFlash = await Promise.resolve(onClick());
+    const nextFlash = await Promise.resolve(onClick() ?? true);
     setTimeout(() => {
         void buttonEl!.offsetHeight; // force reflow
         shouldFlash = nextFlash;
@@ -29,7 +29,9 @@ const handleClick = async () => {
 
 <button-container
     class:success={shouldFlash}
-    class:move-left={moveLeft}
+    class:move-left={moveDirection === "left"}
+    class:move-right={moveDirection === "right"}
+    class:move-up={moveDirection === "up"}
     class:disabled
 >
     <button
@@ -65,14 +67,22 @@ button-container {
         opacity 0.125s ease-in-out;
 
 
-    --hover-movement: 0.5rem;
+    --hover-movement: 0, 0;
 
     &.move-left {
-        --hover-movement: -0.5rem;
+        --hover-movement: -0.5rem, 0;
+    }
+
+    &.move-up {
+        --hover-movement: 0, -0.5rem;
+    }
+
+    &.move-right {
+        --hover-movement: 0.5rem, 0;
     }
         
     &:has(button:hover, button:focus-within) {
-        transform: translateX(var(--hover-movement));
+        transform: translate(var(--hover-movement));
 
         > * {
             filter: brightness(1.125);
@@ -127,7 +137,7 @@ button-shadow {
         @keyframes flash-green-button {
             0%,
             50% {
-                background: var(--tile-green);
+                background: var(--tile-match);
                 border-color: var(--tile-green-dark);
                 color: #fff;
             }

@@ -95,7 +95,7 @@ timer-bg {
     width: 8rem;
     --timer-pct: calc(100% * (1 - var(--timer-progress)));
     mask: linear-gradient(90deg, #0000 var(--timer-pct), #000 var(--timer-pct));
-    background: var(--tile-green);
+    background: var(--tile-match);
     outline: 4px solid var(--color-gray);
 }
 
@@ -104,7 +104,7 @@ timer-bg-pattern {
     width: 100%;
     height: 100%;
     opacity: calc(1 - var(--timer-progress));
-    background: var(--tile-yellow);
+    background: var(--tile-misplaced);
 }
 
 timer-number {

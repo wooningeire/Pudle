@@ -136,7 +136,7 @@ const locateAndDestroyLargeGroups = async () => {
     }
 };
 
-const nextGuessTimeLimit = () => {
+const nextGuessTimeLimitDerived = $derived.by(() => {
     // 3d: https://www.desmos.com/3d/md08iio16o
     // 2d: https://www.desmos.com/calculator/jledjyjotv
 
@@ -147,7 +147,9 @@ const nextGuessTimeLimit = () => {
     const timeLimitByGuessNo = minTimeLimitByWordNo + 2 * (maxTimeLimitByWordNo - minTimeLimitByWordNo) / (1 + Math.exp((roundState.guessedWords.size - 1) * GUESS_TIME_BY_GUESS_NO_DECAY_FAC));
 
     return timeLimitByGuessNo * 1000;
-};
+});
+
+export const nextGuessTimeLimit = () => nextGuessTimeLimitDerived;
 
 const garbageWords = [
     ">.=.<",
@@ -203,7 +205,7 @@ const dropGarbage = async () => {
 
 
     state.boardsLocked = false;
-    restartTimer(dropGarbage, nextGuessTimeLimit());
+    restartTimer(dropGarbage, nextGuessTimeLimitDerived);
 };
 
 /**
@@ -334,7 +336,7 @@ export const consumeGuess = async () => {
     const {shouldContinue} = await execConsumeGuess();
     if (!shouldContinue) return;
 
-    restartTimer(dropGarbage, nextGuessTimeLimit());
+    restartTimer(dropGarbage, nextGuessTimeLimitDerived);
 
     incrementNthGuess();
     state.guess = "";

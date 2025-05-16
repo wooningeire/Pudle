@@ -10,6 +10,8 @@ import { setupInitialLoad } from "../state/initialLoadState.svelte";
 import { onMount } from "svelte";
 import { addMessage, NoticeMessage, noticeState } from "../state/noticeState.svelte";
     import { statsState } from "../state/statsState.svelte";
+    import SettingsPanel from "./panels/SettingsPanel.svelte";
+    import RightPanelOnlySettingsButton from "./panels/RightPanelOnlySettingsButton.svelte";
 
 const removeLoadingMessage = addMessage(NoticeMessage.Loading);
 
@@ -39,6 +41,11 @@ onMount(async () => {
         <LeftPanel />
 
         <RightPanel />
+    {/if}
+    <RightPanelOnlySettingsButton />
+
+    {#if uiState().paused}
+        <SettingsPanel />
     {/if}
 </game-page>
 

@@ -5,11 +5,11 @@
     import { flipRight, halfFlipLeft, halfFlipRight } from "#/transition";
     import Instructions from "./widgets/Instructions.svelte";
     import { flip } from "svelte/animate";
-    import PauseButton from "./widgets/PauseButton.svelte";
     import { statsState } from "$lib/state/statsState.svelte";
     import { uiState } from "@/lib/state/uiState.svelte";
     import { roundState } from "@/lib/state/roundState.svelte";
     import { WORD_LENGTH } from "@/lib/constants";
+    import SettingsButton from "./widgets/SettingsButton.svelte";
 
 const shownGuesses = $derived(
     uiState().gameOver
@@ -29,6 +29,13 @@ const flyAbsoluteEarly = (
 ) => {
 	const style = getComputedStyle(node);
 	const transform = style.transform === 'none' ? '' : style.transform;
+
+    // const rect = node.getBoundingClientRect();
+
+    node.style.position = "absolute";
+    setTimeout(() => {
+        node.style.position = "";
+    }, delay);
 
 	return {
 		delay,
@@ -75,10 +82,6 @@ opacity: ${t};`
             {/each}
         </prev-guesses-grid-list>
     </right-panel-top>
-
-    <right-panel-bottom>
-        <PauseButton />
-    </right-panel-bottom>
 </right-panel>
 
 
@@ -97,6 +100,7 @@ right-panel {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    margin-bottom: 5rem;
 
     transform: rotateY(-35deg) scale(var(--scale-fac));
     transform-origin: left;
@@ -107,9 +111,6 @@ right-panel {
     @media screen and (max-width: $small-width) {
         --scale-fac: 0.75;
     }
-    // @media screen and (max-width: $xsmall-width) {
-    //     display: none;
-    // }
 }
 
 right-panel-top {
